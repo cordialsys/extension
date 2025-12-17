@@ -1,11 +1,12 @@
 {
-  "name": "wxt-svelte-starter",
-  "description": "manifest.json description",
+  "name": "Cordial Browser Extension",
+  "description": "Silent crosschain browser wallet connecting to a Cordial Treasury deployment",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "wxt",
+    "dev:chromium": "wxt -b chromium",
     "dev:edge": "wxt -b edge",
     "dev:firefox": "wxt -b firefox",
     "build": "wxt build",
@@ -17,6 +18,8 @@
     "postinstall": "wxt prepare"
   },
   "devDependencies": {
+    "@scure/base": "^2.0.0",
+    "@serenity-kit/noble-sodium": "^0.2.2",
     "@tsconfig/svelte": "^5.0.5",
     "@wxt-dev/module-svelte": "^2.0.3",
     "svelte": "^5.38.6",

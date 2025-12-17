@@ -1,6 +1,9 @@
 # company-owned devices have locked down extensions
 dev:
-	pnpm run dev:edge
+	pnpm run dev:chromium
+
+build:
+	pnpm run build
 
 # on Linux, do something like `ln -s /usr/bin/xdg-open ~/.local/bin/open`
 demo:
@@ -10,7 +13,7 @@ demo:
 setup-mac: install
 	ln -sf web-ext.config.mac.ts web-ext.config.ts
 
-# configures Edge for `microsoft-edge-stable-bin` package
+# configures Edge for `microsoft-edge-stable-bin` AUR package
 setup-arch: install
 	ln -sf web-ext.config.arch.ts web-ext.config.ts
 
