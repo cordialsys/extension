@@ -5,6 +5,13 @@ dev:
 build:
 	pnpm run build
 
+fmt:
+	pnpm exec prettier . --write
+
+lint:
+	pnpm exec prettier . --check
+	pnpm dlx --package jiti eslint src
+
 # on Linux, do something like `ln -s /usr/bin/xdg-open ~/.local/bin/open`
 demo:
 	open demo/index.html

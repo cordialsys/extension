@@ -18,14 +18,19 @@
     "postinstall": "wxt prepare"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.2",
     "@scure/base": "^2.0.0",
     "@serenity-kit/noble-sodium": "^0.2.2",
     "@tsconfig/svelte": "^5.0.5",
     "@wxt-dev/module-svelte": "^2.0.3",
+    "eslint": "^9.39.2",
+    "globals": "^16.5.0",
+    "prettier": "3.7.4",
     "svelte": "^5.38.6",
     "svelte-check": "^4.3.1",
     "tslib": "^2.8.1",
     "typescript": "^5.9.2",
+    "typescript-eslint": "^8.50.0",
     "wxt": "^0.20.6"
   }
 }
