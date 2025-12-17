@@ -28,6 +28,9 @@ importers:
       globals:
         specifier: ^16.5.0
         version: 16.5.0
+      idb-keyval:
+        specifier: ^6.2.2
+        version: 6.2.2
       prettier:
         specifier: 3.7.4
         version: 3.7.4
@@ -37,6 +40,9 @@ importers:
       svelte-check:
         specifier: ^4.3.1
         version: 4.3.4(picomatch@4.0.3)(svelte@5.46.0)(typescript@5.9.3)
+      temporal-polyfill:
+        specifier: ^0.3.0
+        version: 0.3.0
       tslib:
         specifier: ^2.8.1
         version: 2.8.1
@@ -2211,6 +2217,12 @@ packages:
         integrity: sha512-TwAZM+zE5Tq3lrEHvOlvwgj1XLWQCtaaibSN11Q+gGBAS7Y1uZSWwXXRe4iF6OXnaq1riyQAPFOBtYc77Mxq0g==,
       }
 
+  idb-keyval@6.2.2:
+    resolution:
+      {
+        integrity: sha512-yjD9nARJ/jb1g+CvD0tlhUHOrJ9Sy0P8T9MF3YaLlHnSRpwPfpTX0XIvpmw3gAJUmEu3FiICLBDPXVwyEvrleg==,
+      }
+
   ignore@5.3.2:
     resolution:
       {
@@ -3468,6 +3480,18 @@ packages:
         integrity: sha512-ZhLtvroYxUxr+HQJfMZEDRsGsmU46x12RvAv/zi9584f5KOX7bUrEbhPJ7cKFmUvZTJXi/CFZUYwDC6M1FigPw==,
       }
     engines: { node: ">=18" }
+
+  temporal-polyfill@0.3.0:
+    resolution:
+      {
+        integrity: sha512-qNsTkX9K8hi+FHDfHmf22e/OGuXmfBm9RqNismxBrnSmZVJKegQ+HYYXT+R7Ha8F/YSm2Y34vmzD4cxMu2u95g==,
+      }
+
+  temporal-spec@0.3.0:
+    resolution:
+      {
+        integrity: sha512-n+noVpIqz4hYgFSMOSiINNOUOMFtV5cZQNCmmszA6GiVFVRt3G7AqVyhXjhCSmowvQn+NsGn+jMDMKJYHd3bSQ==,
+      }
 
   thread-stream@3.1.0:
     resolution:
@@ -5011,6 +5035,8 @@ snapshots:
       domutils: 3.2.2
       entities: 6.0.1
 
+  idb-keyval@6.2.2: {}
+
   ignore@5.3.2: {}
 
   ignore@7.0.5: {}
@@ -5710,6 +5736,12 @@ snapshots:
       locate-character: 3.0.0
       magic-string: 0.30.21
       zimmerframe: 1.1.4
+
+  temporal-polyfill@0.3.0:
+    dependencies:
+      temporal-spec: 0.3.0
+
+  temporal-spec@0.3.0: {}
 
   thread-stream@3.1.0:
     dependencies:
