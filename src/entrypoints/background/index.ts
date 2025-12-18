@@ -1,3 +1,11 @@
+// Copyright 2025 Cordial Systems, Inc.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 import { hex } from "@scure/base";
 import {
   cryptoBoxKeyPair,
@@ -20,11 +28,12 @@ export async function showOff() {
   await browser.action.setIcon({ path: GRAY });
 }
 
-async function getOrCreateIdentity(): Identity {
+async function getOrCreateIdentity(): Promise<Identity> {
   let ed255 = await get("identity");
   if (typeof ed255 == "undefined") {
-    ed255 = rotateRawIdentity;
+    ed255 = await rotateRawIdentity();
   }
+  console.log(ed255);
   const publicExport = await crypto.subtle.exportKey("raw", ed255.publicKey);
   const publicHex = hex.encode(new Uint8Array(publicExport));
   return {
@@ -35,8 +44,11 @@ async function getOrCreateIdentity(): Identity {
 }
 
 // TODO: where are the WebCrypto types?
-async function rotateRawIdentity(): unknown {
-  ed255 = await crypto.subtle.generateKey("Ed25519", false, ["sign", "verify"]);
+async function rotateRawIdentity(): Promise<CryptoKeyPair> {
+  const ed255 = await crypto.subtle.generateKey("Ed25519", false, [
+    "sign",
+    "verify",
+  ]);
   await set("identity", ed255);
   return ed255;
 }
@@ -48,7 +60,7 @@ export interface Config {
   addresses: string[];
 }
 
-async function fetchConfig(userId: string): Config {
+async function fetchConfig(userId: string): Promise<Config> {
   const url = `https://admin.cordialapis.com/v1/users/${userId}/extension`;
   const response = await fetch(url, { credentials: "include" });
   return (await response.json()) as Config;
@@ -103,9 +115,7 @@ interface Login {
   certificate: string;
 }
 
-async function doLogin(tab): Login {
-  console.log("browser action triggered,", tab);
-
+async function doLogin(): Promise<Login> {
   //1. prepare request and identity keys
   const identity = await getOrCreateIdentity();
   const key = `ed25519.${identity.publicHex}`;
@@ -184,33 +194,54 @@ function parseJwt(jwt: string): unknown {
   return JSON.parse(decoded);
 }
 
+async function onClicked(tab: globalThis.Browser.tabs.Tab) {
+  console.log("Extension icon clicked in tab", tab);
+  const login = await doLogin();
+  console.log("login", login);
+
+  // set extension to active
+  await showOn();
+
+  let url = "https://admin.cordialapis.com/v1/users";
+  let response = await fetch(url, { credentials: "include" });
+  const users = await response.text();
+  console.log("users", users);
+
+  url = `https://admin.cordialapis.com/v1/users/${login.userId}`;
+  response = await fetch(url, { credentials: "include" });
+  const user = await response.text();
+  console.log("user", user);
+
+  const config = await fetchConfig(login.userId);
+  console.log("config", config);
+
+  // if (tab.id) {
+  //   await browser.tabs.sendMessage(tab.id, { type: "MOUNT_UI" });
+  // }
+}
+
+async function onMessage(
+  request: unknown,
+  sender: globalThis.Browser.runtime.MessageSender,
+  respond: (response?: unknown) => void,
+) {
+  console.log("relay 👉 extension ::", request);
+  try {
+    // TODO: Actually handle it
+    respond({ ok: true, result: "message received" });
+  } catch (e) {
+    console.error("background error", e);
+    try {
+      respond({ ok: false, error: String(e) });
+    } catch (e) {
+      console.error("background error sendResponse error", e);
+    }
+  }
+}
+
 export default defineBackground(() => {
-  console.log("Hello background!", { id: browser.runtime.id });
+  console.log("♥️ Running the Cordial Extension", browser.runtime.id);
 
-  (browser.action ?? browser.browserAction).onClicked.addListener(
-    async (tab) => {
-      const login = await doLogin();
-      console.log("login", login);
-
-      // set extension to active
-      await showOn();
-
-      let url = "https://admin.cordialapis.com/v1/users";
-      let response = await fetch(url, { credentials: "include" });
-      const users = await response.text();
-      console.log("users", users);
-
-      url = `https://admin.cordialapis.com/v1/users/${login.userId}`;
-      response = await fetch(url, { credentials: "include" });
-      const user = await response.text();
-      console.log("user", user);
-
-      const config = await fetchConfig(login.userId);
-      console.log("config", config);
-
-      // if (tab.id) {
-      //   await browser.tabs.sendMessage(tab.id, { type: "MOUNT_UI" });
-      // }
-    },
-  );
+  (browser.action ?? browser.browserAction).onClicked.addListener(onClicked);
+  browser.runtime.onMessage.addListener(onMessage);
 });

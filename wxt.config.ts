@@ -19,8 +19,16 @@ export default defineConfig({
       "https://admin.cordialapis.com/*",
     ],
     permissions: ["storage", "tabs"],
+    web_accessible_resources: [
+      {
+        resources: ["provider.js"],
+        matches: ["*://*/*"],
+      },
+    ],
   },
   webExt: {
-    startUrls: ["https://example.com/"],
+    // startUrls: ["https://example.com/"],
+    startUrls: ["http://127.0.0.1:8080/"],
+    // startUrls: ["file://./demo/index.html"],
   },
 });

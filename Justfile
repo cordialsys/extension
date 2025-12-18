@@ -5,16 +5,23 @@ dev:
 build:
 	pnpm run build
 
+feedback:
+	watchexec -r -w src/ "pnpm run typecheck && pnpm dlx --package jiti eslint src"
+
 fmt:
 	pnpm exec prettier . --write
 
 lint:
 	pnpm exec prettier . --check
+	pnpm run typecheck
 	pnpm dlx --package jiti eslint src
 
 # on Linux, do something like `ln -s /usr/bin/xdg-open ~/.local/bin/open`
 demo:
 	open demo/index.html
+
+host-demo:
+	python -m http.server -d demo 8080
 
 # configures Edge at Mosyle-installed location
 setup-mac: install

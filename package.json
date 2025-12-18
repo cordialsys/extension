@@ -15,7 +15,8 @@
     "zip": "wxt zip",
     "zip:firefox": "wxt zip -b firefox",
     "check": "svelte-check --tsconfig ./tsconfig.json",
-    "postinstall": "wxt prepare"
+    "postinstall": "wxt prepare",
+    "typecheck": "tsc -b && tsc --noEmit"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
