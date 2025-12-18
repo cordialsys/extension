@@ -7,7 +7,7 @@
 // THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 // "unlisted script" that is injected by content.ts into the defi app
-import { Ethereum, ETHEREUM } from "./ethereum";
+import { Ethereum } from "./ethereum";
 import { Solana, SOLANA } from "./solana";
 
 // export class Provider {
@@ -30,6 +30,6 @@ import { Solana, SOLANA } from "./solana";
 export default defineUnlistedScript(() => {
   console.log("♥️ Running the Cordial Provider");
   // const CORDIAL_PROVIDER = new Provider();
-  (window as unknown as { ethereum: Ethereum }).ethereum = ETHEREUM;
+  (window as unknown as { ethereum: Ethereum }).ethereum = new Ethereum();
   (window as unknown as { solana: Solana }).solana = SOLANA;
 });

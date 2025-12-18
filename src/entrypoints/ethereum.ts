@@ -15,6 +15,10 @@
 type Event = string | symbol;
 type Listener = (...args: unknown[]) => void;
 type Listeners = { [event: Event]: Listener[] };
+type Resolver = (value: unknown) => void;
+type Rejecter = (reason?: unknown) => void;
+type RequestId = [string, number];
+type Requests = Map<RequestId, [Resolver, Rejecter]>;
 
 export class EventEmitter {
   private listeners: Listeners = {};
@@ -41,45 +45,94 @@ export class EventEmitter {
 }
 
 export class Ethereum extends EventEmitter implements Provider {
-  private chainId: string;
+  // use a nonce specific per instance, so multiple tabs will not get mixed up
+  private instanceId: string = "abc123";
+  private requestCounter: number = 0;
+  private requests: Requests = new Map();
 
   constructor() {
     super();
-    // ETH Sepolia
-    this.chainId = "0xaa36a7";
-    announce();
+    this.announce();
+    window.addEventListener("eip6963:requestProvider", this.announce);
+    window.addEventListener("message", this.backward);
     console.log("💪 Instantiated the Cordial Ethereum Provider");
   }
 
   async request(args: Request): Promise<unknown> {
-    const { method /*, params*/ } = args as Request;
+    const { method, params } = args as Request;
 
     if (!method) throw new Error("Invalid Ethereum request");
     switch (method) {
+      case "eth_accounts":
+      case "eth_blockNumber":
       case "eth_chainId":
-        return this.chainId;
+      case "eth_requestAccounts": // does https://eips.ethereum.org/EIPS/eip-1102 change anything?
+      case "eth_sendTransaction":
+      case "eth_swithEthereumChain":
+        console.log(method, params);
+        return this.forward(method, params);
+
       default:
         throw providerError(-32601, `Method ${method} not supported`);
     }
   }
+
+  // forward requests to relay
+  private forward(method: string, params?: unknown): Promise<unknown> {
+    const id = this.requestId();
+    const { promise, resolve, reject } = Promise.withResolvers();
+    this.requests.set(id, [resolve, reject]);
+    window.postMessage(
+      {
+        host: window.location.host,
+        origin: window.location.origin,
+        source: "provider",
+        type: "cordial:request",
+        id,
+        method,
+        params,
+      },
+      "*",
+    );
+    return promise;
+  }
+
+  // forward responses from relay ("backwards" from point of view of app)
+  private backward(event: MessageEvent) {
+    const data = event.data;
+    const request = this.requests.get(data.id);
+    if (!request) return;
+    this.requests.delete(data.id);
+    const [resolve, reject] = request;
+    if (data.error) {
+      reject(providerError(-32603, String(data.error)));
+    } else {
+      resolve(data.result);
+    }
+  }
+
+  private requestId(): RequestId {
+    // TODO: use a nonce
+    return [this.instanceId, this.requestCounter++];
+  }
+
+  private announce() {
+    const INFO: Info = {
+      uuid: "9f5b2a5a-2f4d-4a6b-9d3f-6963aaaa0001",
+      name: "Cordial Treasury",
+      icon: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="12" fill="%23006AFF"/><path d="M16 24h32v16H16z" fill="white"/><circle cx="44" cy="32" r="3" fill="%23006AFF"/></svg>`,
+      rdns: "systems.cordial.treasury",
+    };
+
+    window.dispatchEvent(
+      new CustomEvent("eip6963:announceProvider", {
+        detail: { info: INFO, provider: this },
+      }),
+    );
+  }
 }
 
-export const INFO: Info = {
-  uuid: "9f5b2a5a-2f4d-4a6b-9d3f-6963aaaa0001",
-  name: "Cordial Treasury",
-  icon: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="12" fill="%23006AFF"/><path d="M16 24h32v16H16z" fill="white"/><circle cx="44" cy="32" r="3" fill="%23006AFF"/></svg>`,
-  rdns: "systems.cordial.treasury",
-};
-
-export const ETHEREUM = new Ethereum();
-
-function announce() {
-  window.dispatchEvent(
-    new CustomEvent("eip6963:announceProvider", {
-      detail: { info: INFO, provider: ETHEREUM },
-    }),
-  );
-}
+// export const ETHEREUM = new Ethereum();
 
 interface Provider {
   request(args: Request): Promise<unknown>;
