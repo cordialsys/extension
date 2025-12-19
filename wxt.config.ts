@@ -17,6 +17,7 @@ export default defineConfig({
       "https://auth.cordial.systems/*",
       "https://auth.cordialapis.com/*",
       "https://admin.cordialapis.com/*",
+      "https://clerk.cordial.systems/*",
     ],
     permissions: ["storage", "tabs"],
     web_accessible_resources: [

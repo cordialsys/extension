@@ -11,8 +11,17 @@ import {
   cryptoBoxKeyPair,
   cryptoBoxOpenEasy,
 } from "@serenity-kit/noble-sodium";
-import { get, set } from "idb-keyval";
+import { /*del,*/ get, set } from "idb-keyval";
 import { Temporal } from "temporal-polyfill";
+
+// TODO: use fetchTimeout, see https://dmitripavlutin.com/timeout-fetch-request/
+
+// TODO: Should this depend on how long we're still logged into Clerk?
+// 15 minutes
+const LOGIN_REFRESH: number = 15 * 60 * 1000;
+// TODO: Replace with long-polling for immediate updates
+// 5 seconds
+const CONFIG_REFRESH: number = 5 * 1000;
 
 export interface Identity {
   publicKey: CryptoKey;
@@ -20,20 +29,24 @@ export interface Identity {
   publicHex: string;
 }
 
-export async function showOn() {
-  await browser.action.setIcon({ path: COLOR });
-}
-
-export async function showOff() {
-  await browser.action.setIcon({ path: GRAY });
-}
-
 async function getOrCreateIdentity(): Promise<Identity> {
-  let ed255 = await get("identity");
-  if (typeof ed255 == "undefined") {
-    ed255 = await rotateRawIdentity();
+  return await flexIdentity(false);
+}
+
+async function newIdentity(): Promise<Identity> {
+  return await flexIdentity(true);
+}
+
+async function flexIdentity(alwaysNew: boolean): Promise<Identity> {
+  let ed255: CryptoKeyPair | undefined = await get("identity");
+  if (!ed255 || alwaysNew) {
+    ed255 = await crypto.subtle.generateKey("Ed25519", false, [
+      "sign",
+      "verify",
+    ]);
+    await set("identity", ed255);
   }
-  console.log(ed255);
+  // console.log(ed255);
   const publicExport = await crypto.subtle.exportKey("raw", ed255.publicKey);
   const publicHex = hex.encode(new Uint8Array(publicExport));
   return {
@@ -41,16 +54,6 @@ async function getOrCreateIdentity(): Promise<Identity> {
     publicKey: ed255.publicKey,
     publicHex,
   };
-}
-
-// TODO: where are the WebCrypto types?
-async function rotateRawIdentity(): Promise<CryptoKeyPair> {
-  const ed255 = await crypto.subtle.generateKey("Ed25519", false, [
-    "sign",
-    "verify",
-  ]);
-  await set("identity", ed255);
-  return ed255;
 }
 
 export interface Config {
@@ -62,7 +65,7 @@ export interface Config {
 
 async function fetchConfig(userId: string): Promise<Config> {
   const url = `https://admin.cordialapis.com/v1/users/${userId}/extension`;
-  const response = await fetch(url, { credentials: "include" });
+  const response = await fetch(url);
   return (await response.json()) as Config;
 }
 
@@ -91,7 +94,7 @@ interface Request {
   open(boxed: Boxed): string;
 }
 
-function createRequest(): Request {
+function newRequest(): Request {
   const x255 = cryptoBoxKeyPair();
   const publicHex = hex.encode(x255.publicKey);
   return {
@@ -113,75 +116,211 @@ interface Login {
   userId: string;
   identity: Identity;
   certificate: string;
+  expires: number;
 }
 
-async function doLogin(): Promise<Login> {
-  //1. prepare request and identity keys
-  const identity = await getOrCreateIdentity();
-  const key = `ed25519.${identity.publicHex}`;
-  console.log("key", key);
+async function loginFirstName(login: Login): Promise<string> {
+  const url = `https://admin.cordialapis.com/v1/users/${login.userId}`;
+  const response = await fetch(url);
+  const firstName = ((await response.json()) as { first_name: string })
+    .first_name;
+  return firstName;
+}
 
-  const x255 = createRequest();
-  const request = x255.publicHex;
-  console.log("request", request);
+async function clerkLoggedIn(): Promise<boolean> {
+  // response to `/v1/client` is nested under `response` keys
+  interface ClerkClientResponse {
+    response: ClerkSessions;
+  }
 
-  // 2. have the user login
-  let url = `https://auth.cordial.systems/login/flow?key=${key}&request=${request}`;
-  browser.tabs.create({ url });
+  // inside the response, we are interested if the `sessions` array is non-empty
+  interface ClerkSessions {
+    sessions: unknown[];
+  }
 
+  const url = "https://clerk.cordial.systems/v1/client";
+  const response = await fetch(url);
+  if (!response.ok) {
+    return false;
+  }
+  const json = (await response.json()) as ClerkClientResponse;
+  const loggedIn = json.response.sessions.length > 0;
+  // console.log("💯", loggedIn);
+  return loggedIn;
+}
+
+async function loadLogin(): Promise<Login | undefined> {
+  // 1. verify logged in to Clerk
+  if (!(await clerkLoggedIn())) {
+    return undefined;
+  }
+
+  // 2. verify logged in to Cordial SaaS
+  // Note we cannot read it directly.
+  const url = "https://admin.cordialapis.com/v1/users/me";
+  const response = await fetch(url);
+  if (!response.ok) {
+    console.log("could not get /v1/users/me");
+    return undefined;
+  }
+
+  // 3. load it from DB
+  const login = await get("login");
+  if (!login) {
+    return undefined;
+  }
+
+  // 4. verify it is still valid for 10 more minutes
+  // console.log("certificate", login.certificate);
+  // const jwt = parseJwt(login.certificate) as { exp: number; sub: string };
+  // console.log("certificate jwt", jwt);
+  const now = Temporal.Now.instant();
+  // console.log("loaded login", login);
+  const expires = Temporal.Instant.fromEpochMilliseconds(login.expires);
+  if (
+    Temporal.Duration.compare(
+      now.until(expires),
+      Temporal.Duration.from({ minutes: 10 }),
+    ) != 1
+  ) {
+    console.warn("certificate expired");
+    return undefined;
+  }
+
+  // TODO: Verify login is valid
+  // - do a call to admin API to check if cookie is good
+  // - decode certificate to see if it's still valid for > X minutes
+  return login;
+}
+
+async function completeLogin(
+  identity: Identity,
+  request: Request,
+): Promise<Login> {
   // 3.1 fetch boxed access token
-  url = `https://auth.cordial.systems/login/get-access?request=${request}`;
+  let url = `https://auth.cordial.systems/login/get-access?request=${request.publicHex}`;
   let boxed;
   while (true) {
     const response = await fetch(url);
     if (!response.ok) {
-      await setTimeout(() => {}, 1000);
+      await setTimeout(() => {}, 100);
       continue;
     }
     boxed = (await response.json()) as Boxed;
     break;
   }
-  console.log("boxed:", boxed);
+  // console.log("boxed:", boxed);
 
   // 3.2 decrypt access token
-  const access_token = x255.open(boxed);
-  console.log("access-token", access_token);
+  const access_token = request.open(boxed);
+  // console.log("access-token", access_token);
 
   // 3.3 extract user ID
   const jwt = parseJwt(access_token) as { exp: number; sub: string };
   const userId = jwt.sub.replace("user_", "");
-  console.log("userId", userId);
+  // console.log("userId", userId);
   const expires = Temporal.Instant.fromEpochMilliseconds(jwt.exp * 1_000);
-  console.log("expires", expires.toLocaleString());
+  // console.log("expires", expires.toLocaleString());
 
   // 4.1 fetch boxed certificate
-  url = `https://auth.cordial.systems/login/get-certificate?request=${request}`;
+  url = `https://auth.cordial.systems/login/get-certificate?request=${request.publicHex}`;
   while (true) {
     const response = await fetch(url);
     if (!response.ok) {
-      await setTimeout(() => {}, 1000);
+      await setTimeout(() => {}, 100);
       continue;
     }
     boxed = (await response.json()) as Boxed;
     break;
   }
-  console.log("boxed:", boxed);
+  // console.log("boxed:", boxed);
 
   // 4.2 decrypt certificate
-  const certificate = x255.open(boxed);
-  console.log("certificate", certificate);
+  const certificate = request.open(boxed);
+  // console.log("certificate", certificate);
 
   // 5. set cookie
   url = `https://auth.cordialapis.com/login/set-cookie?access_token=${access_token}`;
-  const response = await fetch(url, { credentials: "include" });
-  console.log(response);
+  /*const response =*/ await fetch(url);
+  // console.log(response);
 
   // all done, return
   return {
     userId,
     identity,
     certificate,
+    expires: expires.epochMilliseconds,
   };
+}
+
+//async function turnOn
+async function newLogin(): Promise<Login> {
+  const prevLogin = await loadLogin();
+  if (prevLogin) {
+    // console.log("reusing previous login");
+    return prevLogin;
+  }
+  //1. prepare request and identity keys
+  const identity = await getOrCreateIdentity();
+  const key = `ed25519.${identity.publicHex}`;
+  // console.log("key", key);
+
+  const request = newRequest();
+  const requestHex = request.publicHex;
+  // console.log("request", requestHex);
+
+  // 2. have the user login
+  const url = `https://auth.cordial.systems/login/flow?key=${key}&request=${requestHex}`;
+  if (!(await clerkLoggedIn())) {
+    // console.log("opening tab");
+    browser.tabs.create({ url });
+  } else {
+    // console.log("not opening tab");
+    await fetch(url);
+  }
+
+  return await completeLogin(identity, request);
+}
+
+// TODO: Only refresh if we're somewhat close to expiry of cookie or certificate
+async function refreshLogin(): Promise<Login | undefined> {
+  if (!(await get("on"))) {
+    setTimeout(refreshLogin, LOGIN_REFRESH);
+    return;
+  }
+  if (!(await clerkLoggedIn())) {
+    // can't refresh silently
+    await turnOff();
+    setTimeout(refreshLogin, LOGIN_REFRESH);
+    return;
+  }
+
+  // console.log("refreshing login");
+  const identity = await newIdentity();
+  const key = `ed25519.${identity.publicHex}`;
+  const request = newRequest();
+  const requestHex = request.publicHex;
+
+  const url = `https://auth.cordial.systems/login/flow?key=${key}&request=${requestHex}`;
+  await fetch(url);
+  const login = await completeLogin(identity, request);
+  await set("login", login);
+  setTimeout(refreshLogin, LOGIN_REFRESH);
+  return login;
+}
+
+async function refreshConfig() {
+  const login = await loadLogin();
+  const on = await get("on");
+  if (!on || !login) {
+    setTimeout(refreshConfig, CONFIG_REFRESH);
+    return;
+  }
+  // console.log("refreshing config");
+  const config = await fetchConfig(login.userId);
+  await set("config", config);
+  // console.log("config", config);
+  setTimeout(refreshConfig, CONFIG_REFRESH);
 }
 
 function parseJwt(jwt: string): unknown {
@@ -192,32 +331,6 @@ function parseJwt(jwt: string): unknown {
   const payload = parts[1];
   const decoded = atob(payload.replace(/-/g, "+").replace(/_/g, "/"));
   return JSON.parse(decoded);
-}
-
-async function onClicked(tab: globalThis.Browser.tabs.Tab) {
-  console.log("Extension icon clicked in tab", tab);
-  const login = await doLogin();
-  console.log("login", login);
-
-  // set extension to active
-  await showOn();
-
-  let url = "https://admin.cordialapis.com/v1/users";
-  let response = await fetch(url, { credentials: "include" });
-  const users = await response.text();
-  console.log("users", users);
-
-  url = `https://admin.cordialapis.com/v1/users/${login.userId}`;
-  response = await fetch(url, { credentials: "include" });
-  const user = await response.text();
-  console.log("user", user);
-
-  const config = await fetchConfig(login.userId);
-  console.log("config", config);
-
-  // if (tab.id) {
-  //   await browser.tabs.sendMessage(tab.id, { type: "MOUNT_UI" });
-  // }
 }
 
 async function onMessage(
@@ -239,9 +352,81 @@ async function onMessage(
   }
 }
 
+async function turnOff() {
+  console.log("🥺 Turning off");
+  await set("on", false);
+  // await del("login");
+  await browser.action.setIcon({ path: GRAY });
+}
+
+// TODO: Would be pretty cool to set extension icon to "rotating"
+// while logging in. This can be done with timers: https://stackoverflow.com/a/44082232
+async function turnOn() {
+  console.log("🤩 Turning on");
+  const login = await newLogin();
+  await set("login", login);
+
+  // set extension to active
+  await set("on", true);
+  await browser.action.setIcon({ path: COLOR });
+
+  // // The rest is just fooling around.
+  // let url = "https://admin.cordialapis.com/v1/users";
+  // let response = await fetch(url);
+  // const users = await response.text();
+  // console.log("users", users);
+  //
+  const url = `https://admin.cordialapis.com/v1/users/${login.userId}`;
+  const response = await fetch(url);
+  const firstName = ((await response.json()) as { first_name: string })
+    .first_name;
+  console.log(`👋 Hello, ${firstName}, extension is active!`);
+
+  // refresh every five minutes
+  setTimeout(refreshLogin, LOGIN_REFRESH);
+}
+
+async function onClicked(tab: globalThis.Browser.tabs.Tab) {
+  console.log(`extension icon clicked on page "${tab.title}" (${tab.url})`);
+
+  if (!(await get("on"))) {
+    await turnOn();
+  } else {
+    await turnOff();
+  }
+}
+
+// figure out what state we're in, and ensure the keys
+// - on
+// - login
+// - ...
+// are setup
+async function init() {
+  await refreshConfig();
+  if (!(await get("on"))) {
+    // console.log("didn't get `on`");
+    return await turnOff();
+  }
+  const login = await loadLogin();
+  if (!login) {
+    console.log("didn't get `login`");
+    return await turnOff();
+  }
+
+  setTimeout(refreshLogin, 5 * 1000);
+  const firstName = await loginFirstName(login);
+  console.log(`👋 Welcome back, ${firstName}`);
+  await browser.action.setIcon({ path: COLOR });
+}
+
+async function background() {
+  await init();
+  (browser.action ?? browser.browserAction).onClicked.addListener(onClicked);
+  browser.runtime.onMessage.addListener(onMessage);
+}
+
 export default defineBackground(() => {
   console.log("♥️ Running the Cordial Extension", browser.runtime.id);
 
-  (browser.action ?? browser.browserAction).onClicked.addListener(onClicked);
-  browser.runtime.onMessage.addListener(onMessage);
+  setTimeout(background, 0);
 });
