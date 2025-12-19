@@ -16,13 +16,6 @@ lint:
 	pnpm run typecheck
 	pnpm dlx --package jiti eslint src
 
-# on Linux, do something like `ln -s /usr/bin/xdg-open ~/.local/bin/open`
-demo:
-	open demo/index.html
-
-host-demo:
-	python -m http.server -d demo 8080
-
 # configures Edge at Mosyle-installed location
 setup-mac: install
 	ln -sf web-ext.config.mac.ts web-ext.config.ts
