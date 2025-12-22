@@ -23,6 +23,9 @@ const LOGIN_REFRESH: number = 15 * 60 * 1000;
 // 5 seconds
 const CONFIG_REFRESH: number = 5 * 1000;
 
+// browser.actions is MV3, for firefox MV2 need browser.browserAction
+const browser_action = browser.action ?? browser.browserAction;
+
 export interface Identity {
   publicKey: CryptoKey;
   privateKey: CryptoKey;
@@ -333,15 +336,84 @@ function parseJwt(jwt: string): unknown {
   return JSON.parse(decoded);
 }
 
+// host: "app.uniswap.org"
+// id: (2) ['abc123', 0]
+// method: "eth_requestAccounts"
+// origin: "https://app.uniswap.org"
+// source: "provider"
+// type: "cordial:provider:request"
+
 async function onMessage(
-  request: unknown,
+  request: any,
   sender: globalThis.Browser.runtime.MessageSender,
   respond: (response?: unknown) => void,
 ) {
-  console.log("relay 👉 extension ::", request);
+  console.log(`    relay 👉 extension :: ${request.method} ::`, request);
   try {
+    // https://docs.base.org/base-account/reference/core/provider-rpc-methods/eth_requestAccounts
+    // eth_requestAccounts should return an error if user doesn't give permission
+    // eth_accounts should return an empty array
+    // We can probably handle both the same way (return empty array)
+    if (
+      request?.method === "eth_requestAccounts" ||
+      request?.method === "eth_accounts"
+    ) {
+      // await browser.tabs.sendMessage(sender.tab!.id!, {type: 'provider_response', id: msg?.id, result});
+      const result = [
+        "0x4838b106fce9647bdf1e7877bf73ce8b0bad5f97",
+        "0x25306c5a4f24c10cbdddda531e8b3450da3d1751",
+      ];
+      const response = {
+        type: "cordial:response",
+        data: {
+          id: request?.id,
+          // error: 4001,
+          result,
+        },
+      };
+      console.log(`    relay 👈 extension :: result :: ${result} ::`, response);
+      respond(response);
+      // await browser.tabs.sendMessage(sender.tab!.id!, {type: "cordial:response", id: request?.id, response});
+      return;
+    }
+    if (request?.method === "eth_chainId") {
+      const result = "0xaa36a7";
+      const response = {
+        type: "cordial:response",
+        data: {
+          id: request?.id,
+          result,
+        },
+      };
+      console.log(`    relay 👈 extension :: result :: ${result} ::`, response);
+      respond(response);
+      return;
+    }
+    if (request?.method === "eth_blockNumber") {
+      const result = "0x111111";
+      const response = {
+        type: "cordial:response",
+        data: {
+          id: request?.id,
+          result,
+        },
+      };
+      console.log(`    relay 👈 extension :: result :: ${result} ::`, response);
+      respond(response);
+      return;
+    }
+    // unsupported method;
+    const error = 4200;
+    const response = {
+      type: "cordial:response",
+      data: {
+        id: request?.id,
+        error,
+      },
+    };
     // TODO: Actually handle it
-    respond({ ok: true, result: "message received" });
+    console.log(`    relay 👈 extension :: error :: ${error} ::`, response);
+    respond(response);
   } catch (e) {
     console.error("background error", e);
     try {
@@ -356,7 +428,7 @@ async function turnOff() {
   console.log("🥺 Turning off");
   await set("on", false);
   // await del("login");
-  await browser.action.setIcon({ path: GRAY });
+  await browser_action.setIcon({ path: GRAY });
 }
 
 // TODO: Would be pretty cool to set extension icon to "rotating"
@@ -368,7 +440,7 @@ async function turnOn() {
 
   // set extension to active
   await set("on", true);
-  await browser.action.setIcon({ path: COLOR });
+  await browser_action.setIcon({ path: COLOR });
 
   // // The rest is just fooling around.
   // let url = "https://admin.cordialapis.com/v1/users";
@@ -416,12 +488,12 @@ async function init() {
   setTimeout(refreshLogin, 5 * 1000);
   const firstName = await loginFirstName(login);
   console.log(`👋 Welcome back, ${firstName}`);
-  await browser.action.setIcon({ path: COLOR });
+  await browser_action.setIcon({ path: COLOR });
 }
 
 async function background() {
   await init();
-  (browser.action ?? browser.browserAction).onClicked.addListener(onClicked);
+  browser_action.onClicked.addListener(onClicked);
   browser.runtime.onMessage.addListener(onMessage);
 }
 

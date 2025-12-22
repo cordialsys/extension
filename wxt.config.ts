@@ -30,9 +30,6 @@ export default defineConfig({
   webExt: {
     // startUrls: ["https://example.com/"],
     // startUrls: ["http://127.0.0.1:8080/"],
-    startUrls: [
-      "https://www.orca.so/",
-      "https://app.uniswap.org/",
-    ],
+    startUrls: ["https://www.orca.so/", "https://app.uniswap.org/"],
   },
 });

@@ -30,6 +30,7 @@ import { Solana, SOLANA } from "./solana";
 export default defineUnlistedScript(() => {
   console.log("♥️ Running the Cordial Provider");
   // const CORDIAL_PROVIDER = new Provider();
-  (window as unknown as { ethereum: Ethereum }).ethereum = new Ethereum();
+  // (window as unknown as { ethereum: Ethereum }).ethereum = new Ethereum();
+  new Ethereum();
   (window as unknown as { solana: Solana }).solana = SOLANA;
 });
