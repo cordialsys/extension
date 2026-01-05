@@ -13,5 +13,3 @@ export class Solana {
 }
 
 export const SOLANA = new Solana();
-
-export default defineUnlistedScript(() => {});

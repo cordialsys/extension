@@ -10,29 +10,29 @@
 // https://eips.ethereum.org/EIPS/eip-1193
 // https://eips.ethereum.org/EIPS/eip-6963
 
-import { EventEmitter } from "./events";
+import { EventEmitter } from "./event_emitter";
+import { EthRequest, Nonce } from "./types";
 
 type Resolver = (value: unknown) => void;
 type Rejecter = (reason?: unknown) => void;
-type RequestId = [string, number];
-type Requests = Map<RequestId, [Resolver, Rejecter]>;
+// Map object keys are compared by reference (object identity), not value
+// Currently, Nonce is the primitive type string so it works.
+type Requests = Map<Nonce, [Resolver, Rejecter]>;
 const REQUESTS: Requests = new Map();
 
 export class Ethereum extends EventEmitter implements Provider {
-  // use a nonce specific per instance, so multiple tabs will not get mixed up
-  private instanceId: string = "abc123";
-  private requestCounter: number = 0;
   // private requests: Requests = new Map();
 
   constructor() {
     super();
     window.addEventListener("eip6963:requestProvider", this.announce);
     window.addEventListener("message", this.backward);
+    // TODO: Only announce if the origin is allowed?
     this.announce();
   }
 
-  async request(args: Request): Promise<unknown> {
-    const { method, params } = args as Request;
+  async request(args: EthRequest): Promise<unknown> {
+    const { method, params } = args as EthRequest;
 
     if (!method) throw new Error("Invalid Ethereum request");
     switch (method) {
@@ -52,16 +52,14 @@ export class Ethereum extends EventEmitter implements Provider {
 
   // forward requests to relay
   private forward(method: string, params?: unknown): Promise<unknown> {
-    const id = this.requestId();
+    const id = Nonce.new();
     const { promise, resolve, reject } = Promise.withResolvers();
-    REQUESTS.set(JSON.stringify(id), [resolve, reject]);
+    REQUESTS.set(id, [resolve, reject]);
     window.postMessage(
       {
-        host: window.location.host,
-        origin: window.location.origin,
-        source: "provider",
-        type: "cordial:provider:request",
         id,
+        kind: "cordial:provider:request",
+        provider: "ETH",
         method,
         params,
       },
@@ -73,14 +71,17 @@ export class Ethereum extends EventEmitter implements Provider {
   // forward responses from relay ("backwards" from point of view of app)
   private backward(event: MessageEvent) {
     const data = event.data;
-    if (data.type !== "cordial:response") {
-      // console.log("non-matching data.type", data.type);
+    console.log("eth provider got data", data);
+    if (data.kind !== "cordial:extension:response") {
       return;
     }
     console.log("  eth-provider 👈 relay ::", data);
-    const request = REQUESTS.get(JSON.stringify(data.id));
-    if (!request) return;
-    REQUESTS.delete(JSON.stringify(data.id));
+    const request = REQUESTS.get(data.id);
+    if (!request) {
+      console.log("No such request for", data.id);
+      return;
+    }
+    REQUESTS.delete(data.id);
     const [resolve, reject] = request;
     if (data.error) {
       console.log("app 👈 eth-provider :: rejecting ::", data.result);
@@ -89,11 +90,6 @@ export class Ethereum extends EventEmitter implements Provider {
       console.log("app 👈 eth-provider :: resolving ::", data.result);
       resolve(data.result);
     }
-  }
-
-  private requestId(): RequestId {
-    // TODO: use a nonce
-    return [this.instanceId, this.requestCounter++];
   }
 
   private announce() {
@@ -116,12 +112,7 @@ export class Ethereum extends EventEmitter implements Provider {
 // export const ETHEREUM = new Ethereum();
 
 interface Provider {
-  request(args: Request): Promise<unknown>;
-}
-
-interface Request {
-  method: string;
-  params?: unknown[] | object;
+  request(args: EthRequest): Promise<unknown>;
 }
 
 interface ProviderError extends Error {
@@ -146,5 +137,3 @@ function providerError(
   error.data = data;
   return error;
 }
-
-export default defineUnlistedScript(() => {});

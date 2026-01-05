@@ -12,82 +12,63 @@
 // const MESSAGE_TYPE_RESPONSE = "cordial:response";
 // const MESSAGE_TYPE_ANNOUNCE = "cordial:announce";
 
+import { ProviderRequest, Response } from "@/lib/types";
+
 // This content script relays between our providers and the extension
 export default defineContentScript({
   matches: ["*://*/*"],
   main() {
     // provider-initiated communication: provider -> us -> extension (with response)
-    window.addEventListener("message", forward);
+    window.addEventListener("message", fromProvider);
     // extension-initiated communication: provider <- us <- extension
-    browser.runtime.onMessage.addListener(announce);
+    // browser.runtime.onMessage.addListener(announce);
     // notify
     console.log("♥️ Running the Cordial Relay");
   },
 });
 
-interface ProviderEventData {
-  type: string;
-}
-
-interface ExtensionEvent {
-  type: string;
-  id: unknown;
-  error?: unknown;
-  result?: unknown;
-}
-
-function forward(event: MessageEvent<ProviderEventData>) {
-  // console.log("👉 ::", event);
+function fromProvider(event: MessageEvent<ProviderRequest>) {
   // checks
   if (event.source !== window) return;
   const request = event.data;
-  if (!request || request.type !== "cordial:provider:request") return;
+  if (!request || request.kind !== "cordial:provider:request") return;
 
   // relay
   console.log("  provider 👉 relay ::", request);
-  browser.runtime.sendMessage(request, backward);
+  browser.runtime.sendMessage(request, fromExtension);
 }
 
-function backward(response: ExtensionEvent) {
+function fromExtension(response: Response) {
   console.log("    relay 👈 extension ::", response);
+
   // checks
-  if (!response || response.type !== "cordial:response") return;
+  if (!response || response.kind !== "cordial:extension:response") return;
 
   // relay
-  window.postMessage(
-    {
-      source: "extension",
-      type: "cordial:response",
-      id: response.data.id,
-      result: response.data.result,
-      error: response.data.error,
-      host: window.location.host,
-    },
-    "*",
-  );
+  window.postMessage(response);
 }
 
-function announce(
-  announce: ExtensionEvent,
-  sender: unknown, // globalThis.Browser.runtime.MessageSender,
-  respond: (response?: unknown) => void,
-) {
-  console.log("🤛", announce);
+// function announce(
+//   announce: ExtensionEvent,
+//   sender: unknown, // globalThis.Browser.runtime.MessageSender,
+//   respond: (response?: unknown) => void,
+// ) {
+//   console.log("🤛", announce);
 
-  // checks
-  if (announce.type !== "cordial:announce") return;
+//   // checks
+//   if (announce.type !== "cordial:announce") return;
 
-  // relay and confirm
-  window.postMessage(
-    {
-      source: "extension",
-      type: "cordial:announce",
-      id: announce.id,
-      result: announce.result,
-      error: announce.error,
-      host: window.location.host,
-    },
-    "*",
-  );
-  respond({ received: true });
-}
+//   // relay and confirm
+//   window.postMessage(
+//     {
+//       source: "extension",
+//       type: "cordial:announce",
+//       id: announce.id,
+//       result: announce.result,
+//       error: announce.error,
+//       host: window.location.host,
+//     },
+//     "*",
+//   );
+//   respond({ received: true });
+// }
