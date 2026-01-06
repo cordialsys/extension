@@ -1,3 +1,9 @@
+import * as Eth from "@/lib/types/eth";
+export * as Eth from "@/lib/types/eth";
+
+// import * as Sol from "@/lib/types/sol";
+export * as Sol from "@/lib/types/sol";
+
 export type Nonce = string;
 export const Nonce = {
   new(length = 16): Nonce {
@@ -10,6 +16,13 @@ export const Nonce = {
     ).join("");
   },
 };
+
+type Resolver = (value: unknown) => void;
+type Rejecter = (reason?: unknown) => void;
+// Map object keys are compared by reference (object identity), not value
+// Currently, Nonce is the primitive type string so it works.
+export type Requests = Map<Nonce, [Resolver, Rejecter]>;
+
 export type Provider = "ETH" | "SOL";
 
 export interface ProviderRequest {
@@ -18,12 +31,7 @@ export interface ProviderRequest {
   provider: Provider;
 }
 
-export interface EthRequest {
-  method: string;
-  params?: unknown[] | object;
-}
-
-export interface EthProviderRequest extends ProviderRequest, EthRequest {}
+export interface EthProviderRequest extends ProviderRequest, Eth.Request {}
 
 export interface Response {
   id: Nonce;

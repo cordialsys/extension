@@ -9,7 +9,7 @@
 import { get } from "idb-keyval";
 
 import { browser_action, COLOR } from "@/lib/constants";
-import { refreshConfig } from "@/lib/config";
+import { refreshConfig, Config } from "@/lib/config";
 import {
   loadLogin,
   loginFirstName,
@@ -18,13 +18,6 @@ import {
   turnOn,
 } from "@/lib/login";
 import { handleRequest } from "@/lib/handler";
-
-// host: "app.uniswap.org"
-// id: (2) ['abc123', 0]
-// method: "eth_requestAccounts"
-// origin: "https://app.uniswap.org"
-// source: "provider"
-// type: "cordial:provider:request"
 
 async function onClicked(tab: globalThis.Browser.tabs.Tab) {
   console.log(`extension icon clicked on page "${tab.title}" (${tab.url})`);
@@ -56,6 +49,10 @@ async function init() {
   setTimeout(refreshLogin, 5 * 1000);
   const firstName = await loginFirstName(login);
   console.log(`👋 Welcome back, ${firstName}`);
+  const config = await Config.get();
+  if (config) {
+    console.log("Configuration:", config);
+  }
   await browser_action.setIcon({ path: COLOR });
 }
 

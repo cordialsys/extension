@@ -6,7 +6,7 @@ build:
 	pnpm run build
 
 feedback:
-	watchexec -r -w src/ "pnpm run typecheck && pnpm dlx --package jiti eslint src"
+	watchexec -r -w src/ "clear && pnpm run typecheck && pnpm dlx --package jiti eslint src"
 
 fmt:
 	pnpm exec prettier . --write

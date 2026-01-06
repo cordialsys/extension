@@ -11,13 +11,8 @@
 // https://eips.ethereum.org/EIPS/eip-6963
 
 import { EventEmitter } from "./event_emitter";
-import { EthRequest, Nonce } from "./types";
+import { Eth, Nonce, Requests } from "./types";
 
-type Resolver = (value: unknown) => void;
-type Rejecter = (reason?: unknown) => void;
-// Map object keys are compared by reference (object identity), not value
-// Currently, Nonce is the primitive type string so it works.
-type Requests = Map<Nonce, [Resolver, Rejecter]>;
 const REQUESTS: Requests = new Map();
 
 export class Ethereum extends EventEmitter implements Provider {
@@ -26,13 +21,13 @@ export class Ethereum extends EventEmitter implements Provider {
   constructor() {
     super();
     window.addEventListener("eip6963:requestProvider", this.announce);
-    window.addEventListener("message", this.backward);
+    window.addEventListener("message", this.fromRelay);
     // TODO: Only announce if the origin is allowed?
     this.announce();
   }
 
-  async request(args: EthRequest): Promise<unknown> {
-    const { method, params } = args as EthRequest;
+  async request(args: Eth.Request): Promise<unknown> {
+    const { method, params } = args as Eth.Request;
 
     if (!method) throw new Error("Invalid Ethereum request");
     switch (method) {
@@ -43,7 +38,7 @@ export class Ethereum extends EventEmitter implements Provider {
       case "eth_sendTransaction":
       case "eth_swithEthereumChain":
         console.log(`app 👉 eth-provider ${method}(${params})`);
-        return this.forward(method, params);
+        return this.fromProvider(method, params);
 
       default:
         throw providerError(-32601, `Method ${method} not supported`);
@@ -51,7 +46,7 @@ export class Ethereum extends EventEmitter implements Provider {
   }
 
   // forward requests to relay
-  private forward(method: string, params?: unknown): Promise<unknown> {
+  private fromProvider(method: string, params?: unknown): Promise<unknown> {
     const id = Nonce.new();
     const { promise, resolve, reject } = Promise.withResolvers();
     REQUESTS.set(id, [resolve, reject]);
@@ -69,7 +64,7 @@ export class Ethereum extends EventEmitter implements Provider {
   }
 
   // forward responses from relay ("backwards" from point of view of app)
-  private backward(event: MessageEvent) {
+  private fromRelay(event: MessageEvent) {
     const data = event.data;
     console.log("eth provider got data", data);
     if (data.kind !== "cordial:extension:response") {
@@ -112,7 +107,7 @@ export class Ethereum extends EventEmitter implements Provider {
 // export const ETHEREUM = new Ethereum();
 
 interface Provider {
-  request(args: EthRequest): Promise<unknown>;
+  request(args: Eth.Request): Promise<unknown>;
 }
 
 interface ProviderError extends Error {

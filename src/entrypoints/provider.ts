@@ -8,29 +8,10 @@
 
 // "unlisted script" that is injected by content.ts into the defi app
 import { Ethereum } from "@/lib/ethereum";
-import { Solana, SOLANA } from "@/lib/solana";
+import { Solana } from "@/lib/solana";
 
-// export class Provider {
-//   ethereum: Ethereum;
-//   solana: Solana;
-//
-//   constructor() {
-//     this.ethereum = ETHEREUM;
-//     this.solana = SOLANA;
-//   }
-//
-//   // // expose Ethereum provider
-//   // async request(args: Request): Promise<unknown> {
-//   //   return this.ethereum.request(args);
-//   // }
-//   //
-//   // // expose Solana provider
-// }
-//
 export default defineUnlistedScript(() => {
   console.log("♥️ Running the Cordial Provider");
-  // const CORDIAL_PROVIDER = new Provider();
-  // (window as unknown as { ethereum: Ethereum }).ethereum = new Ethereum();
   new Ethereum();
-  (window as unknown as { solana: Solana }).solana = SOLANA;
+  new Solana();
 });
