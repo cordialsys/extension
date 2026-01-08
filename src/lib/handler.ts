@@ -3,6 +3,11 @@ import { browser_action } from "./constants";
 import { Sdk } from "./sdk";
 import { Err, Eth, Ok, Option, Request, Response, Result, Sol } from "./types";
 
+import {
+  type SolanaSignTransactionInput as SignTransactionInput,
+  type SolanaSignTransactionOutput as SignTransactionOutput,
+} from "@solana/wallet-standard-features";
+
 export function handleRequest(
   request: Request,
   sender: globalThis.Browser.runtime.MessageSender,
@@ -117,7 +122,15 @@ async function process(
       } as Sol.Changes);
     }
 
-    return Ok(`method ${request.method} not implemented`);
+    if (method === "sol_signTransaction") {
+      const result = await sol_signTransaction(
+        config,
+        request.params as SignTransactionInput[],
+      );
+      return result;
+    }
+
+    return Err(`method ${request.method} not implemented`);
   }
 
   if (provider === "ETH") {
@@ -155,6 +168,15 @@ async function process(
   }
 
   return Err("unreachable");
+}
+
+async function sol_signTransaction(
+  config: Config,
+  inputs: SignTransactionInput[],
+): Promise<Result<SignTransactionOutput>> {
+  console.log("config:", config);
+  console.log("inputs:", inputs);
+  return Err("sol_signTransaction not implemented yet");
 }
 
 function eth_accounts(config: Config): string[] {

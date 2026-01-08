@@ -38,7 +38,7 @@ import {
   type StandardDisconnectFeature,
   type StandardEventsFeature,
   // type StandardConnectMethod as ConnectMethod,
-  // type StandardConnectInput as ConnectInput,
+  type StandardConnectInput as ConnectInput,
   type StandardConnectOutput as ConnectOutput,
   // type StandardDisconnectMethod as DisconnectMethod,
   type StandardEventsOnMethod as EventsOnMethod,
@@ -211,40 +211,40 @@ export class Solana implements Wallet {
   }
 
   async signIn(...inputs: SignInInput[]): Promise<SignInOutput[]> {
-    console.log("signIn", inputs);
-    throw new Error("not implemented");
+    return solRequest("sol_signIn", inputs) as Promise<SignInOutput[]>;
   }
 
   async signMessage(
     ...inputs: SignMessageInput[]
   ): Promise<SignMessageOutput[]> {
-    console.log("signMessage", inputs);
-    throw new Error("not implemented");
+    return solRequest("sol_signMessage", inputs) as Promise<
+      SignMessageOutput[]
+    >;
   }
 
   async signAndSendTransaction(
     ...inputs: SignAndSendTransactionInput[]
   ): Promise<SignAndSendTransactionOutput[]> {
-    console.log("signAndSendTransaction", inputs);
-    throw new Error("not implemented");
+    return solRequest("sol_signAndSendTransaction", inputs) as Promise<
+      SignAndSendTransactionOutput[]
+    >;
   }
 
   async signTransaction(
     ...inputs: SignTransactionInput[]
   ): Promise<SignTransactionOutput[]> {
-    console.log("signTransaction", inputs);
-    throw new Error("not implemented");
+    return solRequest("sol_signTransaction", inputs) as Promise<
+      SignTransactionOutput[]
+    >;
   }
 
-  // async connect(input?: ConnectInput): Promise<ConnectOutput> {
-  async connect(): Promise<ConnectOutput> {
-    console.log("Cordial Solana connect");
-    throw new Error("not implemented");
+  async connect(input?: ConnectInput): Promise<ConnectOutput> {
+    return solRequest("standard_connect", input) as Promise<ConnectOutput>;
   }
 
   async disconnect() {
     console.log("Cordial Solana disconnect");
-    await solRequest("solana_disconnect");
+    await solRequest("standard_disconnect");
     if (this.accounts) {
       this.#accounts = [];
       this.emit("change", { accounts: [] });
