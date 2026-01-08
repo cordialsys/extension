@@ -21,7 +21,7 @@
 import { solRequest } from "./relay";
 import { Sol } from "./types";
 
-import { PublicKey } from "@solana/web3.js";
+// import { PublicKey } from "@solana/web3.js";
 import type {
   IdentifierString,
   Wallet,
@@ -88,7 +88,7 @@ function newAccount(chain: IdentifierString, addr: string): Sol.Account {
     SignTransaction,
   ];
 
-  const pubKey = new Uint8Array(Array.from(new PublicKey(addr).toBytes()));
+  const pubKey = new Uint8Array(); //Array.from(new PublicKey(addr).toBytes()));
   return Sol.AccountNew.new(addr, pubKey, [chain], features);
 }
 
