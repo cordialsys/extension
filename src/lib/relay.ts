@@ -38,7 +38,7 @@ export function request(
   const request = Request.new(provider, method, params);
   const id = request.header.id;
   PROMISES.set(id, [resolve, reject]);
-  console.log(`👉 ${provider} request :: ${id} :: ${method} ::`, params);
+  console.log(`❓ ${provider} :: ${id} :: ${method} ::`, params);
   window.postMessage(request, "*");
   return promise;
 }
@@ -80,11 +80,12 @@ export function response(event: MessageEvent<Response>) {
   PROMISES.delete(id);
   const [resolve, reject] = request;
   const result = response.result;
+  const log = `✍ ${provider} :: ${id} :: ${response.method} ::`;
   if (result.ok) {
-    console.log(`👈 ${provider} response :: ${id} ::`, result.value);
+    console.log(log, result.value);
     resolve(result.value);
   } else {
-    console.error(`👈 ${provider} response :: ${id} ::`, result.error);
+    console.error(log, result.error);
     reject(result.error);
   }
 }

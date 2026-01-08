@@ -48,21 +48,6 @@ export class Ethereum extends EventEmitter implements Eth.Provider {
     const { method, params } = args as Eth.Request;
 
     if (!method) throw new Error("Invalid Ethereum request");
-    switch (method) {
-      case "eth_accounts":
-      case "eth_blockNumber":
-      case "eth_chainId":
-      case "eth_requestAccounts": // does https://eips.ethereum.org/EIPS/eip-1102 change anything?
-      case "eth_sendTransaction":
-      case "eth_switchEthereumChain":
-        // console.log(`app 👉 eth-provider ${method}(${params})`);
-        return ethRequest(method, params);
-
-      default:
-        throw Eth.Provider.Error.create(
-          Eth.Code.MethodNotSupported,
-          `Method ${method} not supported`,
-        );
-    }
+    return ethRequest(method, params);
   }
 }

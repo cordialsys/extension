@@ -1,7 +1,7 @@
 import { Config } from "./config";
 import { browser_action } from "./constants";
 import { Sdk } from "./sdk";
-import { Eth, Option, Request, Response, Sol } from "./types";
+import { Err, Eth, Ok, Option, Request, Response, Result, Sol } from "./types";
 
 export function handleRequest(
   request: Request,
@@ -25,35 +25,38 @@ async function handleAsync(
   sender: globalThis.Browser.runtime.MessageSender,
 ): Promise<Response> {
   const config = await Config.get();
-  // console.log("sender", sender);
   const origin = sender.origin;
   const tab = sender.tab?.id;
-  const header = request.header;
-  const id = header.id;
-  const provider = header.provider;
-  console.log(
-    `👉 ${provider} request :: ${id} :: ${request.method} ::`,
-    request.params,
-  );
 
-  const response = await handleInner(request, config, origin, tab);
-  const result = response.result;
+  const id = request.header.id;
+  const method = request.method;
+  const provider = request.header.provider;
+  console.log(`❓ ${provider} :: ${id} :: ${method} ::`, request.params);
+
+  const result = await process(request, config, origin, tab);
+
+  const log = `✍ ${provider} :: ${id} :: ${method} ::`;
   if (result.ok) {
-    console.log(`👈 ${provider} response :: ${id} ::`, result.value);
+    console.log(log, result.value);
   } else {
-    console.error(`👈 ${provider} response :: ${id} ::`, result.error);
+    console.error(log, result.error);
   }
-  return response;
+  return {
+    header: request.header,
+    kind: "cordial:extension:response",
+    method,
+    result,
+  };
 }
 
-async function handleInner(
+async function process(
   request: Request,
   config: Option<Config>,
   origin: Option<string>,
   tab: Option<number>,
-): Promise<Response> {
-  const header = request.header;
-  const provider = header.provider;
+): Promise<Result<unknown>> {
+  const provider = request.header.provider;
+  const method = request.method;
 
   const notAllowed = !config || !origin || !config.origins.includes(origin);
 
@@ -70,29 +73,29 @@ async function handleInner(
     await browser_action.setBadgeBackgroundColor({ tabId: tab, color: "#0F0" });
   }
 
-  if (request.method === "cordial_ping") {
-    return Response.ok(header, "pong");
+  if (method === "cordial_ping") {
+    return Ok("pong");
   }
 
   if (provider === "SOL") {
     if (notAllowed) {
       const error = Eth.Code.Unauthorized;
-      return Response.err(header, error);
+      return Err(error);
     }
     // const request = the_request;
-    if (request.method === "cordial_preconnect") {
+    if (method === "cordial_preconnect") {
       const treasury = await Sdk.treasury.treasury(
         config.treasury.url,
         config.treasury.name,
       );
       if (!treasury) {
-        return Response.err(header, "not ok");
+        return Err("not ok");
       }
       let chain = Sol.MAINNET;
       if (treasury.network !== "mainnet") {
         const network = await Sdk.connector.testnetChainNetwork("SOL");
         if (!network) {
-          return Response.err(header, "not ok");
+          return Err("not ok");
         }
         // console.log("network", network);
         if (network === "devnet") {
@@ -100,7 +103,7 @@ async function handleInner(
         } else if (network === "testnet") {
           chain = Sol.TESTNET;
         } else {
-          return Response.err(header, "not ok");
+          return Err("not ok");
         }
         // TODO: Query connector.cordialapis.com to get configured !mainnet
       }
@@ -108,52 +111,50 @@ async function handleInner(
       const addresses: string[] = config.addresses
         .filter((a) => a.startsWith(prefix))
         .map((a) => a.slice(prefix.length));
-      return Response.ok(header, {
+      return Ok({
         addresses,
         chain,
       } as Sol.Changes);
     }
 
-    return Response.ok(header, `method ${request.method} not implemented`);
+    return Ok(`method ${request.method} not implemented`);
   }
 
   if (provider === "ETH") {
     if (notAllowed) {
       const error = Eth.Code.Unauthorized;
-      return Response.err(header, error);
+      return Err(error);
     }
     // https://docs.base.org/base-account/reference/core/provider-rpc-methods/eth_requestAccounts
     // eth_requestAccounts should return an error if user doesn't give permission
     // eth_accounts should return an empty array
     // We can probably handle both the same way (return empty array)
-    if (
-      request.method === "eth_requestAccounts" ||
-      request.method === "eth_accounts"
-    ) {
+    if (method === "eth_requestAccounts" || method === "eth_accounts") {
       // const addresses = [
       //   "0x4838b106fce9647bdf1e7877bf73ce8b0bad5f97",
       //   "0x25306c5a4f24c10cbdddda531e8b3450da3d1751",
       // ];
       const addresses = eth_accounts(config);
-      return Response.ok(header, addresses);
+      return Ok(addresses);
     }
-    if (request.method === "eth_chainId") {
+    if (method === "eth_chainId") {
       const chainId = await eth_chainId(config);
-      if (!chainId) return Response.err(header, "not ok");
-      return Response.ok(header, chainId);
+      if (!chainId) return Err("not ok");
+      return Ok(chainId);
     }
-    if (request.method === "eth_blockNumber") {
+    if (method === "eth_blockNumber") {
       const blockNumber = await eth_blockNumber(config);
-      if (!blockNumber) return Response.err(header, "not ok");
-      return Response.ok(header, blockNumber);
+      if (!blockNumber) return Err("not ok");
+      return Ok(blockNumber);
     }
 
     // unsupported method;
+    console.error(`💔 Method ${method} not supported`);
     const error = Eth.Code.Unsupported;
-    return Response.err(header, error);
+    return Err(error);
   }
 
-  return Response.err(header, "unreachable");
+  return Err("unreachable");
 }
 
 function eth_accounts(config: Config): string[] {

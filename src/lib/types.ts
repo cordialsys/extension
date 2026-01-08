@@ -51,42 +51,28 @@ export const Request = {
 export interface Response<T = unknown, E = unknown> {
   header: Header;
   kind: "cordial:extension:response";
+  method: string;
   result: Result<T, E>;
 }
 
 export type Option<T> = T | undefined;
 
+export type Result<T, E = unknown> = Ok<T> | Err<E>;
+
 export interface Ok<T = unknown> {
   ok: true;
   value: T;
 }
+
+export function Ok<T = unknown>(value: T): Ok<T> {
+  return { ok: true, value };
+}
+
 export interface Err<E = unknown> {
   ok: false;
   error: E;
 }
 
-export type Result<T, E = unknown> = Ok<T> | Err<E>;
-
-export const Response = {
-  ok(header: Header, value: unknown): Response {
-    return {
-      header,
-      kind: "cordial:extension:response",
-      result: {
-        ok: true,
-        value,
-      },
-    };
-  },
-
-  err(header: Header, error: unknown): Response {
-    return {
-      header,
-      kind: "cordial:extension:response",
-      result: {
-        ok: false,
-        error,
-      },
-    };
-  },
-};
+export function Err<E = unknown>(error: E): Err<E> {
+  return { ok: false, error };
+}
