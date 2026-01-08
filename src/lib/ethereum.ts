@@ -15,15 +15,29 @@ import { Eth, Nonce, Requests } from "./types";
 
 const REQUESTS: Requests = new Map();
 
-export class Ethereum extends EventEmitter implements Provider {
+const INFO: Eth.Info = {
+  uuid: "db69fd17-3a07-453d-92c9-e51a6027de1d",
+  name: "Cordial Wallet (ETH)",
+  icon: `data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgNDQgNDQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSIgc3R5bGU9ImZpbGwtcnVsZTpldmVub2RkO2NsaXAtcnVsZTpldmVub2RkO3N0cm9rZS1saW5lam9pbjpyb3VuZDtzdHJva2UtbWl0ZXJsaW1pdDoyIj48cGF0aCBkPSJNMjAuNDY5IDMwLjgwMmM1LjcwNyAwIDEwLjMzMy00LjYyNiAxMC4zMzMtMTAuMzMzcy00LjYyNi0xMC4zMzQtMTAuMzMzLTEwLjMzNGMtNS43MDggMC0xMC4zMzQgNC42MjctMTAuMzM0IDEwLjMzNHM0LjYyNiAxMC4zMzMgMTAuMzM0IDEwLjMzM20wIDMuOWM3Ljg2IDAgMTQuMjMzLTYuMzcyIDE0LjIzMy0xNC4yMzNTMjguMzI5IDYuMjM2IDIwLjQ2OSA2LjIzNiA2LjIzNSAxMi42MDggNi4yMzUgMjAuNDY5czYuMzczIDE0LjIzMyAxNC4yMzQgMTQuMjMzIiBzdHlsZT0iZmlsbDojMzczZDNkIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgyLjE0MSAxLjUzMSkiLz48cGF0aCBkPSJtMjMuOTA0LjI4LS42NDMgMy44NDZhMTYuOCAxNi44IDAgMCAwLTUuNTE3IDBMMTcuMTAxLjI4YTIwLjcgMjAuNyAwIDAgMSA2LjgwMyAwTTEzLjMzNiAxLjI4NWwxLjM2NSAzLjY1M2ExNi42IDE2LjYgMCAwIDAtNC43NjQgMi43NTFMNy40NDkgNC42ODRhMjAuNSAyMC41IDAgMCAxIDUuODg3LTMuMzk5TTQuNjkyIDcuNDM2bDMuMDEgMi40ODRhMTYuNiAxNi42IDAgMCAwLTIuNzU2IDQuNzU3bC0zLjY1OC0xLjM2M2EyMC40IDIwLjQgMCAwIDEgMy40MDQtNS44NzhNLjI4MSAxNy4wNzNBMjAuNSAyMC41IDAgMCAwIDAgMjAuNDY5cS4wMDIgMS43MzcuMjgxIDMuMzk2bDMuODUyLS42NDJhMTYuNiAxNi42IDAgMCAxLS4yMjgtMi43NTRxLjAwMS0xLjQxMy4yMjgtMi43NTR6bTEuMDA3IDEwLjU1MSAzLjY1OC0xLjM2M2ExNi42IDE2LjYgMCAwIDAgMi43NTYgNC43NTZsLTMuMDEgMi40ODRhMjAuNCAyMC40IDAgMCAxLTMuNDA0LTUuODc3bTYuMTYxIDguNjI5IDIuNDg4LTMuMDA1YTE2LjYgMTYuNiAwIDAgMCA0Ljc2NCAyLjc1MWwtMS4zNjUgMy42NTNhMjAuNSAyMC41IDAgMCAxLTUuODg3LTMuMzk5bTkuNjUyIDQuNDA0LjY0My0zLjg0NWExNi44IDE2LjggMCAwIDAgNS41MTcgMGwuNjQzIDMuODQ1YTIwLjYgMjAuNiAwIDAgMS0zLjQwMS4yODFjLTEuMTU5IDAtMi4yOTYtLjA5Ni0zLjQwMi0uMjgxbTEwLjU2OS0xLjAwNS0xLjM2Ni0zLjY1M2ExNi42IDE2LjYgMCAwIDAgNC43NjQtMi43NTFsMi40ODkgMy4wMDVhMjAuNSAyMC41IDAgMCAxLTUuODg3IDMuMzk5bTguNjQzLTYuMTUxLTMuMDEtMi40ODRhMTYuNiAxNi42IDAgMCAwIDIuNzU2LTQuNzU2bDMuNjU5IDEuMzYzYTIwLjUgMjAuNSAwIDAgMS0zLjQwNSA1Ljg3NyIgc3R5bGU9ImZpbGw6I2Q3M2Q3NCIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMi4xNDEgMS41MzEpIi8+PC9zdmc+`,
+  rdns: "systems.cordial.treasury",
+};
+
+export class Ethereum extends EventEmitter implements Eth.Provider {
   // private requests: Requests = new Map();
 
   constructor() {
     super();
-    window.addEventListener("eip6963:requestProvider", this.announce);
-    window.addEventListener("message", this.fromRelay);
-    // TODO: Only announce if the origin is allowed?
-    this.announce();
+  }
+
+  async start() {
+    window.addEventListener("message", fromRelay);
+    try {
+      // const info = await toProvider("cordial_preconnect");
+      window.addEventListener("eip6963:requestProvider", this.announce);
+      this.announce();
+    } catch (error) {
+      console.error(`preconnect error: ${error}`);
+    }
   }
 
   async request(args: Eth.Request): Promise<unknown> {
@@ -36,65 +50,19 @@ export class Ethereum extends EventEmitter implements Provider {
       case "eth_chainId":
       case "eth_requestAccounts": // does https://eips.ethereum.org/EIPS/eip-1102 change anything?
       case "eth_sendTransaction":
-      case "eth_swithEthereumChain":
+      case "eth_switchEthereumChain":
         console.log(`app 👉 eth-provider ${method}(${params})`);
-        return this.fromProvider(method, params);
+        return toProvider(method, params);
 
       default:
-        throw providerError(-32601, `Method ${method} not supported`);
-    }
-  }
-
-  // forward requests to relay
-  private fromProvider(method: string, params?: unknown): Promise<unknown> {
-    const id = Nonce.new();
-    const { promise, resolve, reject } = Promise.withResolvers();
-    REQUESTS.set(id, [resolve, reject]);
-    window.postMessage(
-      {
-        id,
-        kind: "cordial:provider:request",
-        provider: "ETH",
-        method,
-        params,
-      },
-      "*",
-    );
-    return promise;
-  }
-
-  // forward responses from relay ("backwards" from point of view of app)
-  private fromRelay(event: MessageEvent) {
-    const data = event.data;
-    console.log("eth provider got data", data);
-    if (data.kind !== "cordial:extension:response") {
-      return;
-    }
-    console.log("  eth-provider 👈 relay ::", data);
-    const request = REQUESTS.get(data.id);
-    if (!request) {
-      console.log("No such request for", data.id);
-      return;
-    }
-    REQUESTS.delete(data.id);
-    const [resolve, reject] = request;
-    if (data.error) {
-      console.log("app 👈 eth-provider :: rejecting ::", data.result);
-      reject(providerError(-32603, String(data.error)));
-    } else {
-      console.log("app 👈 eth-provider :: resolving ::", data.result);
-      resolve(data.result);
+        throw Eth.ProviderError.create(
+          Eth.ErrorCode.MethodNotSupported,
+          `Method ${method} not supported`,
+        );
     }
   }
 
   private announce() {
-    const INFO: Info = {
-      uuid: "9f5b2a5a-2f4d-4a6b-9d3f-6963aaaa0001",
-      name: "Cordial Treasury",
-      icon: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="12" fill="%23006AFF"/><path d="M16 24h32v16H16z" fill="white"/><circle cx="44" cy="32" r="3" fill="%23006AFF"/></svg>`,
-      rdns: "systems.cordial.treasury",
-    };
-
     window.dispatchEvent(
       new CustomEvent("eip6963:announceProvider", {
         detail: { info: INFO, provider: this },
@@ -104,31 +72,45 @@ export class Ethereum extends EventEmitter implements Provider {
   }
 }
 
-// export const ETHEREUM = new Ethereum();
-
-interface Provider {
-  request(args: Eth.Request): Promise<unknown>;
+// forward responses from relay ("backwards" from point of view of app)
+function fromRelay(event: MessageEvent) {
+  const data = event.data;
+  console.log("eth provider got data", data);
+  if (data.kind !== "cordial:extension:response") {
+    return;
+  }
+  console.log("  eth-provider 👈 relay ::", data);
+  const request = REQUESTS.get(data.id);
+  if (!request) {
+    console.log("No such request for", data.id);
+    return;
+  }
+  REQUESTS.delete(data.id);
+  const [resolve, reject] = request;
+  if (!data.result.ok) {
+    console.log("app 👈 eth-provider :: rejecting ::", data.result.error);
+    // reject(providerError(Eth.ErrorCode.InternalRpcError, String(data.error)));
+    reject(data.error);
+  } else {
+    console.log("app 👈 eth-provider :: resolving ::", data.result.value);
+    resolve(data.result);
+  }
 }
 
-interface ProviderError extends Error {
-  code: number;
-  data?: unknown;
-}
-
-interface Info {
-  uuid: string;
-  name: string;
-  icon: string;
-  rdns: string;
-}
-
-function providerError(
-  code: number,
-  message: string,
-  data?: unknown,
-): ProviderError {
-  const error = new Error(message) as ProviderError;
-  error.code = code;
-  error.data = data;
-  return error;
+// forward requests to relay
+function toProvider(method: string, params?: unknown): Promise<unknown> {
+  const id = Nonce.new();
+  const { promise, resolve, reject } = Promise.withResolvers();
+  REQUESTS.set(id, [resolve, reject]);
+  window.postMessage(
+    {
+      id,
+      kind: "cordial:provider:request",
+      provider: "ETH",
+      method,
+      params,
+    },
+    "*",
+  );
+  return promise;
 }

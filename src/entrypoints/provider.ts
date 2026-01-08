@@ -12,6 +12,8 @@ import { Solana } from "@/lib/solana";
 
 export default defineUnlistedScript(() => {
   console.log("♥️ Running the Cordial Provider");
-  new Ethereum();
-  new Solana();
+  const eth = new Ethereum();
+  setTimeout(eth.start.bind(eth), 0);
+  const sol = new Solana();
+  setTimeout(sol.start.bind(sol), 0);
 });

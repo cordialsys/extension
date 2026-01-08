@@ -2,9 +2,11 @@ import { get, set } from "idb-keyval";
 
 import { CONFIG_REFRESH } from "./constants";
 import { loadLogin } from "./login";
+import { Sdk } from "./sdk";
+import { Option } from "./types";
 
 export const Config = {
-  get(): Promise<Config | undefined> {
+  get(): Promise<Option<Config>> {
     return get("config");
   },
 };
@@ -25,14 +27,8 @@ export interface Treasury {
   url: string;
 }
 
-async function fetchConfig(userId: string): Promise<Config | undefined> {
-  const url = `https://admin.cordialapis.com/v1/users/${userId}/extension`;
-  const response = await fetch(url);
-  if (!response.ok) {
-    return undefined;
-  }
-  const extension = (await response.json()) as Extension;
-  return extension.config;
+async function fetchConfig(userId: string): Promise<Option<Config>> {
+  return await Sdk.admin.users.extension(userId);
 }
 
 export async function refreshConfig() {

@@ -11,4 +11,9 @@ export default defineConfig([
     languageOptions: { globals: globals.browser },
   },
   tseslint.configs.recommended,
+  {
+    rules: {
+      "@typescript-eslint/no-namespace": "off",
+    },
+  },
 ]);

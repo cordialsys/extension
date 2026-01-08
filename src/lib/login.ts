@@ -6,6 +6,7 @@ import {
 import { Temporal } from "temporal-polyfill";
 import { get, set } from "idb-keyval";
 import { browser_action, COLOR, GRAY, LOGIN_REFRESH } from "./constants";
+import { Option } from "./types";
 
 export interface Identity {
   publicKey: CryptoKey;
@@ -40,7 +41,7 @@ async function newIdentity(): Promise<Identity> {
 }
 
 async function flexIdentity(alwaysNew: boolean): Promise<Identity> {
-  let ed255: CryptoKeyPair | undefined = await get("identity");
+  let ed255: Option<CryptoKeyPair> = await get("identity");
   if (!ed255 || alwaysNew) {
     ed255 = await crypto.subtle.generateKey("Ed25519", false, [
       "sign",
@@ -150,7 +151,7 @@ async function clerkLoggedIn(): Promise<boolean> {
   return loggedIn;
 }
 
-export async function loadLogin(): Promise<Login | undefined> {
+export async function loadLogin(): Promise<Option<Login>> {
   // 1. verify logged in to Clerk
   if (!(await clerkLoggedIn())) {
     return undefined;
@@ -284,7 +285,7 @@ async function newLogin(): Promise<Login> {
 }
 
 // TODO: Only refresh if we're somewhat close to expiry of cookie or certificate
-export async function refreshLogin(): Promise<Login | undefined> {
+export async function refreshLogin(): Promise<Option<Login>> {
   if (!(await get("on"))) {
     setTimeout(refreshLogin, LOGIN_REFRESH);
     return;

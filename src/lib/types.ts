@@ -29,31 +29,50 @@ export interface ProviderRequest {
   id: Nonce;
   kind: "cordial:provider:request";
   provider: Provider;
+  method: string;
 }
 
 export interface EthProviderRequest extends ProviderRequest, Eth.Request {}
 
-export interface Response {
+export interface Response<T = unknown, E = unknown> {
   id: Nonce;
   kind: "cordial:extension:response";
-  error?: unknown;
-  result?: unknown;
+  result: Result<T, E>;
 }
 
+export type Option<T> = T | undefined;
+
+export interface Ok<T = unknown> {
+  ok: true;
+  value: T;
+}
+export interface Err<E = unknown> {
+  ok: false;
+  error: E;
+}
+
+export type Result<T, E = unknown> = Ok<T> | Err<E>;
+
 export const Response = {
-  new(id: Nonce, result: unknown): Response {
+  ok(id: Nonce, value: unknown): Response {
     return {
       id,
       kind: "cordial:extension:response",
-      result,
+      result: {
+        ok: true,
+        value,
+      },
     };
   },
 
-  fail(id: Nonce, error: unknown): Response {
+  err(id: Nonce, error: unknown): Response {
     return {
       id,
       kind: "cordial:extension:response",
-      error,
+      result: {
+        ok: false,
+        error,
+      },
     };
   },
 };

@@ -8,11 +8,7 @@
  * THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-// const MESSAGE_TYPE_REQUEST = "cordial:request";
-// const MESSAGE_TYPE_RESPONSE = "cordial:response";
-// const MESSAGE_TYPE_ANNOUNCE = "cordial:announce";
-
-import { ProviderRequest, Response } from "@/lib/types";
+import { fromProvider } from "@/lib/relay";
 
 // This content script relays between our providers and the extension
 export default defineContentScript({
@@ -26,27 +22,6 @@ export default defineContentScript({
     console.log("♥️ Running the Cordial Relay");
   },
 });
-
-function fromProvider(event: MessageEvent<ProviderRequest>) {
-  // checks
-  if (event.source !== window) return;
-  const request = event.data;
-  if (!request || request.kind !== "cordial:provider:request") return;
-
-  // relay
-  console.log("  provider 👉 relay ::", request);
-  browser.runtime.sendMessage(request, fromExtension);
-}
-
-function fromExtension(response: Response) {
-  console.log("    relay 👈 extension ::", response);
-
-  // checks
-  if (!response || response.kind !== "cordial:extension:response") return;
-
-  // relay
-  window.postMessage(response);
-}
 
 // function announce(
 //   announce: ExtensionEvent,
