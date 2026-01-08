@@ -2,20 +2,16 @@ import { Config } from "./config";
 import { browser_action } from "./constants";
 import { Sdk } from "./sdk";
 import { Err, Eth, Ok, Option, Request, Response, Result, Sol } from "./types";
+import * as sol from "./handler/sol";
 
-import {
-  type SolanaSignTransactionInput as SignTransactionInput,
-  type SolanaSignTransactionOutput as SignTransactionOutput,
-} from "@solana/wallet-standard-features";
+import type * as solTypes from "@solana/wallet-standard-features";
 
 export function handleRequest(
   request: Request,
   sender: globalThis.Browser.runtime.MessageSender,
   respond: (response: Response) => void,
 ) {
-  if (!request || request.kind !== "cordial:provider:request") {
-    return;
-  }
+  if (!request || request.kind !== "cordial:provider:request") return;
 
   // Bit weird.. if handleRequest is async, then the responder doesn't work
   // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/onMessage#sending_an_asynchronous_response_using_sendresponse
@@ -30,26 +26,19 @@ async function handleAsync(
   sender: globalThis.Browser.runtime.MessageSender,
 ): Promise<Response> {
   const config = await Config.get();
-  const origin = sender.origin;
-  const tab = sender.tab?.id;
 
-  const id = request.header.id;
-  const method = request.method;
-  const provider = request.header.provider;
-  console.log(`❓ ${provider} :: ${id} :: ${method} ::`, request.params);
+  const log = `${request.header.provider} :: ${request.header.id} :: ${request.method} ::`;
+  console.log("❓", log, request.params);
 
-  const result = await process(request, config, origin, tab);
+  const result = await process(request, config, sender.origin, sender.tab?.id);
 
-  const log = `✍ ${provider} :: ${id} :: ${method} ::`;
-  if (result.ok) {
-    console.log(log, result.value);
-  } else {
-    console.error(log, result.error);
-  }
+  if (result.ok) console.log("✍", log, result.value);
+  else console.error("✍", log, result.error);
+
   return {
     header: request.header,
     kind: "cordial:extension:response",
-    method,
+    method: request.method,
     result,
   };
 }
@@ -123,11 +112,10 @@ async function process(
     }
 
     if (method === "sol_signTransaction") {
-      const result = await sol_signTransaction(
+      return await sol.signTransaction(
         config,
-        request.params as SignTransactionInput[],
+        request.params as solTypes.SolanaSignTransactionInput[],
       );
-      return result;
     }
 
     return Err(`method ${request.method} not implemented`);
@@ -143,10 +131,6 @@ async function process(
     // eth_accounts should return an empty array
     // We can probably handle both the same way (return empty array)
     if (method === "eth_requestAccounts" || method === "eth_accounts") {
-      // const addresses = [
-      //   "0x4838b106fce9647bdf1e7877bf73ce8b0bad5f97",
-      //   "0x25306c5a4f24c10cbdddda531e8b3450da3d1751",
-      // ];
       const addresses = eth_accounts(config);
       return Ok(addresses);
     }
@@ -168,15 +152,6 @@ async function process(
   }
 
   return Err("unreachable");
-}
-
-async function sol_signTransaction(
-  config: Config,
-  inputs: SignTransactionInput[],
-): Promise<Result<SignTransactionOutput>> {
-  console.log("config:", config);
-  console.log("inputs:", inputs);
-  return Err("sol_signTransaction not implemented yet");
 }
 
 function eth_accounts(config: Config): string[] {
