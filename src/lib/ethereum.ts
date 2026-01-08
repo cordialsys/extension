@@ -11,9 +11,8 @@
 // https://eips.ethereum.org/EIPS/eip-6963
 
 import { EventEmitter } from "./event_emitter";
-import { Eth, Nonce, Requests } from "./types";
-
-const REQUESTS: Requests = new Map();
+import { ethRequest } from "./relay";
+import { Eth } from "./types";
 
 const INFO: Eth.Info = {
   uuid: "db69fd17-3a07-453d-92c9-e51a6027de1d",
@@ -23,21 +22,26 @@ const INFO: Eth.Info = {
 };
 
 export class Ethereum extends EventEmitter implements Eth.Provider {
-  // private requests: Requests = new Map();
-
   constructor() {
     super();
   }
 
   async start() {
-    window.addEventListener("message", fromRelay);
     try {
-      // const info = await toProvider("cordial_preconnect");
       window.addEventListener("eip6963:requestProvider", this.announce);
       this.announce();
     } catch (error) {
-      console.error(`preconnect error: ${error}`);
+      console.error(`Ethereum provider start error: ${error}`);
     }
+  }
+
+  private announce() {
+    window.dispatchEvent(
+      new CustomEvent("eip6963:announceProvider", {
+        detail: { info: INFO, provider: this },
+      }),
+    );
+    console.log("📢 Announced Cordial Ethereum provider");
   }
 
   async request(args: Eth.Request): Promise<unknown> {
@@ -51,66 +55,14 @@ export class Ethereum extends EventEmitter implements Eth.Provider {
       case "eth_requestAccounts": // does https://eips.ethereum.org/EIPS/eip-1102 change anything?
       case "eth_sendTransaction":
       case "eth_switchEthereumChain":
-        console.log(`app 👉 eth-provider ${method}(${params})`);
-        return toProvider(method, params);
+        // console.log(`app 👉 eth-provider ${method}(${params})`);
+        return ethRequest(method, params);
 
       default:
-        throw Eth.ProviderError.create(
-          Eth.ErrorCode.MethodNotSupported,
+        throw Eth.Provider.Error.create(
+          Eth.Code.MethodNotSupported,
           `Method ${method} not supported`,
         );
     }
   }
-
-  private announce() {
-    window.dispatchEvent(
-      new CustomEvent("eip6963:announceProvider", {
-        detail: { info: INFO, provider: this },
-      }),
-    );
-    console.log("📢 Announced Cordial Ethereum provider");
-  }
-}
-
-// forward responses from relay ("backwards" from point of view of app)
-function fromRelay(event: MessageEvent) {
-  const data = event.data;
-  console.log("eth provider got data", data);
-  if (data.kind !== "cordial:extension:response") {
-    return;
-  }
-  console.log("  eth-provider 👈 relay ::", data);
-  const request = REQUESTS.get(data.id);
-  if (!request) {
-    console.log("No such request for", data.id);
-    return;
-  }
-  REQUESTS.delete(data.id);
-  const [resolve, reject] = request;
-  if (!data.result.ok) {
-    console.log("app 👈 eth-provider :: rejecting ::", data.result.error);
-    // reject(providerError(Eth.ErrorCode.InternalRpcError, String(data.error)));
-    reject(data.error);
-  } else {
-    console.log("app 👈 eth-provider :: resolving ::", data.result.value);
-    resolve(data.result);
-  }
-}
-
-// forward requests to relay
-function toProvider(method: string, params?: unknown): Promise<unknown> {
-  const id = Nonce.new();
-  const { promise, resolve, reject } = Promise.withResolvers();
-  REQUESTS.set(id, [resolve, reject]);
-  window.postMessage(
-    {
-      id,
-      kind: "cordial:provider:request",
-      provider: "ETH",
-      method,
-      params,
-    },
-    "*",
-  );
-  return promise;
 }

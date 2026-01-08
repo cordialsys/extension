@@ -10,7 +10,7 @@ export interface Request {
   params?: unknown[] | object;
 }
 
-export enum ErrorCode {
+export enum Code {
   // The user rejected the request.
   Rejected = 4001,
   // The requested method and/or account has not been authorized by the user.
@@ -34,16 +34,20 @@ export interface Provider {
   request(args: Request): Promise<unknown>;
 }
 
-export interface ProviderError extends Error {
-  code: ErrorCode;
-  data?: unknown;
-}
+export namespace Provider {
+  // globalThis.Error accesses the locally shadowed Javascript Error object
 
-export const ProviderError = {
-  create: (code: ErrorCode, message: string, data?: unknown): ProviderError => {
-    const error = new Error(message) as ProviderError;
-    error.code = code;
-    error.data = data;
-    return error;
-  },
-};
+  export interface Error extends globalThis.Error {
+    code: Code;
+    data?: unknown;
+  }
+
+  export const Error = {
+    create: (code: Code, message: string, data?: unknown): Provider.Error => {
+      const error = new globalThis.Error(message) as Provider.Error;
+      error.code = code;
+      error.data = data;
+      return error;
+    },
+  };
+}

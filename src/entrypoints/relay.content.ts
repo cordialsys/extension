@@ -8,17 +8,13 @@
  * THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { fromProvider } from "@/lib/relay";
+import { relayRequest } from "@/lib/relay";
 
 // This content script relays between our providers and the extension
 export default defineContentScript({
   matches: ["*://*/*"],
   main() {
-    // provider-initiated communication: provider -> us -> extension (with response)
-    window.addEventListener("message", fromProvider);
-    // extension-initiated communication: provider <- us <- extension
-    // browser.runtime.onMessage.addListener(announce);
-    // notify
+    window.addEventListener("message", relayRequest);
     console.log("♥️ Running the Cordial Relay");
   },
 });

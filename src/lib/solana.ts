@@ -1,13 +1,25 @@
 // Copyright 2025 Cordial Systems, Inc.
 //
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the “Software”), to
+// deal in the Software without restriction, including without limitation the
+// rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+// sell copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
-// THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+// IN THE SOFTWARE.
 
-// import { SolEventEmitter } from "./event_emitter";
-import { Nonce, Requests, Result, Sol } from "./types";
+import { solRequest } from "./relay";
+import { Sol } from "./types";
 
 import { PublicKey } from "@solana/web3.js";
 import type {
@@ -59,8 +71,6 @@ import {
 
 const ICON: WalletIcon =
   `data:image/svg+xml;base64,PHN2ZyBlbmFibGUtYmFja2dyb3VuZD0ibmV3IDAgMCAyODAuMTczIDI4MC4xNzMiIHZpZXdCb3g9IjAgMCAyODAuMTczIDI4MC4xNzMiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0ibTEzMy45NjEuMTQ1Yy03MC44ODIgMy41LTEyNS4xMzcgNjMuODgxLTEyNS4xMzcgMTM0Ljc2M3Y2Ni41MDYgNjUuNjMxYzAgNi4xMjYgNi4xMjYgOS42MjYgMTEuMzc2IDYuMTI2bDIwLjEyNy0xMi4yNTFjNy44NzYtNC4zNzUgMTcuNTAyLTQuMzc1IDI1LjM3NyAwbDE4LjM3NyAxMC41MDFjNy44NzYgNC4zNzUgMTcuNTAyIDQuMzc1IDI1LjM3NyAwbDE4LjM3Ny0xMC41MDFjNy44NzYtNC4zNzUgMTcuNTAyLTQuMzc1IDI1LjM3NyAwbDE4LjM3NyAxMC41MDFjNy44NzYgNC4zNzUgMTcuNTAyIDQuMzc1IDI1LjM3NyAwbDE4LjM3Ny0xMC41MDFjNy44NzYtNC4zNzUgMTcuNTAyLTQuMzc1IDI1LjM3NyAwbDE5LjI1MiAxMS4zNzZjNS4yNTEgMi42MjUgMTEuMzc2LS44NzUgMTEuMzc2LTYuMTI2IDAtMTguMzc3IDAtNTAuNzU1IDAtNjUuNjMxdi03MC4wMDdjLjAwMS03My41MDctNjIuMTMtMTMzLjg4Ny0xMzcuMzg3LTEzMC4zODd6IiBmaWxsPSIjZTI1NzRjIi8+PHBhdGggZD0ibTI2LjMyNSAxMzEuNDA4YzAtNjkuMTMyIDU0LjI1NS0xMjYuMDEyIDEyMi41MTItMTMxLjI2My0yLjYyNSAwLTYuMTI2IDAtOC43NTEgMC03Mi42MzIgMC0xMzEuMjYyIDU4LjYzMS0xMzEuMjYyIDEzMS4yNjN2MTQ4Ljc2NWM3Ljg3NiAwIDEzLjEyNi0zLjUgMTcuNTAyLTcuODc2LS4wMDEtMTUuNzUyLS4wMDEtMTQwLjg4OS0uMDAxLTE0MC44ODl6IiBmaWxsPSIjZDI1MTQ3Ii8+PHBhdGggZD0ibTE4OC4yMTYgMTEzLjkwNmMtMTYuNjI3IDAtMzAuNjI4IDE0LjAwMS0zMC42MjggMzAuNjI4czE0LjAwMSAzMC42MjggMzAuNjI4IDMwLjYyOCAzMC42MjgtMTQuMDAxIDMwLjYyOC0zMC42MjgtMTQuMDAxLTMwLjYyOC0zMC42MjgtMzAuNjI4em0tOTYuMjU5IDBjLTE2LjYyNyAwLTMwLjYyOCAxNC4wMDEtMzAuNjI4IDMwLjYyOHMxNC4wMDEgMzAuNjI4IDMwLjYyOCAzMC42MjggMzAuNjI4LTE0LjAwMSAzMC42MjgtMzAuNjI4LTE0LjAwMi0zMC42MjgtMzAuNjI4LTMwLjYyOHoiIGZpbGw9IiNlNGU3ZTciLz48cGF0aCBkPSJtMTg4LjIxNiAxMzEuNDA4Yy03LjAwMSAwLTEzLjEyNiA2LjEyNi0xMy4xMjYgMTMuMTI2IDAgNy4wMDEgNi4xMjYgMTMuMTI2IDEzLjEyNiAxMy4xMjZzMTMuMTI2LTYuMTI2IDEzLjEyNi0xMy4xMjZjMC03LjAwMS02LjEyNS0xMy4xMjYtMTMuMTI2LTEzLjEyNnptLTk2LjI1OSAwYy03LjAwMSAwLTEzLjEyNiA2LjEyNi0xMy4xMjYgMTMuMTI2IDAgNy4wMDEgNi4xMjYgMTMuMTI2IDEzLjEyNiAxMy4xMjYgNy4wMDEgMCAxMy4xMjYtNi4xMjYgMTMuMTI2LTEzLjEyNiAwLTcuMDAxLTYuMTI2LTEzLjEyNi0xMy4xMjYtMTMuMTI2eiIgZmlsbD0iIzMyNGQ1YiIvPjwvc3ZnPg==` as const;
-
-const REQUESTS2: Requests = new Map();
 
 type Features = StandardConnectFeature &
   StandardDisconnectFeature &
@@ -119,42 +129,29 @@ export class Solana implements Wallet {
   }
 
   constructor() {
-    // super();
-    // this.init.bind(this)();
-    console.log("constructor this", this);
-    // setTimeout(this.init.bind(this), 0);
-    // setTimeout(this.init, 0);
+    // console.log("constructor this", this);
   }
 
   async start(this: Solana) {
     console.log("Initializing Cordial Solana Provider");
-    // console.log("💪 Instantiated the Cordial Solana Provider");
-    // console.log("test1", await providerRequest("cordial_ping"));
-    window.addEventListener("message", relayResponse);
-    console.log(await providerRequest("cordial_ping"));
+    // console.log(await solRequest("cordial_ping"));
     try {
-      const response = (await providerRequest(
-        "cordial_preconnect",
-      )) as Result<Sol.Changes>;
-      console.log("preconnect response:", response);
-      if (response.ok) {
-        const changes = response.value;
-        this.#accounts = changes.addresses.map((a) =>
-          newAccount(changes.chain as IdentifierString, a),
-        );
-        console.log("changes:", changes);
-        // TODO: only announce if origin is allowed
-        // and we have an address (e.g. Orca totally ignores us if there are no addresses)
-        console.log("this is", this);
-        console.log("this.announce is", this.announce);
-        this.announce();
-      }
+      const changes = (await solRequest("cordial_preconnect")) as Sol.Changes;
+      // console.log("preconnect response:", changes);
+      this.#accounts = changes.addresses.map((a) =>
+        newAccount(changes.chain as IdentifierString, a),
+      );
+
+      // TODO: only announce if origin is allowed
+      // and we have an address (e.g. Orca totally ignores us if there are no addresses)
+      this.announce();
     } catch (error) {
       console.error(`preconnect error: ${error}`);
     }
   }
 
   announce(this: Solana) {
+    console.log("Announcing Cordial Solana Provider");
     const win = window as WalletEventsWindow;
 
     const callback: Callback = ({ register }) => {
@@ -190,26 +187,11 @@ export class Solana implements Wallet {
     event: E,
     ...args: Parameters<EventsListeners[E]>
   ) {
-    console.log(
-      "emitting event",
-      event,
-      "with args",
-      args,
-      "to listeners",
-      this.listeners,
-    );
     // eslint-disable-next-line prefer-spread
     this.listeners[event]?.forEach((listener) => listener.apply(null, args));
   }
 
   on: EventsOnMethod = (event, listener) => {
-    // on<E extends EventsNames>(
-    //   event: E,
-    //   listener: EventsListeners[E],
-    // ): () => void {
-    console.log("this", this);
-    console.log("event", event, "on listener", listener);
-    console.log("listeners before", this.listeners);
     console.log("Cordial Solana on event", event);
     const listeners = this.listeners[event];
     if (listeners) {
@@ -217,7 +199,7 @@ export class Solana implements Wallet {
     } else {
       this.listeners[event] = [listener];
     }
-    console.log("listeners after", this.listeners);
+    // console.log("listeners after", this.listeners);
     return () => this.off(event, listener);
   };
 
@@ -258,58 +240,14 @@ export class Solana implements Wallet {
   async connect(): Promise<ConnectOutput> {
     console.log("Cordial Solana connect");
     throw new Error("not implemented");
-    // if (!this.accounts) {
-    // }
   }
 
   async disconnect() {
     console.log("Cordial Solana disconnect");
-    await providerRequest("solana_disconnect");
+    await solRequest("solana_disconnect");
     if (this.accounts) {
       this.#accounts = [];
       this.emit("change", { accounts: [] });
     }
-  }
-}
-
-function providerRequest(method: string, params?: unknown): Promise<unknown> {
-  console.log("Cordial Solana providerRequest");
-  const id = Nonce.new();
-  const { promise, resolve, reject } = Promise.withResolvers();
-  REQUESTS2.set(id, [resolve, reject]);
-  window.postMessage(
-    {
-      id,
-      kind: "cordial:provider:request",
-      provider: "SOL",
-      method,
-      params,
-    },
-    "*",
-  );
-  return promise;
-}
-
-function relayResponse(event: MessageEvent) {
-  // console.log("from relay: ", event);
-  const data = event.data;
-  if (data.kind !== "cordial:extension:response") {
-    return;
-  }
-  console.log("  sol-provider 👈 relay ::", data);
-  const request = REQUESTS2.get(data.id);
-  if (!request) {
-    console.log("No such request for", data.id);
-    return;
-  }
-  REQUESTS2.delete(data.id);
-  const [resolve, reject] = request;
-  if (!data.result.ok) {
-    console.log("app 👈 sol-provider :: rejecting ::", data.result.error);
-    // reject(providerError(Eth.ErrorCode.InternalRpcError, String(data.error)));
-    reject(data.error);
-  } else {
-    console.log("app 👈 sol-provider :: resolving ::", data.result.value);
-    resolve(data.result);
   }
 }

@@ -43,7 +43,7 @@ export namespace Sdk {
       treasuryName: string,
     ): Promise<Option<Treasury>> {
       const url = `${api}v1/${treasuryName}`;
-      console.log("url:", url);
+      // console.log("url:", url);
       const response = await fetch(url);
       if (!response.ok) {
         console.log("Failed to fetch treasury data", response);

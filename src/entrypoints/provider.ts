@@ -9,9 +9,11 @@
 // "unlisted script" that is injected by content.ts into the defi app
 import { Ethereum } from "@/lib/ethereum";
 import { Solana } from "@/lib/solana";
+import { response } from "@/lib/relay";
 
 export default defineUnlistedScript(() => {
   console.log("♥️ Running the Cordial Provider");
+  window.addEventListener("message", response);
   const eth = new Ethereum();
   setTimeout(eth.start.bind(eth), 0);
   const sol = new Solana();

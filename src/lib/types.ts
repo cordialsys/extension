@@ -6,7 +6,7 @@ export * as Sol from "@/lib/types/sol";
 
 export type Nonce = string;
 export const Nonce = {
-  new(length = 16): Nonce {
+  new(length = 11): Nonce {
     const BASE58_ALPHABET: string =
       "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
     // large enough numbers to avoid bias when reducing mod 58
@@ -17,25 +17,39 @@ export const Nonce = {
   },
 };
 
-type Resolver = (value: unknown) => void;
-type Rejecter = (reason?: unknown) => void;
-// Map object keys are compared by reference (object identity), not value
-// Currently, Nonce is the primitive type string so it works.
-export type Requests = Map<Nonce, [Resolver, Rejecter]>;
-
 export type Provider = "ETH" | "SOL";
+export type Params = unknown[] | object;
 
-export interface ProviderRequest {
+export interface Header {
   id: Nonce;
-  kind: "cordial:provider:request";
   provider: Provider;
-  method: string;
 }
 
-export interface EthProviderRequest extends ProviderRequest, Eth.Request {}
+export interface Request extends Eth.Request {
+  header: Header;
+  kind: "cordial:provider:request";
+  method: string;
+  params?: Params;
+}
+
+export const Request = {
+  new(provider: Provider, method: string, params?: Params): Request {
+    return {
+      header: {
+        id: Nonce.new(),
+        provider,
+      },
+      kind: "cordial:provider:request",
+      method,
+      params,
+    };
+  },
+};
+
+// export interface EthProviderRequest extends ProviderRequest, Eth.Request {}
 
 export interface Response<T = unknown, E = unknown> {
-  id: Nonce;
+  header: Header;
   kind: "cordial:extension:response";
   result: Result<T, E>;
 }
@@ -54,9 +68,9 @@ export interface Err<E = unknown> {
 export type Result<T, E = unknown> = Ok<T> | Err<E>;
 
 export const Response = {
-  ok(id: Nonce, value: unknown): Response {
+  ok(header: Header, value: unknown): Response {
     return {
-      id,
+      header,
       kind: "cordial:extension:response",
       result: {
         ok: true,
@@ -65,9 +79,9 @@ export const Response = {
     };
   },
 
-  err(id: Nonce, error: unknown): Response {
+  err(header: Header, error: unknown): Response {
     return {
-      id,
+      header,
       kind: "cordial:extension:response",
       result: {
         ok: false,
