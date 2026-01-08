@@ -85,16 +85,13 @@ async function handleInner(
         config.treasury.url,
         config.treasury.name,
       );
-      // console.log("treasury:", treasury);
       if (!treasury) {
         return Response.err(header, "not ok");
       }
-      let chain: string;
-      if (treasury.network === "mainnet") {
-        chain = Sol.MAINNET;
-      } else {
-        const network = await Sdk.oracle.testnetChainNetwork("SOL");
-        if (!treasury) {
+      let chain = Sol.MAINNET;
+      if (treasury.network !== "mainnet") {
+        const network = await Sdk.connector.testnetChainNetwork("SOL");
+        if (!network) {
           return Response.err(header, "not ok");
         }
         // console.log("network", network);
@@ -133,19 +130,22 @@ async function handleInner(
       request.method === "eth_requestAccounts" ||
       request.method === "eth_accounts"
     ) {
-      const result = [
-        "0x4838b106fce9647bdf1e7877bf73ce8b0bad5f97",
-        "0x25306c5a4f24c10cbdddda531e8b3450da3d1751",
-      ];
-      return Response.ok(header, result);
+      // const addresses = [
+      //   "0x4838b106fce9647bdf1e7877bf73ce8b0bad5f97",
+      //   "0x25306c5a4f24c10cbdddda531e8b3450da3d1751",
+      // ];
+      const addresses = eth_accounts(config);
+      return Response.ok(header, addresses);
     }
     if (request.method === "eth_chainId") {
-      const result = "0xaa36a7";
-      return Response.ok(header, result);
+      const chainId = await eth_chainId(config);
+      if (!chainId) return Response.err(header, "not ok");
+      return Response.ok(header, chainId);
     }
     if (request.method === "eth_blockNumber") {
-      const result = "0x111111";
-      return Response.ok(header, result);
+      const blockNumber = await eth_blockNumber(config);
+      if (!blockNumber) return Response.err(header, "not ok");
+      return Response.ok(header, blockNumber);
     }
 
     // unsupported method;
@@ -154,4 +154,42 @@ async function handleInner(
   }
 
   return Response.err(header, "unreachable");
+}
+
+function eth_accounts(config: Config): string[] {
+  const prefix = "chains/ETH/addresses/";
+  const addresses: string[] = config.addresses
+    .filter((a) => a.startsWith(prefix))
+    .map((a) => a.slice(prefix.length));
+  return addresses;
+}
+
+async function treasury_network(config: Config): Promise<Option<string>> {
+  const treasury = await Sdk.treasury.treasury(
+    config.treasury.url,
+    config.treasury.name,
+  );
+  if (!treasury) return undefined;
+  return treasury.network;
+}
+
+async function eth_chainId(config: Config): Promise<Option<string>> {
+  const network = await treasury_network(config);
+  if (!network) return undefined;
+  if (network === "mainnet") {
+    return "0x1";
+  } else {
+    return (
+      "0x" + Number(await Sdk.connector.testnetChainId("ETH")).toString(16)
+    );
+  }
+}
+
+async function eth_blockNumber(config: Config): Promise<Option<string>> {
+  const network = await treasury_network(config);
+  if (!network) return undefined;
+  const mainnet = network === "mainnet";
+  return (
+    "0x" + Number(await Sdk.connector.blockNumber("ETH", mainnet)).toString(16)
+  );
 }

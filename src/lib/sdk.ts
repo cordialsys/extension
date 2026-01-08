@@ -19,7 +19,23 @@ export namespace Sdk {
     }
   }
 
-  export namespace oracle {
+  export namespace connector {
+    export async function blockNumber(
+      chainId: string,
+      mainnet: boolean,
+    ): Promise<Option<string>> {
+      // TODO: handle mainnet vs testnet
+      let url = `https://connector.cordialapis.com/v1/chains/${chainId}/block`;
+      if (!mainnet) {
+        url += "?network=testnet";
+      }
+      const response = await fetch(url);
+      if (!response.ok) {
+        return undefined;
+      }
+      const chain = (await response.json()) as { height: string };
+      return chain.height;
+    }
     export async function testnetChainNetwork(
       chainId: string,
     ): Promise<Option<string>> {
@@ -30,6 +46,17 @@ export namespace Sdk {
       }
       const chain = (await response.json()) as { network: string };
       return chain.network;
+    }
+    export async function testnetChainId(
+      chainId: string,
+    ): Promise<Option<string>> {
+      const url = `https://connector.cordialapis.com/v1/chains/${chainId}?network=!mainnet`;
+      const response = await fetch(url);
+      if (!response.ok) {
+        return undefined;
+      }
+      const chain = (await response.json()) as { chain_id: string };
+      return chain.chain_id;
     }
   }
 
