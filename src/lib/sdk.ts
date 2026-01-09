@@ -65,7 +65,8 @@ export namespace Sdk {
   }
 
   export namespace propose {
-    export const PROPOSE_API = "https://treasury.cordialapis.com/v1/propose";
+    // export const PROPOSE_API = "https://treasury.cordialapis.com/v1/propose";
+    export const PROPOSE_API = "http://127.0.0.1:8777/v1/propose";
 
     export async function executeSigned<T>(
       request: Request,
