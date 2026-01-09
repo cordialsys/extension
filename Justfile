@@ -16,6 +16,15 @@ lint:
 	pnpm run typecheck
 	pnpm dlx --package jiti eslint src
 
+api-gen project api:
+	pnpm dlx openapi-typescript https://api.stoplight.io/projects/{{ project }}/branches/main/export/reference/{{ api }}.yaml -o src/lib/sdk/{{ api }}.d.ts
+
+api-types:
+    just api-gen cHJqOjIzOTcxNQ admin
+    just api-gen cHJqOjIzOTcxOA connector
+    just api-gen cHJqOjIzOTcxOQ oracle
+    just api-gen cHJqOjIzOTcxNw treasury
+
 # configures Edge at Mosyle-installed location
 setup-mac: install
 	ln -sf web-ext.config.mac.ts web-ext.config.ts

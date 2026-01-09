@@ -9,14 +9,8 @@
 import { get } from "idb-keyval";
 
 import { browser_action, COLOR } from "@/lib/constants";
-import { refreshConfig, Config } from "@/lib/config";
-import {
-  loadLogin,
-  loginFirstName,
-  refreshLogin,
-  turnOff,
-  turnOn,
-} from "@/lib/login";
+import { Config } from "@/lib/config";
+import { Login, loginFirstName, turnOff, turnOn } from "@/lib/login";
 import { handleRequest } from "@/lib/handler";
 
 async function onClicked(tab: globalThis.Browser.tabs.Tab) {
@@ -35,21 +29,21 @@ async function onClicked(tab: globalThis.Browser.tabs.Tab) {
 // - ...
 // are setup
 async function init() {
-  await refreshConfig();
+  Config.track();
   if (!(await get("on"))) {
     // console.log("didn't get `on`");
     return await turnOff();
   }
-  const login = await loadLogin();
+  const login = await Login.load();
   if (!login) {
     console.log("didn't get `login`");
     return await turnOff();
   }
 
-  setTimeout(refreshLogin, 5 * 1000);
+  setTimeout(Login.track, 5 * 1000);
   const firstName = await loginFirstName(login);
   console.log(`👋 Welcome back, ${firstName}`);
-  const config = await Config.get();
+  const config = await Config.load();
   if (config) {
     console.log("Configuration:", config);
   }

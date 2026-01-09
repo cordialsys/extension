@@ -1,5 +1,9 @@
 import { Config, Extension } from "./config";
-import { Option } from "./types";
+import { Login } from "./login";
+import { sign } from "./sdk/http_signature";
+import { Err, Ok, Option, Result } from "./types";
+
+import type { CallT, TreasuryT } from "./sdk/treasury";
 
 export namespace Sdk {
   export namespace admin {
@@ -60,15 +64,58 @@ export namespace Sdk {
     }
   }
 
-  export namespace treasury {
-    export interface Treasury {
-      name: string;
-      network: "mainnet" | "!mainnet";
+  export namespace propose {
+    export const PROPOSE_API = "https://treasury.cordialapis.com/v1/propose";
+
+    export async function executeSigned<T>(
+      request: Request,
+    ): Promise<Result<T>> {
+      const login = await Login.load();
+      if (!login) {
+        return Err("not logged in");
+      }
+      const config = await Config.load();
+      if (!config) {
+        return Err("not configured");
+      }
+      const prefix = "treasuries/";
+      if (!config.treasury.name.startsWith(prefix)) {
+        return Err("invalid treasury name");
+      }
+      const treasuryId = config.treasury.name.slice(prefix.length);
+      try {
+        request = await sign("pro", login, request, treasuryId);
+        const response = await fetch(request);
+
+        if (!response.ok) {
+          return Err(await response.json());
+        }
+        return Ok((await response.json()) as T);
+      } catch (error) {
+        return Err(error);
+      }
     }
+
+    export namespace call {
+      export async function create(
+        chain: string,
+        call: CallT,
+      ): Promise<Result<string>> {
+        const url = `${PROPOSE_API}/chains/${chain}/calls`;
+        const request = new Request(url, {
+          method: "POST",
+          body: JSON.stringify(call),
+        });
+        return executeSigned(request);
+      }
+    }
+  }
+
+  export namespace treasury {
     export async function treasury(
       api: string,
       treasuryName: string,
-    ): Promise<Option<Treasury>> {
+    ): Promise<Option<TreasuryT>> {
       const url = `${api}v1/${treasuryName}`;
       // console.log("url:", url);
       const response = await fetch(url);
@@ -76,7 +123,7 @@ export namespace Sdk {
         console.log("Failed to fetch treasury data", response);
         return undefined;
       }
-      const treasury = (await response.json()) as Treasury;
+      const treasury = (await response.json()) as TreasuryT;
       return treasury;
     }
   }

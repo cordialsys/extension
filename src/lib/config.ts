@@ -1,54 +1,42 @@
 import { get, set } from "idb-keyval";
 
 import { CONFIG_REFRESH } from "./constants";
-import { loadLogin } from "./login";
+import { Login } from "./login";
 import { Sdk } from "./sdk";
+import { ConfigT, ExtensionT, TreasuryT } from "./sdk/admin";
 import { Option } from "./types";
 
 export const Config = {
-  get(): Promise<Option<Config>> {
+  // fetches the latest config if logged in
+  async fetch(): Promise<Option<Config>> {
+    const login = await Login.load();
+    if (!login) {
+      return undefined;
+    }
+    return await Sdk.admin.users.extension(login.userId);
+  },
+
+  // loads the currently active config, assumed fetched/refreshed in the background
+  async load(): Promise<Option<Config>> {
     return get("config");
+  },
+
+  async track() {
+    const config = await Config.fetch();
+
+    if (!config) {
+      setTimeout(Config.track, CONFIG_REFRESH);
+      return;
+    }
+
+    if (JSON.stringify(await Config.load()) !== JSON.stringify(config)) {
+      console.log("Config changed:", config);
+      await set("config", config);
+    }
+    setTimeout(Config.track, CONFIG_REFRESH);
   },
 };
 
-export interface Extension {
-  revision: string;
-  config?: Config;
-}
-
-export interface Config {
-  addresses: string[];
-  origins: string[];
-  treasury: Treasury;
-}
-
-export interface Treasury {
-  name: string;
-  url: string;
-}
-
-async function fetchConfig(userId: string): Promise<Option<Config>> {
-  return await Sdk.admin.users.extension(userId);
-}
-
-export async function refreshConfig() {
-  const login = await loadLogin();
-  // const on = await get("on");
-  // if (!on || !login) {
-  if (!login) {
-    setTimeout(refreshConfig, CONFIG_REFRESH);
-    return;
-  }
-  // console.log("refreshing config");
-  const config = await fetchConfig(login.userId);
-  if (!config) {
-    setTimeout(refreshConfig, CONFIG_REFRESH);
-    return;
-  }
-  if (JSON.stringify(await get("config")) != JSON.stringify(config)) {
-    console.log("Config changed:", config);
-  }
-  await set("config", config);
-  // console.log("config", config);
-  setTimeout(refreshConfig, CONFIG_REFRESH);
-}
+export interface Config extends ConfigT {}
+export interface Extension extends ExtensionT {}
+export interface Treasury extends TreasuryT {}

@@ -25,7 +25,7 @@ async function handleAsync(
   request: Request,
   sender: globalThis.Browser.runtime.MessageSender,
 ): Promise<Response> {
-  const config = await Config.get();
+  const config = await Config.load();
 
   const log = `${request.header.provider} :: ${request.header.id} :: ${request.method} ::`;
   console.log("❓", log, request.params);
@@ -116,6 +116,10 @@ async function process(
         config,
         request.params as solTypes.SolanaSignTransactionInput[],
       );
+    }
+
+    if (method === "sol_signIn") {
+      return await sol.signIn(request.params as solTypes.SolanaSignInInput[]);
     }
 
     return Err(`method ${request.method} not implemented`);

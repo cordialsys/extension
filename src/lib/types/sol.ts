@@ -3,12 +3,13 @@ import type {
   WindowRegisterWalletEventCallback as Callback,
 } from "@wallet-standard/base";
 
-import type { WalletAccount as Account } from "@wallet-standard/base";
-export type { WalletAccount as Account } from "@wallet-standard/base";
+import type { WalletAccount } from "@wallet-standard/base";
 import type { IdentifierArray } from "@wallet-standard/base";
 export type { IdentifierArray } from "@wallet-standard/base";
 
-export const AccountNew = {
+export interface Account extends WalletAccount {}
+
+export const Account = {
   new(
     address: string,
     publicKey: Uint8Array,

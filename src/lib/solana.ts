@@ -89,7 +89,7 @@ function newAccount(chain: IdentifierString, addr: string): Sol.Account {
   ];
 
   const pubKey = new Uint8Array(); //Array.from(new PublicKey(addr).toBytes()));
-  return Sol.AccountNew.new(addr, pubKey, [chain], features);
+  return Sol.Account.new(addr, pubKey, [chain], features);
 }
 
 export class Solana implements Wallet {

@@ -1,3 +1,4 @@
+// TODO: Consider using @noble for this, which wraps WebCrypto
 import { hex } from "@scure/base";
 import {
   cryptoBoxKeyPair,
@@ -14,7 +15,7 @@ export interface Identity {
   publicHex: string;
 }
 
-interface Login {
+export interface Login {
   userId: string;
   identity: Identity;
   certificate: string;
@@ -70,7 +71,7 @@ export async function turnOff() {
 // while logging in. This can be done with timers: https://stackoverflow.com/a/44082232
 export async function turnOn() {
   console.log("🤩 Turning on");
-  const login = await newLogin();
+  const login = await Login.new();
   await set("login", login);
 
   // set extension to active
@@ -90,7 +91,7 @@ export async function turnOn() {
   console.log(`👋 Hello, ${firstName}, extension is active!`);
 
   // refresh every five minutes
-  setTimeout(refreshLogin, LOGIN_REFRESH);
+  setTimeout(Login.track, LOGIN_REFRESH);
 }
 
 function newRequest(): Request {
@@ -151,49 +152,106 @@ async function clerkLoggedIn(): Promise<boolean> {
   return loggedIn;
 }
 
-export async function loadLogin(): Promise<Option<Login>> {
-  // 1. verify logged in to Clerk
-  if (!(await clerkLoggedIn())) {
-    return undefined;
-  }
+export const Login = {
+  async new(): Promise<Login> {
+    const prevLogin = await Login.load();
+    if (prevLogin) {
+      // console.log("reusing previous login");
+      return prevLogin;
+    }
+    //1. prepare request and identity keys
+    const identity = await getOrCreateIdentity();
+    const key = `ed25519.${identity.publicHex}`;
+    // console.log("key", key);
 
-  // 2. verify logged in to Cordial SaaS
-  // Note we cannot read it directly.
-  const url = "https://admin.cordialapis.com/v1/users/me";
-  const response = await fetch(url);
-  if (!response.ok) {
-    console.log("could not get /v1/users/me");
-    return undefined;
-  }
+    const request = newRequest();
+    const requestHex = request.publicHex;
+    // console.log("request", requestHex);
 
-  // 3. load it from DB
-  const login = await get("login");
-  if (!login) {
-    return undefined;
-  }
+    // 2. have the user login
+    const url = `https://auth.cordial.systems/login/flow?key=${key}&request=${requestHex}`;
+    if (!(await clerkLoggedIn())) {
+      // console.log("opening tab");
+      browser.tabs.create({ url });
+    } else {
+      // console.log("not opening tab");
+      await fetch(url);
+    }
 
-  // 4. verify it is still valid for 10 more minutes
-  // console.log("certificate", login.certificate);
-  // const jwt = parseJwt(login.certificate) as { exp: number; sub: string };
-  // console.log("certificate jwt", jwt);
-  const now = Temporal.Now.instant();
-  // console.log("loaded login", login);
-  const expires = Temporal.Instant.fromEpochMilliseconds(login.expires);
-  if (
-    Temporal.Duration.compare(
-      now.until(expires),
-      Temporal.Duration.from({ minutes: 10 }),
-    ) != 1
-  ) {
-    console.warn("certificate expired");
-    return undefined;
-  }
+    return await completeLogin(identity, request);
+  },
 
-  // TODO: Verify login is valid
-  // - do a call to admin API to check if cookie is good
-  // - decode certificate to see if it's still valid for > X minutes
-  return login;
-}
+  async load(): Promise<Option<Login>> {
+    // 1. verify logged in to Clerk
+    if (!(await clerkLoggedIn())) {
+      return undefined;
+    }
+
+    // 2. verify logged in to Cordial SaaS
+    // Note we cannot read it directly.
+    const url = "https://admin.cordialapis.com/v1/users/me";
+    const response = await fetch(url);
+    if (!response.ok) {
+      console.log("could not get /v1/users/me");
+      return undefined;
+    }
+
+    // 3. load it from DB
+    const login = await get("login");
+    if (!login) {
+      return undefined;
+    }
+
+    // 4. verify it is still valid for 10 more minutes
+    // console.log("certificate", login.certificate);
+    // const jwt = parseJwt(login.certificate) as { exp: number; sub: string };
+    // console.log("certificate jwt", jwt);
+    const now = Temporal.Now.instant();
+    // console.log("loaded login", login);
+    const expires = Temporal.Instant.fromEpochMilliseconds(login.expires);
+    if (
+      Temporal.Duration.compare(
+        now.until(expires),
+        Temporal.Duration.from({ minutes: 10 }),
+      ) != 1
+    ) {
+      console.warn("certificate expired");
+      return undefined;
+    }
+
+    // TODO: Verify login is valid
+    // - do a call to admin API to check if cookie is good
+    // - decode certificate to see if it's still valid for > X minutes
+    return login;
+  },
+
+  // TODO: Only refresh if we're somewhat close to expiry of cookie or certificate
+  async track(): Promise<Option<Login>> {
+    if (!(await get("on"))) {
+      setTimeout(Login.track, LOGIN_REFRESH);
+      return;
+    }
+    if (!(await clerkLoggedIn())) {
+      // can't refresh silently
+      await turnOff();
+      setTimeout(Login.track, LOGIN_REFRESH);
+      return;
+    }
+
+    // console.log("refreshing login");
+    const identity = await newIdentity();
+    const key = `ed25519.${identity.publicHex}`;
+    const request = newRequest();
+    const requestHex = request.publicHex;
+
+    const url = `https://auth.cordial.systems/login/flow?key=${key}&request=${requestHex}`;
+    await fetch(url);
+    const login = await completeLogin(identity, request);
+    await set("login", login);
+    setTimeout(Login.track, LOGIN_REFRESH);
+    return login;
+  },
+};
 
 async function completeLogin(
   identity: Identity,
@@ -253,60 +311,4 @@ async function completeLogin(
     certificate,
     expires: expires.epochMilliseconds,
   };
-}
-
-//async function turnOn
-async function newLogin(): Promise<Login> {
-  const prevLogin = await loadLogin();
-  if (prevLogin) {
-    // console.log("reusing previous login");
-    return prevLogin;
-  }
-  //1. prepare request and identity keys
-  const identity = await getOrCreateIdentity();
-  const key = `ed25519.${identity.publicHex}`;
-  // console.log("key", key);
-
-  const request = newRequest();
-  const requestHex = request.publicHex;
-  // console.log("request", requestHex);
-
-  // 2. have the user login
-  const url = `https://auth.cordial.systems/login/flow?key=${key}&request=${requestHex}`;
-  if (!(await clerkLoggedIn())) {
-    // console.log("opening tab");
-    browser.tabs.create({ url });
-  } else {
-    // console.log("not opening tab");
-    await fetch(url);
-  }
-
-  return await completeLogin(identity, request);
-}
-
-// TODO: Only refresh if we're somewhat close to expiry of cookie or certificate
-export async function refreshLogin(): Promise<Option<Login>> {
-  if (!(await get("on"))) {
-    setTimeout(refreshLogin, LOGIN_REFRESH);
-    return;
-  }
-  if (!(await clerkLoggedIn())) {
-    // can't refresh silently
-    await turnOff();
-    setTimeout(refreshLogin, LOGIN_REFRESH);
-    return;
-  }
-
-  // console.log("refreshing login");
-  const identity = await newIdentity();
-  const key = `ed25519.${identity.publicHex}`;
-  const request = newRequest();
-  const requestHex = request.publicHex;
-
-  const url = `https://auth.cordial.systems/login/flow?key=${key}&request=${requestHex}`;
-  await fetch(url);
-  const login = await completeLogin(identity, request);
-  await set("login", login);
-  setTimeout(refreshLogin, LOGIN_REFRESH);
-  return login;
 }
