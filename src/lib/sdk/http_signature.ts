@@ -13,12 +13,14 @@ export async function sign(
   const method: string = request.method;
   const headers = request.headers;
   const body = await request.text();
+  // must always start with `/`
   const path: string = url.pathname;
-  const query = "";
+  // must always start with `?`
+  const query = url.search ? url.search : "?";
   const contentDigest = base64.encode(sha256(utf8ToBytes(body ?? "")));
 
   const alg = "open-pubkey";
-  const created = 123;
+  const created = Math.floor(Date.now() / 1000);
   const keyid = login.certificate;
   const nonce = (Math.random() * 10 ** 9) | 0;
   const tag = "";

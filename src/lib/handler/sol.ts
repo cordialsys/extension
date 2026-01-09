@@ -1,21 +1,52 @@
 import { Config } from "@/lib/config";
-import { Err, Result } from "@/lib/types";
+import { Err, Ok } from "@/lib/types";
 import { Sdk } from "@/lib/sdk";
-// import {
-//   //   configureTreasuryClient,
-//   // getTreasuryClient,
-// } from "../../../../frontend/src/lib/sdks/treasury";
-// import { decodeJwt } from "jose";
+import { Error, Result } from "@/lib/sdk/error";
+
+import * as T from "@/lib/sdk/treasury";
 
 import * as Sol from "@solana/wallet-standard-features";
 
-/*
-import {Call, Transaction} from "../../../../frontend/src/lib/sdks/treasury/api/types";
-import {RequestError} from "../../../../frontend/src/lib/sdks/treasury/api/errors";
-import {RegisteredCredential} from "../../../../frontend/src/lib/sdks/treasury/api/webauthn";
-import {parseName} from "../../../../frontend/src/lib/sdks/utils/name";
-import {OpenPubkeyClient} from "../../../../frontend/src/lib/sdks/treasury/api/openpubkey";
-*/
+const sleep = (millis: number) => new Promise((_) => setTimeout(_, millis));
+const SLEEP = 100;
+
+async function locateCall(
+  // proposalName: string,
+  proposalId: string,
+): Promise<Result<string>> {
+  while (true) {
+    // Once our API filtering implements JSON expansion, we will
+    // be able to do this, for now we have to use `proposal_id`.
+    // const filter = `json(proposal).name = "${proposalName}"`;
+    const filter = `proposal_id = "${proposalId}"`;
+    const callsResult = await Sdk.treasury.chains.calls.list({ filter });
+    if (!callsResult.ok) return callsResult;
+    const calls = callsResult.value;
+
+    if (calls) {
+      // TODO: Check that there is only one call?
+      return Ok(calls[0].name!);
+    }
+    await sleep(SLEEP);
+  }
+}
+
+async function callCompleted(callName: string): Promise<Result<T.Call>> {
+  while (true) {
+    const result = await Sdk.treasury.chains.calls.get(callName);
+    if (!result.ok) return result;
+    const call = result.value;
+    // TODO: Shouldn't need to cast state as string,
+    // it should be defined properly in OpenAPI spec.
+    if ((call.state as string) === "succeeded") {
+      return Ok(call);
+    }
+    if ((call.state as string) === "failed") {
+      return Err(Error.unknown(JSON.stringify(call)));
+    }
+    await sleep(SLEEP);
+  }
+}
 
 export async function signIn(
   inputs: Sol.SolanaSignInInput[],
@@ -30,13 +61,31 @@ export async function signIn(
   //   domain: inputs[0].domain,
   //   statement: inputs[0].statement,
   // };
-  const call = {
-    call: msg,
-  };
+  const proposal = { call: msg };
 
-  const proposal = await Sdk.propose.call.create("SOL", call);
-  console.log("proposal:", proposal);
-  return Err("not implemented");
+  // 1. Create the proposal via Propose API
+  const proposalNameResult = await Sdk.propose.chains.calls.create(
+    "SOL",
+    proposal,
+  );
+  if (!proposalNameResult.ok) return proposalNameResult;
+  const proposalName = proposalNameResult.value;
+  console.log("proposal name:", proposalName);
+  const proposalId = proposalName.slice("chains/SOL/calls/".length);
+
+  // 2. Locate the call via Treasury API
+  const callNameResult = await locateCall(proposalId);
+  if (!callNameResult.ok) return callNameResult;
+  const callName = callNameResult.value;
+  console.log("call name:", callName);
+
+  // 3. Wait for the call to complete
+  const callResult = await callCompleted(callName);
+  if (!callResult.ok) return callResult;
+  const call = callResult.value;
+  console.log("completed call:", call);
+
+  return Err(Error.unimplemented("SOL signIn not finished yet"));
 }
 
 export async function signTransaction(
@@ -52,7 +101,7 @@ export async function signTransaction(
   //   account: inputs[0].account.address,
   // };
 
-  return Err("not implemented");
+  return Err(Error.unimplemented("SOL signTransaction not finished yet"));
 
   /*
   const call = {

@@ -3,7 +3,7 @@ import { get, set } from "idb-keyval";
 import { CONFIG_REFRESH } from "./constants";
 import { Login } from "./login";
 import { Sdk } from "./sdk";
-import { ConfigT, ExtensionT, TreasuryT } from "./sdk/admin";
+import * as A from "./sdk/admin";
 import { Option } from "./types";
 
 export const Config = {
@@ -13,7 +13,7 @@ export const Config = {
     if (!login) {
       return undefined;
     }
-    return await Sdk.admin.users.extension(login.userId);
+    return await Sdk.admin.users.extension.maybe(login.userId);
   },
 
   // loads the currently active config, assumed fetched/refreshed in the background
@@ -37,6 +37,6 @@ export const Config = {
   },
 };
 
-export interface Config extends ConfigT {}
-export interface Extension extends ExtensionT {}
-export interface Treasury extends TreasuryT {}
+export interface Config extends A.ExtensionConfig {}
+export interface Extension extends A.Extension {}
+export interface Treasury extends A.ExtensionTreasury {}

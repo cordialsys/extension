@@ -3,12 +3,12 @@
 // browser.actions is MV3, for firefox MV2 need browser.browserAction
 export const browser_action = browser.action ?? browser.browserAction;
 
-// TODO: Should this depend on how long we're still logged into Clerk?
 // 15 minutes
+// TODO: Should this depend on how long we're still logged into Clerk?
 export const LOGIN_REFRESH: number = 15 * 60 * 1000;
 
-// TODO: Replace with long-polling for immediate updates
 // 5 seconds
+// TODO: Replace with long-polling for immediate updates
 export const CONFIG_REFRESH: number = 5 * 1000;
 
 export const GRAY = {

@@ -1,24 +1,97 @@
 import { Config, Extension } from "./config";
 import { Login } from "./login";
+import { Error, Result } from "./sdk/error";
 import { sign } from "./sdk/http_signature";
-import { Err, Ok, Option, Result } from "./types";
+import { Err, Ok, Option } from "./types";
 
-import type { CallT, TreasuryT } from "./sdk/treasury";
+import * as A from "./sdk/admin";
+import * as T from "./sdk/treasury";
+
+interface ListOptions {
+  filter?: string;
+}
+
+function notConfigured(): Error {
+  return Error.failedPrecondition("not configured");
+}
+
+function notLoggedIn(): Error {
+  return Error.failedPrecondition("not logged in");
+}
+
+// All Cordial APIs work in this same way.
+async function apiGet<R>(url: string): Promise<Result<R>> {
+  const response = await fetch(url);
+  if (!response.ok) {
+    return Err((await response.json()) as Error);
+  }
+  return Ok((await response.json()) as R);
+}
+
+async function apiList<R>(
+  url: string,
+  plural: string,
+  options?: ListOptions,
+): Promise<Result<R[]>> {
+  if (options && options.filter) {
+    const filtered = new URL(url);
+    filtered.searchParams.set("filter", options.filter);
+    url = filtered.toString();
+  }
+  const response = await fetch(url);
+  if (!response.ok) {
+    return Err((await response.json()) as Error);
+  }
+  // TODO: pagination
+  const page = (await response.json()) as { [plural]: R[] };
+  return Ok(page[plural]);
+}
 
 export namespace Sdk {
   export namespace admin {
-    export function users(): unknown[] {
-      return [];
+    const API: string = "https://admin.cordialapis.com/";
+
+    async function adminApiGet<R>(name: string): Promise<Result<R>> {
+      const url = `${API}v1/${name}`;
+      return await apiGet<R>(url);
     }
+
+    async function adminApiList<R>(
+      path: string,
+      plural: string,
+      options?: ListOptions,
+    ): Promise<Result<R[]>> {
+      const url = `${API}v1/${path}`;
+      return await apiList<R>(url, plural, options);
+    }
+
     export namespace users {
-      export async function extension(userId: string): Promise<Option<Config>> {
-        const url = `https://admin.cordialapis.com/v1/users/${userId}/extension`;
-        const response = await fetch(url);
-        if (!response.ok) {
-          return undefined;
+      export async function get(userId: string): Promise<Result<A.User>> {
+        return adminApiGet<A.User>(`users/${userId}`);
+      }
+
+      export async function list(
+        options?: ListOptions,
+      ): Promise<Result<A.User[]>> {
+        return adminApiList<A.User>("users", "users", options);
+      }
+
+      export namespace extension {
+        export async function get(
+          userId: string,
+        ): Promise<Result<A.Extension>> {
+          const name = `users/${userId}/extension`;
+          return await adminApiGet<A.Extension>(name);
         }
-        const extension = (await response.json()) as Extension;
-        return extension.config;
+        // syntactic sugar
+        export async function maybe(userId: string): Promise<Option<Config>> {
+          const result = await get(userId);
+          if (!result.ok) {
+            return undefined;
+          }
+          const extension = result.value as Extension;
+          return extension.config;
+        }
       }
     }
   }
@@ -73,15 +146,19 @@ export namespace Sdk {
     ): Promise<Result<T>> {
       const login = await Login.load();
       if (!login) {
-        return Err("not logged in");
+        return Err(notLoggedIn());
       }
       const config = await Config.load();
       if (!config) {
-        return Err("not configured");
+        return Err(notConfigured());
       }
       const prefix = "treasuries/";
       if (!config.treasury.name.startsWith(prefix)) {
-        return Err("invalid treasury name");
+        return Err(
+          Error.invalidArgument(
+            `invalid treasury name ${config.treasury.name}`,
+          ),
+        );
       }
       const treasuryId = config.treasury.name.slice(prefix.length);
       try {
@@ -93,30 +170,67 @@ export namespace Sdk {
         }
         return Ok((await response.json()) as T);
       } catch (error) {
-        return Err(error);
+        return Err(Error.unknown(JSON.stringify(error)));
       }
     }
 
-    export namespace call {
-      export async function create(
-        chain: string,
-        call: CallT,
-      ): Promise<Result<string>> {
-        const url = `${PROPOSE_API}/chains/${chain}/calls`;
-        const request = new Request(url, {
-          method: "POST",
-          body: JSON.stringify(call),
-        });
-        return executeSigned(request);
+    export namespace chains {
+      export namespace calls {
+        export async function create(
+          chain: string,
+          call: T.Call,
+        ): Promise<Result<string>> {
+          const url = `${PROPOSE_API}/chains/${chain}/calls`;
+          const request = new Request(url, {
+            method: "POST",
+            body: JSON.stringify(call),
+          });
+          return executeSigned(request);
+        }
       }
     }
   }
 
   export namespace treasury {
+    async function treasuryApiList<R>(
+      path: string,
+      plural: string,
+      options?: ListOptions,
+    ): Promise<Result<R[]>> {
+      const config = await Config.load();
+      if (!config) {
+        return Err(Error.failedPrecondition("not configured"));
+      }
+      const url = `${config.treasury.url}v1/${path}`;
+      return await apiList<R>(url, plural, options);
+    }
+
+    async function treasuryApiGet<T>(name: string): Promise<Result<T>> {
+      const config = await Config.load();
+      if (!config) {
+        return Err(Error.failedPrecondition("not configured"));
+      }
+      const url = `${config.treasury.url}v1/${name}`;
+      return await apiGet<T>(url);
+    }
+
+    export namespace chains {
+      export namespace calls {
+        export async function get(callName: string): Promise<Result<T.Call>> {
+          return await treasuryApiGet(callName);
+        }
+
+        export async function list(
+          options?: ListOptions,
+        ): Promise<Result<T.Call[]>> {
+          return await treasuryApiList<T.Call>("calls", "calls", options);
+        }
+      }
+    }
     export async function treasury(
       api: string,
       treasuryName: string,
-    ): Promise<Option<TreasuryT>> {
+    ): Promise<Option<T.Treasury>> {
       const url = `${api}v1/${treasuryName}`;
       // console.log("url:", url);
       const response = await fetch(url);
@@ -124,7 +238,7 @@ export namespace Sdk {
         console.log("Failed to fetch treasury data", response);
         return undefined;
       }
-      const treasury = (await response.json()) as TreasuryT;
+      const treasury = (await response.json()) as T.Treasury;
       return treasury;
     }
   }
