@@ -49,7 +49,7 @@ treasury: ${treasuryId}
   headers.append("Signature-Input", signatureInputHeader);
   headers.append("Signature", signatureHeader);
   headers.append("Treasury", treasuryId);
-  headers.append("User", "36wmfPUiYuoh6E4yCb9lEdijCj0");
+  // headers.append("User", "36wmfPUiYuoh6E4yCb9lEdijCj0");
   console.log("headers", headers);
   for (const [h, v] of headers) {
     console.log(h, ":", v);
