@@ -181,9 +181,7 @@ async function eth_chainId(config: Config): Promise<Option<string>> {
   if (network === "mainnet") {
     return "0x1";
   } else {
-    return (
-      "0x" + Number(await Sdk.connector.testnetChainId("ETH")).toString(16)
-    );
+    return `0x${Number(await Sdk.connector.testnetChainId("ETH")).toString(16)}`;
   }
 }
 
@@ -191,7 +189,5 @@ async function eth_blockNumber(config: Config): Promise<Option<string>> {
   const network = await treasury_network(config);
   if (!network) return undefined;
   const mainnet = network === "mainnet";
-  return (
-    "0x" + Number(await Sdk.connector.blockNumber("ETH", mainnet)).toString(16)
-  );
+  return `0x${Number(await Sdk.connector.blockNumber("ETH", mainnet)).toString(16)}`;
 }

@@ -1,0 +1,59 @@
+#:schema https://dystroy.org/bacon/.bacon.schema.json
+
+# This is a configuration file for the bacon tool
+#
+# Complete help on configuration: https://dystroy.org/bacon/config/
+#
+# You may check the current default at
+#   https://github.com/Canop/bacon/blob/main/defaults/default-bacon.toml
+
+default_job = "check"
+
+# This requires https://github.com/Canop/bacon/pull/427
+[jobs.check]
+command = [
+    "pnpm", "exec", "tsc",
+    "--noEmit", "--pretty",
+]
+need_stdout = true
+analyzer = "typescript"
+watch = ["src"]
+
+[jobs.lint]
+command = [
+    # "pnpm", "dlx",
+    # "--package", "jiti",
+    "pnpm", "exec",
+    "eslint",
+    "--color", "src"
+]
+need_stdout = true
+analyzer = "eslint"
+watch = ["src"]
+
+[jobs.pedantic]
+env.RAYON_NUM_THREADS = "1" # for constant ordering of items
+command = [
+    "pnpm", "dlx",
+    "@biomejs/biome", "lint",
+    "--colors", "force",
+    "./src",
+    # "--skip", "complexity/useArrowFunction",
+    # this leads to noise everytime we add a method to our interfaces..
+    "--skip", "style/useImportType",
+    # want to call our Error Error
+    "--skip", "suspicious/noShadowRestrictedNames",
+    # "--skip", "style/useTemplate",
+]
+need_stdout = true
+analyzer = "biome"
+watch = ["src"]
+
+# You may define here keybindings that would be specific to
+# a project, for example a shortcut to launch a specific job.
+# Shortcuts to internal functions (scrolling, toggling, etc.)
+# should go in your personal global prefs.toml file instead.
+[keybindings]
+c = "job:check"
+l = "job:lint"
+p = "job:pedantic"

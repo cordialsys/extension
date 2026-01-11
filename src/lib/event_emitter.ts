@@ -31,7 +31,9 @@ export class EventEmitter {
 
   emit(event: Event, ...args: unknown[]) {
     console.log("👂 Provider emit", event, "with args", args);
-    this.listeners[event]?.forEach((listener) => listener(args));
+    this.listeners[event]?.forEach((listener) => {
+      listener(args);
+    });
   }
 }
 
@@ -42,8 +44,10 @@ export class SolEventEmitter {
     event: E,
     ...args: Parameters<EventsListeners[E]>
   ) {
-    // eslint-disable-next-line prefer-spread
-    this.listeners[event]?.forEach((listener) => listener.apply(null, args));
+    this.listeners[event]?.forEach((listener) => {
+      // eslint-disable-next-line prefer-spread
+      listener.apply(null, args);
+    });
   }
 
   on: EventsOnMethod = (event, listener) => {

@@ -25,6 +25,7 @@ async function locateCall(
 
     if (calls) {
       // TODO: Check that there is only one call?
+      // biome-ignore lint/style/noNonNullAssertion: The schema is incorrect, name of a call is not optional.
       return Ok(calls[0].name!);
     }
     await sleep(SLEEP);

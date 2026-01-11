@@ -22,9 +22,9 @@ const INFO: Eth.Info = {
 };
 
 export class Ethereum extends EventEmitter implements Eth.Provider {
-  constructor() {
-    super();
-  }
+  // constructor() {
+  //   super();
+  // }
 
   async start() {
     try {

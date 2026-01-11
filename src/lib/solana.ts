@@ -94,6 +94,8 @@ function newAccount(chain: IdentifierString, addr: string): Sol.Account {
 
 export class Solana implements Wallet {
   #accounts: Sol.Account[] = [];
+  // Using Set<EventsListeners[E]> instead of arrays
+  // has its own downsides, like no `.filter` method.
   listeners: { [E in EventsNames]?: EventsListeners[E][] } = {};
 
   chains = Sol.CHAINS.slice();
@@ -128,9 +130,9 @@ export class Solana implements Wallet {
     return features;
   }
 
-  constructor() {
-    // console.log("constructor this", this);
-  }
+  // constructor() {
+  //   // console.log("constructor this", this);
+  // }
 
   async start(this: Solana) {
     console.log("Initializing Cordial Solana Provider");
@@ -187,8 +189,10 @@ export class Solana implements Wallet {
     event: E,
     ...args: Parameters<EventsListeners[E]>
   ) {
-    // eslint-disable-next-line prefer-spread
-    this.listeners[event]?.forEach((listener) => listener.apply(null, args));
+    this.listeners[event]?.forEach((listener) => {
+      // eslint-disable-next-line prefer-spread
+      listener.apply(null, args);
+    });
   }
 
   on: EventsOnMethod = (event, listener) => {

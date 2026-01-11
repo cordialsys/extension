@@ -33,7 +33,7 @@ async function apiList<R>(
   plural: string,
   options?: ListOptions,
 ): Promise<Result<R[]>> {
-  if (options && options.filter) {
+  if (options?.filter) {
     const filtered = new URL(url);
     filtered.searchParams.set("filter", options.filter);
     url = filtered.toString();

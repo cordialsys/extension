@@ -99,16 +99,15 @@ function newRequest(): Request {
   const publicHex = hex.encode(x255.publicKey);
   return {
     publicHex,
-    open: function (boxed: Boxed) {
-      return new TextDecoder().decode(
+    open: (boxed: Boxed) =>
+      new TextDecoder().decode(
         cryptoBoxOpenEasy({
           ciphertext: new Uint8Array(boxed.cipher),
           nonce: new Uint8Array(boxed.nonce),
           publicKey: new Uint8Array(boxed.public_key),
           privateKey: x255.privateKey,
         }),
-      );
-    },
+      ),
   };
 }
 
@@ -213,7 +212,7 @@ export const Login = {
       Temporal.Duration.compare(
         now.until(expires),
         Temporal.Duration.from({ minutes: 10 }),
-      ) != 1
+      ) !== 1
     ) {
       console.warn("certificate expired");
       return undefined;
@@ -259,7 +258,7 @@ async function completeLogin(
 ): Promise<Login> {
   // 3.1 fetch boxed access token
   let url = `https://auth.cordial.systems/login/get-access?request=${request.publicHex}`;
-  let boxed;
+  let boxed: Boxed;
   while (true) {
     const response = await fetch(url);
     if (!response.ok) {
