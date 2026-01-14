@@ -4452,7 +4452,7 @@ export interface components {
     CallName: string;
     /** CallData */
     CallData: {
-      call?: Record<string, never>;
+      call?: object;
       transaction?: components["schemas"]["TransactionName"];
       skip_broadcast?: boolean;
       id?: string;

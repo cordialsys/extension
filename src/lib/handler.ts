@@ -113,7 +113,6 @@ async function process(
 
     if (method === "sol_signTransaction") {
       return await sol.signTransaction(
-        config,
         request.params as solTypes.SolanaSignTransactionInput[],
       );
     }
