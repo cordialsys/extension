@@ -1,13 +1,13 @@
 import { Config } from "./config";
-import { browser_action } from "./constants";
-import { Sdk } from "./sdk";
-import { Err, Eth, Ok, Option, Request, Response, Result, Sol } from "./types";
+import { Error, Sdk } from "./sdk";
+import { Eth, Sol } from "./types";
+import { Err, None, Ok, Option, Request, Response, Result } from "./types";
 import * as sol from "./handler/sol";
 
 import superjson from "superjson";
 import type * as solTypes from "@solana/wallet-standard-features";
 
-export function handleRequest(
+export function onMessage(
   requestJson: string,
   sender: globalThis.Browser.runtime.MessageSender,
   respond: (response: string) => void,
@@ -20,26 +20,27 @@ export function handleRequest(
   // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/onMessage#sending_an_asynchronous_response_using_sendresponse
   //
   // Seems with Chrome 144 (out January 7, 2026), should be able to use async/await normally.
-  handleAsync(request, sender).then((response) => {
+  handle(request, sender).then((response) => {
     const responseJson = superjson.stringify(response);
     respond(responseJson);
   });
   return true;
 }
 
-async function handleAsync(
+async function handle(
   request: Request,
   sender: globalThis.Browser.runtime.MessageSender,
 ): Promise<Response> {
   const config = await Config.load();
 
   const log = `${request.header.provider} :: ${request.header.id} :: ${request.method} ::`;
-  console.log("❓", log, request.params);
+  // console.log("❓", log, request.params);
+  console.log("▶️", log, request.params);
 
   const result = await process(request, config, sender.origin, sender.tab?.id);
 
-  if (result.ok) console.log("✍", log, result.value);
-  else console.error("✍", log, result.error);
+  if (result.ok) console.log("⬅️", log, result.value);
+  else console.error("💔", log, result.error);
 
   return {
     header: request.header,
@@ -58,30 +59,27 @@ async function process(
   const provider = request.header.provider;
   const method = request.method;
 
-  const notAllowed = !config || !origin || !config.origins.includes(origin);
+  if (!tab) {
+    return Err(Error.permissionDenied("Not a tab"));
+  }
 
-  if (config) {
-    browser_action.setTitle({ title: JSON.stringify(config, null, 2) });
+  if (!config) {
+    await Config.setBadge(None, tab, false);
+    return Err(Error.permissionDenied("Not configured"));
   }
-  if (notAllowed && tab) {
-    console.log(`Origin ${origin} not allowed`);
-    await browser_action.setBadgeText({ tabId: tab, text: "✗" });
-    await browser_action.setBadgeBackgroundColor({ tabId: tab, color: "#F00" });
-  } else {
-    // console.log(`Origin ${origin} allowed`);
-    await browser_action.setBadgeText({ tabId: tab, text: "✓" });
-    await browser_action.setBadgeBackgroundColor({ tabId: tab, color: "#0F0" });
+
+  if (!origin || !config.origins.includes(origin)) {
+    await Config.setBadge(config, tab, false);
+    return Err(Error.permissionDenied(`Origin ${origin} not allowed`));
   }
+
+  await Config.setBadge(config, tab, true);
 
   if (method === "cordial_ping") {
     return Ok("pong");
   }
 
   if (provider === "SOL") {
-    if (notAllowed) {
-      const error = Eth.Code.Unauthorized;
-      return Err(error);
-    }
     // const request = the_request;
     if (method === "cordial_preconnect") {
       const treasury = await Sdk.treasury.treasury(
@@ -136,10 +134,6 @@ async function process(
   }
 
   if (provider === "ETH") {
-    if (notAllowed) {
-      const error = Eth.Code.Unauthorized;
-      return Err(error);
-    }
     // https://docs.base.org/base-account/reference/core/provider-rpc-methods/eth_requestAccounts
     // eth_requestAccounts should return an error if user doesn't give permission
     // eth_accounts should return an empty array
@@ -181,13 +175,13 @@ async function treasury_network(config: Config): Promise<Option<string>> {
     config.treasury.url,
     config.treasury.name,
   );
-  if (!treasury) return undefined;
+  if (!treasury) return None;
   return treasury.network;
 }
 
 async function eth_chainId(config: Config): Promise<Option<string>> {
   const network = await treasury_network(config);
-  if (!network) return undefined;
+  if (!network) return None;
   if (network === "mainnet") {
     return "0x1";
   } else {
@@ -197,7 +191,7 @@ async function eth_chainId(config: Config): Promise<Option<string>> {
 
 async function eth_blockNumber(config: Config): Promise<Option<string>> {
   const network = await treasury_network(config);
-  if (!network) return undefined;
+  if (!network) return None;
   const mainnet = network === "mainnet";
   return `0x${Number(await Sdk.connector.blockNumber("ETH", mainnet)).toString(16)}`;
 }

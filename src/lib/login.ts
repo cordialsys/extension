@@ -8,7 +8,7 @@ import { Temporal } from "temporal-polyfill";
 import { get, set } from "idb-keyval";
 import { browser_action, COLOR, GRAY, LOGIN_REFRESH } from "./constants";
 import { short_sleep } from "./util";
-import { Option } from "./types";
+import { None, Option } from "./types";
 
 export interface Identity {
   publicKey: CryptoKey;
@@ -179,9 +179,7 @@ export const Login = {
 
   async load(): Promise<Option<Login>> {
     // 1. verify logged in to Clerk
-    if (!(await clerkLoggedIn())) {
-      return undefined;
-    }
+    if (!(await clerkLoggedIn())) return None;
 
     // 2. verify logged in to Cordial SaaS
     // Note we cannot read it directly.
@@ -189,14 +187,12 @@ export const Login = {
     const response = await fetch(url);
     if (!response.ok) {
       console.log("could not get /v1/users/me");
-      return undefined;
+      return None;
     }
 
     // 3. load it from DB
     const login = await get("login");
-    if (!login) {
-      return undefined;
-    }
+    if (!login) return login;
 
     // 4. verify it is still valid for 10 more minutes
     // console.log("certificate", login.certificate);
@@ -212,7 +208,7 @@ export const Login = {
       ) !== 1
     ) {
       console.warn("certificate expired");
-      return undefined;
+      return None;
     }
 
     // TODO: Verify login is valid

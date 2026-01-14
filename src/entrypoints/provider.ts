@@ -9,13 +9,19 @@
 // "unlisted script" that is injected by content.ts into the defi app
 import { Ethereum } from "@/lib/ethereum";
 import { Solana } from "@/lib/solana";
-import { response } from "@/lib/relay";
+import { cordialRequest, response } from "@/lib/relay";
 
 export default defineUnlistedScript(() => {
   console.log("♥️ Running the Cordial Provider");
   window.addEventListener("message", response);
+  cordialRequest("cordial_ping");
+  // TODO: Only expose providers if the origin is allowed (can tell by response of ping)
+  // This would be easy to do.. but we also have to then expose
+  // it later on (if the user allows the origin by clicking on the extension)
   const eth = new Ethereum();
   setTimeout(eth.start.bind(eth), 0);
   const sol = new Solana();
   setTimeout(sol.start.bind(sol), 0);
+  // clobber the global name space for easy debug access
+  (window as unknown as { cordial: unknown }).cordial = { eth, sol };
 });

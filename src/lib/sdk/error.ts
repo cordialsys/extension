@@ -50,6 +50,13 @@ export const Error = {
       message,
     };
   },
+  permissionDenied(message: string): Error {
+    return {
+      code: 7,
+      status: "Permission Denied",
+      message,
+    };
+  },
   unimplemented(message: string): Error {
     return {
       code: 12,

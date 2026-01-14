@@ -17,9 +17,13 @@ export const Nonce = {
   },
 };
 
-export type Provider = "ETH" | "SOL";
+export type Provider = "cordial" | "ETH" | "SOL";
 export type Params = unknown[] | object;
 
+// Note that "provider" and the prefix of "method" are somewhat redundant.
+// However... the wallet standard also applies to Ethereum, so it would be
+// possible for some dapps to use the "SOL" provider (which would then have
+// to be renamed to e.g. WalletStandard) for ETH methods.
 export interface Header {
   id: Nonce;
   provider: Provider;
@@ -60,6 +64,7 @@ export type Option<T> = Some<T> | None;
 
 export type Some<T> = T;
 export type None = undefined;
+export const None = undefined;
 
 export function Some<T>(value: T): Some<T> {
   return value;

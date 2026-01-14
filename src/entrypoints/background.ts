@@ -9,19 +9,10 @@
 import { get } from "idb-keyval";
 
 import { browser_action, COLOR } from "@/lib/constants";
+import { onClicked } from "@/lib/click";
 import { Config } from "@/lib/config";
-import { Login, loginFirstName, turnOff, turnOn } from "@/lib/login";
-import { handleRequest } from "@/lib/handler";
-
-async function onClicked(tab: globalThis.Browser.tabs.Tab) {
-  console.log(`extension icon clicked on page "${tab.title}" (${tab.url})`);
-
-  if (!(await get("on"))) {
-    await turnOn();
-  } else {
-    await turnOff();
-  }
-}
+import { Login, loginFirstName, turnOff } from "@/lib/login";
+import { onMessage } from "@/lib/handler";
 
 // figure out what state we're in, and ensure the keys
 // - on
@@ -53,7 +44,7 @@ async function init() {
 async function background() {
   await init();
   browser_action.onClicked.addListener(onClicked);
-  browser.runtime.onMessage.addListener(handleRequest);
+  browser.runtime.onMessage.addListener(onMessage);
 }
 
 export default defineBackground(() => {

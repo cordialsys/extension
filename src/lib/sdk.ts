@@ -1,8 +1,9 @@
 import { Config, Extension } from "./config";
 import { Login } from "./login";
 import { Error, Result } from "./sdk/error";
+export { Error, Result } from "./sdk/error";
 import { sign } from "./sdk/http_signature";
-import { Err, Ok, Option } from "./types";
+import { Err, None, Ok, Option } from "./types";
 
 import superjson from "superjson";
 import * as A from "./sdk/admin";
@@ -27,6 +28,18 @@ async function apiGet<R>(url: string): Promise<Result<R>> {
     return Err((await response.json()) as Error);
   }
   return Ok((await response.json()) as R);
+}
+
+async function apiPut<R>(url: string, body: R): Promise<Result<unknown>> {
+  const response = await fetch(url, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!response.ok) {
+    return Err((await response.json()) as Error);
+  }
+  return Ok(await response.json());
 }
 
 async function apiList<R>(
@@ -57,6 +70,15 @@ export namespace Sdk {
       return await apiGet<R>(url);
     }
 
+    async function genericPut<R>(
+      name: string,
+      resource: R,
+    ): Promise<Result<unknown>> {
+      const url = `${API}v1/${name}`;
+      console.log(`putting ${url} to ${resource}`);
+      return await apiPut<R>(url, resource);
+    }
+
     async function genericList<R>(
       path: string,
       plural: string,
@@ -84,12 +106,23 @@ export namespace Sdk {
           const name = `users/${userId}/extension`;
           return await genericGet(name);
         }
+
+        export async function set(
+          userId: string,
+          config: A.ExtensionConfig,
+        ): Promise<Result<unknown>> {
+          const name = `users/${userId}/extension`;
+          const extensionResult = await get(userId);
+          if (!extensionResult.ok) return extensionResult;
+          const extension = extensionResult.value;
+          extension.config = config;
+          return await genericPut(name, extension);
+        }
+
         // syntactic sugar
         export async function maybe(userId: string): Promise<Option<Config>> {
           const result = await get(userId);
-          if (!result.ok) {
-            return undefined;
-          }
+          if (!result.ok) return None;
           const extension = result.value as Extension;
           return extension.config;
         }
@@ -108,9 +141,7 @@ export namespace Sdk {
         url += "?network=testnet";
       }
       const response = await fetch(url);
-      if (!response.ok) {
-        return undefined;
-      }
+      if (!response.ok) return None;
       const chain = (await response.json()) as { height: string };
       return chain.height;
     }
@@ -119,9 +150,7 @@ export namespace Sdk {
     ): Promise<Option<string>> {
       const url = `https://connector.cordialapis.com/v1/chains/${chainId}?network=!mainnet`;
       const response = await fetch(url);
-      if (!response.ok) {
-        return undefined;
-      }
+      if (!response.ok) return None;
       const chain = (await response.json()) as { network: string };
       return chain.network;
     }
@@ -130,9 +159,7 @@ export namespace Sdk {
     ): Promise<Option<string>> {
       const url = `https://connector.cordialapis.com/v1/chains/${chainId}?network=!mainnet`;
       const response = await fetch(url);
-      if (!response.ok) {
-        return undefined;
-      }
+      if (!response.ok) return None;
       const chain = (await response.json()) as { chain_id: string };
       return chain.chain_id;
     }
@@ -240,7 +267,7 @@ export namespace Sdk {
       const response = await fetch(url);
       if (!response.ok) {
         console.log("Failed to fetch treasury data", response);
-        return undefined;
+        return None;
       }
       const treasury = (await response.json()) as T.Treasury;
       return treasury;

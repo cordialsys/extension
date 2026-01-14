@@ -20,6 +20,13 @@ export type Promises = Map<Nonce, [Resolver, Rejecter]>;
 
 const PROMISES: Promises = new Map();
 
+export function cordialRequest(
+  method: string,
+  params?: Params,
+): Promise<unknown> {
+  return request("cordial", method, params);
+}
+
 export function ethRequest(method: string, params?: Params): Promise<unknown> {
   return request("ETH", method, params);
 }
