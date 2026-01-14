@@ -4,6 +4,7 @@ import { Error, Result } from "./sdk/error";
 import { sign } from "./sdk/http_signature";
 import { Err, Ok, Option } from "./types";
 
+import superjson from "superjson";
 import * as A from "./sdk/admin";
 import * as T from "./sdk/treasury";
 
@@ -184,6 +185,10 @@ export namespace Sdk {
           call: T.Call,
         ): Promise<Result<string>> {
           const url = `${PROPOSE_API}/chains/${chain}/calls`;
+          console.log(
+            "proposed call:",
+            JSON.stringify(superjson.serialize(call), null, 2),
+          );
           const request = new Request(url, {
             method: "POST",
             body: JSON.stringify(call),

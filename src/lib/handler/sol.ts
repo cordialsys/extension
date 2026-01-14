@@ -76,6 +76,9 @@ export async function signTransaction(
   const proposalName = proposalNameResult.value;
   console.log("proposal name:", proposalName);
 
+  const submitUrl = `https://treasury.cordial.systems/propose/${proposalName}`;
+  browser.windows.create({ url: submitUrl });
+
   const callResult = await T.Call.byProposal(proposalName);
   if (!callResult.ok) return callResult;
   const call = callResult.value;

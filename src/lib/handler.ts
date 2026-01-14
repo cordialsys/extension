@@ -117,6 +117,11 @@ async function process(
       } as Sol.Changes);
     }
 
+    console.log(
+      "request params:",
+      JSON.stringify(superjson.serialize(request.params), null, 2),
+    );
+
     if (method === "sol_signTransaction") {
       return await sol.signTransaction(
         request.params as solTypes.SolanaSignTransactionInput[],
