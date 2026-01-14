@@ -4,20 +4,26 @@ import { Sdk } from "./sdk";
 import { Err, Eth, Ok, Option, Request, Response, Result, Sol } from "./types";
 import * as sol from "./handler/sol";
 
+import superjson from "superjson";
 import type * as solTypes from "@solana/wallet-standard-features";
 
 export function handleRequest(
-  request: Request,
+  requestJson: string,
   sender: globalThis.Browser.runtime.MessageSender,
-  respond: (response: Response) => void,
+  respond: (response: string) => void,
 ) {
+  const request: Request = superjson.parse(requestJson);
+  console.log("request:", request);
   if (!request || request.kind !== "cordial:provider:request") return;
 
   // Bit weird.. if handleRequest is async, then the responder doesn't work
   // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/onMessage#sending_an_asynchronous_response_using_sendresponse
   //
   // Seems with Chrome 144 (out January 7, 2026), should be able to use async/await normally.
-  handleAsync(request, sender).then((response) => respond(response));
+  handleAsync(request, sender).then((response) => {
+    const responseJson = superjson.stringify(response);
+    respond(responseJson);
+  });
   return true;
 }
 

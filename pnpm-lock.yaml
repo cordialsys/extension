@@ -44,6 +44,9 @@ importers:
       prettier:
         specifier: 3.7.4
         version: 3.7.4
+      superjson:
+        specifier: ^2.2.6
+        version: 2.2.6
       temporal-polyfill:
         specifier: ^0.3.0
         version: 0.3.0
@@ -1340,6 +1343,13 @@ packages:
       }
     engines: { node: ^14.18.0 || >=16.10.0 }
 
+  copy-anything@4.0.5:
+    resolution:
+      {
+        integrity: sha512-7Vv6asjS4gMOuILabD3l739tsaxFQmC+a7pLZm02zyvs8p977bL3zEgq3yDk5rn9B0PbYgIv++jmHcuUab4RhA==,
+      }
+    engines: { node: ">=18" }
+
   core-util-is@1.0.3:
     resolution:
       {
@@ -2172,6 +2182,13 @@ packages:
     resolution:
       {
         integrity: sha512-mE00Gnza5EEB3Ds0HfMyllZzbBrmLOX3vfWoj9A9PEnTfratQ/BcaJOuMhnkhjXvb2+FkY3VuHqtAGpTPmglFQ==,
+      }
+    engines: { node: ">=18" }
+
+  is-what@5.5.0:
+    resolution:
+      {
+        integrity: sha512-oG7cgbmg5kLYae2N5IVd3jm2s+vldjxJzK1pcu9LfpGuQ93MQSzo0okvRna+7y5ifrD+20FE8FvjusyGaz14fw==,
       }
     engines: { node: ">=18" }
 
@@ -3184,6 +3201,13 @@ packages:
       {
         integrity: sha512-zOh9jPYI+xrNOyisSelgym4tolKTJCQd5GBhK0+0xJvcYDcwlOoxF/rnFKQ2KRZknXSG9jWAp66fwP6AxN9STg==,
       }
+
+  superjson@2.2.6:
+    resolution:
+      {
+        integrity: sha512-H+ue8Zo4vJmV2nRjpx86P35lzwDT3nItnIsocgumgr0hHMQ+ZGq5vrERg9kJBo5AWGmxZDhzDo+WVIJqkB0cGA==,
+      }
+    engines: { node: ">=16" }
 
   supports-color@7.2.0:
     resolution:
@@ -4260,6 +4284,10 @@ snapshots:
 
   consola@3.4.2: {}
 
+  copy-anything@4.0.5:
+    dependencies:
+      is-what: 5.5.0
+
   core-util-is@1.0.3: {}
 
   cross-spawn@7.0.6:
@@ -4688,6 +4716,8 @@ snapshots:
   is-unicode-supported@1.3.0: {}
 
   is-unicode-supported@2.1.0: {}
+
+  is-what@5.5.0: {}
 
   is-wsl@2.2.0:
     dependencies:
@@ -5274,6 +5304,10 @@ snapshots:
       stubborn-utils: 1.0.2
 
   stubborn-utils@1.0.2: {}
+
+  superjson@2.2.6:
+    dependencies:
+      copy-anything: 4.0.5
 
   supports-color@7.2.0:
     dependencies:

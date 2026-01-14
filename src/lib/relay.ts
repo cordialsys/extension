@@ -9,6 +9,7 @@ the final resolution requires handling the exceptions that
 are thrown when rejecting the promise
 */
 
+import superjson from "superjson";
 import { Nonce, Params, Provider, Request, Response } from "./types";
 
 // Map object keys are compared by reference (object identity), not value
@@ -43,6 +44,18 @@ export function request(
   return promise;
 }
 
+// It is crucial to stringify the requests and responses ourselves
+// when crossing the extension messaging boundary.
+//
+// The default transport uses JSON.stringify, which messes up types,
+// for instance Uint8Array turns into {0: x, 1: y,.. } etc.
+//
+// This `superjson` library instead adds type hints, to ensure
+// proper deserialization.
+//
+// https://github.com/mozilla/webextension-polyfill/issues/643
+// https://issues.chromium.org/issues/40321352
+
 export function relayRequest(event: MessageEvent<Request>) {
   // checks
   if (event.source !== window) return;
@@ -50,12 +63,14 @@ export function relayRequest(event: MessageEvent<Request>) {
   if (!request || request.kind !== "cordial:provider:request") return;
 
   // relay
-  // console.log("  provider 👉 relay ::", request);
-  browser.runtime.sendMessage(request, relayResponse);
+  console.log("  provider 👉 relay ::", request);
+  const requestJson: string = superjson.stringify(request);
+  browser.runtime.sendMessage(requestJson, relayResponse);
 }
 
-function relayResponse(response: Response) {
-  // console.log("    relay 👈 extension ::", response);
+function relayResponse(responseJson: string) {
+  const response: Response = superjson.parse(responseJson);
+  console.log("    relay 👈 extension ::", response);
 
   // checks
   if (!response || response.kind !== "cordial:extension:response") return;
@@ -71,7 +86,7 @@ export function response(event: MessageEvent<Response>) {
   const id = header.id;
   const provider = header.provider;
 
-  // console.log("  provider 👈 relay ::", response);
+  console.log("  provider 👈 relay ::", response);
   const request = PROMISES.get(id);
   if (!request) {
     console.error("No such request for", id);

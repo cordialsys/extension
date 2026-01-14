@@ -55,8 +55,17 @@ export interface Response<T = unknown, E = unknown> {
   result: Result<T, E>;
 }
 
-export type Option<T> = T | undefined;
+// Option
+export type Option<T> = Some<T> | None;
 
+export type Some<T> = T;
+export type None = undefined;
+
+export function Some<T>(value: T): Some<T> {
+  return value;
+}
+
+// Result
 export type Result<T, E = unknown> = Ok<T> | Err<E>;
 
 export interface Ok<T = unknown> {

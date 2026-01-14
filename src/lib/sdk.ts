@@ -51,12 +51,12 @@ export namespace Sdk {
   export namespace admin {
     const API: string = "https://admin.cordialapis.com/";
 
-    async function adminApiGet<R>(name: string): Promise<Result<R>> {
+    async function genericGet<R>(name: string): Promise<Result<R>> {
       const url = `${API}v1/${name}`;
       return await apiGet<R>(url);
     }
 
-    async function adminApiList<R>(
+    async function genericList<R>(
       path: string,
       plural: string,
       options?: ListOptions,
@@ -67,13 +67,13 @@ export namespace Sdk {
 
     export namespace users {
       export async function get(userId: string): Promise<Result<A.User>> {
-        return adminApiGet<A.User>(`users/${userId}`);
+        return genericGet(`users/${userId}`);
       }
 
       export async function list(
         options?: ListOptions,
       ): Promise<Result<A.User[]>> {
-        return adminApiList<A.User>("users", "users", options);
+        return genericList<A.User>("users", "users", options);
       }
 
       export namespace extension {
@@ -81,7 +81,7 @@ export namespace Sdk {
           userId: string,
         ): Promise<Result<A.Extension>> {
           const name = `users/${userId}/extension`;
-          return await adminApiGet<A.Extension>(name);
+          return await genericGet(name);
         }
         // syntactic sugar
         export async function maybe(userId: string): Promise<Option<Config>> {
@@ -138,8 +138,10 @@ export namespace Sdk {
   }
 
   export namespace propose {
-    export const PROPOSE_API = "https://treasury.cordialapis.com/v1/propose";
-    // export const PROPOSE_API = "http://127.0.0.1:8777/v1/propose";
+    // const PUBLIC_PROPOSE = "https://treasury.cordialapis.com/v1/propose";
+    const LOCAL_PROPOSE = "http://127.0.0.1:8777/v1/propose";
+    export const PROPOSE_API = LOCAL_PROPOSE;
+    const LOCAL: boolean = PROPOSE_API === LOCAL_PROPOSE;
 
     export async function executeSigned<T>(
       request: Request,
@@ -162,6 +164,7 @@ export namespace Sdk {
       }
       const treasuryId = config.treasury.name.slice(prefix.length);
       try {
+        if (LOCAL) request.headers.set("user", login.userId);
         request = await sign("pro", login, request, treasuryId);
         const response = await fetch(request);
 
@@ -192,7 +195,7 @@ export namespace Sdk {
   }
 
   export namespace treasury {
-    async function treasuryApiList<R>(
+    export async function genericList<R>(
       path: string,
       plural: string,
       options?: ListOptions,
@@ -205,7 +208,7 @@ export namespace Sdk {
       return await apiList<R>(url, plural, options);
     }
 
-    async function treasuryApiGet<T>(name: string): Promise<Result<T>> {
+    export async function get<T>(name: string): Promise<Result<T>> {
       const config = await Config.load();
       if (!config) {
         return Err(Error.failedPrecondition("not configured"));
@@ -216,14 +219,10 @@ export namespace Sdk {
 
     export namespace chains {
       export namespace calls {
-        export async function get(callName: string): Promise<Result<T.Call>> {
-          return await treasuryApiGet(callName);
-        }
-
         export async function list(
           options?: ListOptions,
         ): Promise<Result<T.Call[]>> {
-          return await treasuryApiList<T.Call>("calls", "calls", options);
+          return await genericList<T.Call>("calls", "calls", options);
         }
       }
     }

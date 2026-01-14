@@ -7,6 +7,7 @@ import {
 import { Temporal } from "temporal-polyfill";
 import { get, set } from "idb-keyval";
 import { browser_action, COLOR, GRAY, LOGIN_REFRESH } from "./constants";
+import { short_sleep } from "./util";
 import { Option } from "./types";
 
 export interface Identity {
@@ -22,6 +23,27 @@ export interface Login {
   expires: number;
 }
 
+export const Identity = {
+  async new(options?: { refresh?: boolean }): Promise<Identity> {
+    let ed255: Option<CryptoKeyPair> = await get("identity");
+    if (!ed255 || options?.refresh) {
+      ed255 = await crypto.subtle.generateKey("Ed25519", false, [
+        "sign",
+        "verify",
+      ]);
+      await set("identity", ed255);
+    }
+    // console.log(ed255);
+    const publicExport = await crypto.subtle.exportKey("raw", ed255.publicKey);
+    const publicHex = hex.encode(new Uint8Array(publicExport));
+    return {
+      privateKey: ed255.privateKey,
+      publicKey: ed255.publicKey,
+      publicHex,
+    };
+  },
+};
+
 interface Boxed {
   public_key: number[];
   nonce: number[];
@@ -33,32 +55,24 @@ interface Request {
   open(boxed: Boxed): string;
 }
 
-async function getOrCreateIdentity(): Promise<Identity> {
-  return await flexIdentity(false);
-}
-
-async function newIdentity(): Promise<Identity> {
-  return await flexIdentity(true);
-}
-
-async function flexIdentity(alwaysNew: boolean): Promise<Identity> {
-  let ed255: Option<CryptoKeyPair> = await get("identity");
-  if (!ed255 || alwaysNew) {
-    ed255 = await crypto.subtle.generateKey("Ed25519", false, [
-      "sign",
-      "verify",
-    ]);
-    await set("identity", ed255);
-  }
-  // console.log(ed255);
-  const publicExport = await crypto.subtle.exportKey("raw", ed255.publicKey);
-  const publicHex = hex.encode(new Uint8Array(publicExport));
-  return {
-    privateKey: ed255.privateKey,
-    publicKey: ed255.publicKey,
-    publicHex,
-  };
-}
+export const Request = {
+  new(): Request {
+    const x255 = cryptoBoxKeyPair();
+    const publicHex = hex.encode(x255.publicKey);
+    return {
+      publicHex,
+      open: (boxed: Boxed) =>
+        new TextDecoder().decode(
+          cryptoBoxOpenEasy({
+            ciphertext: new Uint8Array(boxed.cipher),
+            nonce: new Uint8Array(boxed.nonce),
+            publicKey: new Uint8Array(boxed.public_key),
+            privateKey: x255.privateKey,
+          }),
+        ),
+    };
+  },
+};
 
 export async function turnOff() {
   console.log("🥺 Turning off");
@@ -92,23 +106,6 @@ export async function turnOn() {
 
   // refresh every five minutes
   setTimeout(Login.track, LOGIN_REFRESH);
-}
-
-function newRequest(): Request {
-  const x255 = cryptoBoxKeyPair();
-  const publicHex = hex.encode(x255.publicKey);
-  return {
-    publicHex,
-    open: (boxed: Boxed) =>
-      new TextDecoder().decode(
-        cryptoBoxOpenEasy({
-          ciphertext: new Uint8Array(boxed.cipher),
-          nonce: new Uint8Array(boxed.nonce),
-          publicKey: new Uint8Array(boxed.public_key),
-          privateKey: x255.privateKey,
-        }),
-      ),
-  };
 }
 
 function parseJwt(jwt: string): unknown {
@@ -159,11 +156,11 @@ export const Login = {
       return prevLogin;
     }
     //1. prepare request and identity keys
-    const identity = await getOrCreateIdentity();
+    const identity = await Identity.new();
     const key = `ed25519.${identity.publicHex}`;
     // console.log("key", key);
 
-    const request = newRequest();
+    const request = Request.new();
     const requestHex = request.publicHex;
     // console.log("request", requestHex);
 
@@ -238,9 +235,9 @@ export const Login = {
     }
 
     // console.log("refreshing login");
-    const identity = await newIdentity();
+    const identity = await Identity.new({ refresh: true });
     const key = `ed25519.${identity.publicHex}`;
-    const request = newRequest();
+    const request = Request.new();
     const requestHex = request.publicHex;
 
     const url = `https://auth.cordial.systems/login/flow?key=${key}&request=${requestHex}`;
@@ -262,7 +259,7 @@ async function completeLogin(
   while (true) {
     const response = await fetch(url);
     if (!response.ok) {
-      await setTimeout(() => {}, 100);
+      await short_sleep();
       continue;
     }
     boxed = (await response.json()) as Boxed;
