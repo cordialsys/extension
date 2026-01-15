@@ -18,8 +18,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 // IN THE SOFTWARE.
 
-import { solRequest } from "./relay";
-import { Sol } from "./types";
+import { solRequest } from "@/lib/relay";
+import { Sol } from "@/lib/types";
 
 // import { PublicKey } from "@solana/web3.js";
 import type {

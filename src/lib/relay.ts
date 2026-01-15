@@ -46,7 +46,9 @@ export function request(
   const request = Request.new(provider, method, params);
   const id = request.header.id;
   PROMISES.set(id, [resolve, reject]);
-  console.log(`❓ ${provider} :: ${id} :: ${method} ::`, params);
+  // console.log(`❓ ${provider} :: ${id} :: ${method} ::`, params);
+  console.log(`▶️ ${provider} :: ${id} :: ${method} ::`, params);
+
   window.postMessage(request, "*");
   return promise;
 }
@@ -70,14 +72,14 @@ export function relayRequest(event: MessageEvent<Request>) {
   if (!request || request.kind !== "cordial:provider:request") return;
 
   // relay
-  console.log("  provider 👉 relay ::", request);
+  // console.log("  provider 👉 relay ::", request);
   const requestJson: string = superjson.stringify(request);
   browser.runtime.sendMessage(requestJson, relayResponse);
 }
 
 function relayResponse(responseJson: string) {
   const response: Response = superjson.parse(responseJson);
-  console.log("    relay 👈 extension ::", response);
+  // console.log("    relay 👈 extension ::", response);
 
   // checks
   if (!response || response.kind !== "cordial:extension:response") return;
@@ -93,7 +95,7 @@ export function response(event: MessageEvent<Response>) {
   const id = header.id;
   const provider = header.provider;
 
-  console.log("  provider 👈 relay ::", response);
+  // console.log("  provider 👈 relay ::", response);
   const request = PROMISES.get(id);
   if (!request) {
     console.error("No such request for", id);
@@ -102,7 +104,8 @@ export function response(event: MessageEvent<Response>) {
   PROMISES.delete(id);
   const [resolve, reject] = request;
   const result = response.result;
-  const log = `✍ ${provider} :: ${id} :: ${response.method} ::`;
+  // const log = `✍ ${provider} :: ${id} :: ${response.method} ::`;
+  const log = `⬅️ ${provider} :: ${id} :: ${response.method} ::`;
   if (result.ok) {
     console.log(log, result.value);
     resolve(result.value);

@@ -151,10 +151,7 @@ async function clerkLoggedIn(): Promise<boolean> {
 export const Login = {
   async new(): Promise<Login> {
     const prevLogin = await Login.load();
-    if (prevLogin) {
-      // console.log("reusing previous login");
-      return prevLogin;
-    }
+    if (prevLogin) return prevLogin;
     //1. prepare request and identity keys
     const identity = await Identity.new();
     const key = `ed25519.${identity.publicHex}`;

@@ -1,8 +1,9 @@
 import { Config } from "./config";
-import { Error, Sdk } from "./sdk";
-import { Eth, Sol } from "./types";
-import { Err, None, Ok, Option, Request, Response, Result } from "./types";
-import * as sol from "./handler/sol";
+import { Error, Result, Sdk } from "./sdk";
+import { Sol } from "./types";
+import { Err, None, Ok, Option, Request, Response } from "./types";
+import * as evm from "./handler/evm";
+import * as svm from "./handler/svm";
 
 import superjson from "superjson";
 import type * as solTypes from "@solana/wallet-standard-features";
@@ -13,7 +14,7 @@ export function onMessage(
   respond: (response: string) => void,
 ) {
   const request: Request = superjson.parse(requestJson);
-  console.log("request:", request);
+  // console.log("request:", request);
   if (!request || request.kind !== "cordial:provider:request") return;
 
   // Bit weird.. if handleRequest is async, then the responder doesn't work
@@ -33,7 +34,7 @@ async function handle(
 ): Promise<Response> {
   const config = await Config.load();
 
-  const log = `${request.header.provider} :: ${request.header.id} :: ${request.method} ::`;
+  const log = `${request.header.provider} :: ${request.header.id} :: ${request.method} :: ${JSON.stringify(request.params)} ::`;
   // console.log("❓", log, request.params);
   console.log("▶️", log, request.params);
 
@@ -59,9 +60,7 @@ async function process(
   const provider = request.header.provider;
   const method = request.method;
 
-  if (!tab) {
-    return Err(Error.permissionDenied("Not a tab"));
-  }
+  if (!tab) return Err(Error.permissionDenied("Not a tab"));
 
   if (!config) {
     await Config.setBadge(None, tab, false);
@@ -75,9 +74,7 @@ async function process(
 
   await Config.setBadge(config, tab, true);
 
-  if (method === "cordial_ping") {
-    return Ok("pong");
-  }
+  if (method === "cordial_ping") return Ok("pong");
 
   if (provider === "SOL") {
     // const request = the_request;
@@ -87,13 +84,13 @@ async function process(
         config.treasury.name,
       );
       if (!treasury) {
-        return Err("not ok");
+        return Err(Error.unknown("not ok"));
       }
       let chain = Sol.MAINNET;
       if (treasury.network !== "mainnet") {
         const network = await Sdk.connector.testnetChainNetwork("SOL");
         if (!network) {
-          return Err("not ok");
+          return Err(Error.unknown("not ok"));
         }
         // console.log("network", network);
         if (network === "devnet") {
@@ -101,7 +98,7 @@ async function process(
         } else if (network === "testnet") {
           chain = Sol.TESTNET;
         } else {
-          return Err("not ok");
+          return Err(Error.unknown("not ok"));
         }
         // TODO: Query connector.cordialapis.com to get configured !mainnet
       }
@@ -120,78 +117,38 @@ async function process(
       JSON.stringify(superjson.serialize(request.params), null, 2),
     );
 
-    if (method === "sol_signTransaction") {
-      return await sol.signTransaction(
+    if (method === "solana:signTransaction") {
+      return await svm.signTransaction(
         request.params as solTypes.SolanaSignTransactionInput[],
       );
     }
 
-    if (method === "sol_signIn") {
-      return await sol.signIn(request.params as solTypes.SolanaSignInInput[]);
+    if (method === "solana:signIn") {
+      return await svm.signIn(request.params as solTypes.SolanaSignInInput[]);
     }
 
-    return Err(`method ${request.method} not implemented`);
+    return Err(Error.unimplemented(`method ${request.method} not implemented`));
   }
 
   if (provider === "ETH") {
+    if (method === "eth_blockNumber") return evm.eth_blockNumber(config);
+    if (method === "eth_chainId") return evm.eth_chainId(config);
     // https://docs.base.org/base-account/reference/core/provider-rpc-methods/eth_requestAccounts
     // eth_requestAccounts should return an error if user doesn't give permission
     // eth_accounts should return an empty array
     // We can probably handle both the same way (return empty array)
-    if (method === "eth_requestAccounts" || method === "eth_accounts") {
-      const addresses = eth_accounts(config);
-      return Ok(addresses);
-    }
-    if (method === "eth_chainId") {
-      const chainId = await eth_chainId(config);
-      if (!chainId) return Err("not ok");
-      return Ok(chainId);
-    }
-    if (method === "eth_blockNumber") {
-      const blockNumber = await eth_blockNumber(config);
-      if (!blockNumber) return Err("not ok");
-      return Ok(blockNumber);
-    }
+    if (method === "eth_requestAccounts" || method === "eth_accounts")
+      return Ok(evm.eth_accounts(config));
+    if (method === "personal_sign") return evm.personal_sign(request.params);
+    // https://eips.ethereum.org/EIPS/eip-2255
+    if (method === "wallet_requestPermissions")
+      return evm.wallet_requestPermissions(request.params);
+    if (method === "wallet_switchEthereumChain")
+      return evm.wallet_switchEthereumChain(request.params);
 
     // unsupported method;
-    console.error(`💔 Method ${method} not supported`);
-    const error = Eth.Code.Unsupported;
-    return Err(error);
+    return Err(Error.unimplemented(`💔 Method ${method} not supported`));
   }
 
-  return Err("unreachable");
-}
-
-function eth_accounts(config: Config): string[] {
-  const prefix = "chains/ETH/addresses/";
-  const addresses: string[] = config.addresses
-    .filter((a) => a.startsWith(prefix))
-    .map((a) => a.slice(prefix.length));
-  return addresses;
-}
-
-async function treasury_network(config: Config): Promise<Option<string>> {
-  const treasury = await Sdk.treasury.treasury(
-    config.treasury.url,
-    config.treasury.name,
-  );
-  if (!treasury) return None;
-  return treasury.network;
-}
-
-async function eth_chainId(config: Config): Promise<Option<string>> {
-  const network = await treasury_network(config);
-  if (!network) return None;
-  if (network === "mainnet") {
-    return "0x1";
-  } else {
-    return `0x${Number(await Sdk.connector.testnetChainId("ETH")).toString(16)}`;
-  }
-}
-
-async function eth_blockNumber(config: Config): Promise<Option<string>> {
-  const network = await treasury_network(config);
-  if (!network) return None;
-  const mainnet = network === "mainnet";
-  return `0x${Number(await Sdk.connector.blockNumber("ETH", mainnet)).toString(16)}`;
+  return Err(Error.unknown("unreachable"));
 }
