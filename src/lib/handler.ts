@@ -117,15 +117,13 @@ async function process(
       JSON.stringify(superjson.serialize(request.params), null, 2),
     );
 
-    if (method === "solana:signTransaction") {
+    if (method === "solana:signTransaction")
       return await svm.signTransaction(
         request.params as solTypes.SolanaSignTransactionInput[],
       );
-    }
 
-    if (method === "solana:signIn") {
+    if (method === "solana:signIn")
       return await svm.signIn(request.params as solTypes.SolanaSignInInput[]);
-    }
 
     return Err(Error.unimplemented(`method ${request.method} not implemented`));
   }
