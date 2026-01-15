@@ -215,13 +215,13 @@ export class Solana implements Wallet {
   }
 
   async signIn(...inputs: SignInInput[]): Promise<SignInOutput[]> {
-    return solRequest("sol_signIn", inputs) as Promise<SignInOutput[]>;
+    return solRequest("solana:signIn", inputs) as Promise<SignInOutput[]>;
   }
 
   async signMessage(
     ...inputs: SignMessageInput[]
   ): Promise<SignMessageOutput[]> {
-    return solRequest("sol_signMessage", inputs) as Promise<
+    return solRequest("solana:signMessage", inputs) as Promise<
       SignMessageOutput[]
     >;
   }
@@ -229,7 +229,7 @@ export class Solana implements Wallet {
   async signAndSendTransaction(
     ...inputs: SignAndSendTransactionInput[]
   ): Promise<SignAndSendTransactionOutput[]> {
-    return solRequest("sol_signAndSendTransaction", inputs) as Promise<
+    return solRequest("solana:signAndSendTransaction", inputs) as Promise<
       SignAndSendTransactionOutput[]
     >;
   }
@@ -237,7 +237,7 @@ export class Solana implements Wallet {
   async signTransaction(
     ...inputs: SignTransactionInput[]
   ): Promise<SignTransactionOutput[]> {
-    return solRequest("sol_signTransaction", inputs) as Promise<
+    return solRequest("solana:signTransaction", inputs) as Promise<
       SignTransactionOutput[]
     >;
   }
