@@ -131,6 +131,7 @@ async function process(
   }
 
   if (provider === "ETH") {
+    if (method === "eth_sendTransaction") return evm.eth_sendTransaction(request)
     if (method === "eth_blockNumber") return evm.eth_blockNumber(config);
     if (method === "eth_chainId") return evm.eth_chainId(config);
     // https://docs.base.org/base-account/reference/core/provider-rpc-methods/eth_requestAccounts

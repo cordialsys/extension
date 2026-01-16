@@ -131,12 +131,14 @@ export namespace Sdk {
   }
 
   export namespace connector {
+    const API: string = "http://localhost:8080/";
+
     export async function blockNumber(
       chainId: string,
       mainnet: boolean,
     ): Promise<Option<string>> {
       // TODO: handle mainnet vs testnet
-      let url = `https://connector.cordialapis.com/v1/chains/${chainId}/block`;
+      let url = `${API}v1/chains/${chainId}/block`;
       if (!mainnet) {
         url += "?network=testnet";
       }
@@ -148,7 +150,7 @@ export namespace Sdk {
     export async function testnetChainNetwork(
       chainId: string,
     ): Promise<Option<string>> {
-      const url = `https://connector.cordialapis.com/v1/chains/${chainId}?network=!mainnet`;
+      const url = `${API}v1/chains/${chainId}?network=!mainnet`;
       const response = await fetch(url);
       if (!response.ok) return None;
       const chain = (await response.json()) as { network: string };
@@ -157,7 +159,7 @@ export namespace Sdk {
     export async function testnetChainId(
       chainId: string,
     ): Promise<Option<string>> {
-      const url = `https://connector.cordialapis.com/v1/chains/${chainId}?network=!mainnet`;
+      const url = `${API}v1/chains/${chainId}?network=!mainnet`;
       const response = await fetch(url);
       if (!response.ok) return None;
       const chain = (await response.json()) as { chain_id: string };

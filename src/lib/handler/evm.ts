@@ -1,10 +1,28 @@
 import { Config } from "@/lib/config";
 import { Error, Result, Sdk } from "@/lib/sdk";
-import { Err, None, Ok, Option } from "@/lib/types";
+import { Err, None, Ok, Option, Request } from "@/lib/types";
 import { Params } from "@/lib/types";
 import { Evm, Evms, Id, Ids } from "@/lib/types/eth";
 
 import * as z from "zod";
+import * as T from "@/lib/sdk/treasury";
+
+export async function eth_sendTransaction(request: Request) {
+  const proposalNameResult = await Sdk.propose.chains.calls.create("ETH", {
+    skip_broadcast: false,
+    call: request,
+  });
+  if (!proposalNameResult.ok) return proposalNameResult;
+  const proposalName = proposalNameResult.value;
+  console.log("proposal name:", proposalName);
+
+  const callResult = await T.Call.byProposal(proposalName);
+  if (!callResult.ok) return callResult;
+  const call = callResult.value;
+  console.log("call:", call);
+  return Ok({});
+}
+
 
 let EVM: Evm = "ETH";
 
