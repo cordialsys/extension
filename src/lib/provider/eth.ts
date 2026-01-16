@@ -47,6 +47,11 @@ export class Ethereum extends EventEmitter implements Eth.Provider {
   async request(args: Eth.Request): Promise<unknown> {
     const { method, params } = args as Eth.Request;
 
+    if (method === "wallet_switchEthereumChain") {
+      this.emit("chainChanged", params?.chainId)
+      return { };
+    }
+
     if (!method) throw new Error("Invalid Ethereum request");
     return ethRequest(method, params);
   }

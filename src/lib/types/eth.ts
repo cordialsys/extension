@@ -1,13 +1,15 @@
-export type Evm = "ETH" | "MATIC";
-export type Id = "0x1" | "0x89";
+export type Evm = "ETH" | "ETH_SEPOLIA" | "MATIC";
+export type Id = "0x1" | "0xaa36a7" | "0x89";
 
 export const Ids: { [evm in Evm]: Id } = {
   ETH: "0x1",
+  ETH_SEPOLIA: "0xaa36a7",
   MATIC: "0x89",
 };
 
 export const Evms: { [id in Id]: Evm } = {
   "0x1": "ETH",
+  "0xaa36a7": "ETH_SEPOLIA",
   "0x89": "MATIC",
 };
 

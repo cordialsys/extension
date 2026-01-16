@@ -107,7 +107,7 @@ export async function treasury_network(
 
 export async function eth_chainId(config: Config): Promise<Result<string>> {
   console.log("unused", config);
-  return Ok(Ids[EVM]);
+  return Ok(Ids["ETH_SEPOLIA"]);
   // const network = await treasury_network(config);
   // if (!network) return Err(Error.unknown("not ok"));
   // if (network === "mainnet") {
