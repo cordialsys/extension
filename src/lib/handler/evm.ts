@@ -20,7 +20,11 @@ export async function eth_sendTransaction(request: Request) {
   if (!callResult.ok) return callResult;
   const call = callResult.value;
   console.log("call:", call);
-  return Ok({});
+  // biome-ignore lint/style/noNonNullAssertion: The schema is incorrect, name of a call is not optional.
+  const tx = await T.Call.succeededTransaction(call.transaction!);
+  if (!tx.ok) return Err(Error.unknown("transaction failed: " + tx.error + "\n"));
+
+  return Ok(tx.value.hash);
 }
 
 

@@ -49,23 +49,22 @@ export const Call = {
       await short_sleep();
     }
 
-    return Err(Error.unknown(`locateSignedTx timed out after ${timeoutMs}ms`));
+    return Err(Error.unknown(`submittedTransaction timed out after ${timeoutMs}ms`));
   },
 
-  // async completed(name: string): Promise<Result<Call>> {
-  //   while (true) {
-  //     const result = await Sdk.treasury.get<Call>(name);
-  //     if (!result.ok) return result;
-  //     const call = result.value;
-  //     // TODO: Shouldn't need to cast state as string,
-  //     // it should be defined properly in OpenAPI spec.
-  //     if ((call.state as string) === "succeeded") {
-  //       return Ok(call);
-  //     }
-  //     if ((call.state as string) === "failed") {
-  //       return Err(Error.unknown(JSON.stringify(call)));
-  //     }
-  //     await short_sleep();
-  //   }
-  // },
+  async succeededTransaction(
+    txName: string,
+    timeoutMs = 180_000, // 3 minutes
+  ): Promise<Result<Transaction>> {
+    const start = Date.now();
+
+    while (Date.now() - start < timeoutMs) {
+      const result = await Sdk.treasury.get<Transaction>(txName);
+      if (!result.ok) return result;
+      if (result.value.state === "succeeded") return Ok(result.value);
+      await short_sleep();
+    }
+
+    return Err(Error.unknown(`succeededTransaction timed out after ${timeoutMs}ms`));
+  },
 };
