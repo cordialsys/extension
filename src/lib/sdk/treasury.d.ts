@@ -2284,6 +2284,9 @@ export interface components {
      * @description Valid blockchain address.
      *
      *     Within treasury, resources have restricted `Id` values. For many blockchains, this is not a problem, as the "actual" address on the blockchain is a valid `Id`. For some, characters like `.` are used which are not valid in an `Id`. Hence, resources like `Address` and `Asset`, in general, use the normalized `Id` value corresponding to the blockchain address as their resource ID. They also have an optional field `blockchain_address` allowing to record the "real" blockchain address. It is required that this value normalizes to the resource ID of the resource.
+     * @example AAPGdMUVxGJqbY1gg6jMA7hnQdSzDtfcW4DPAVL56L9w
+     * @example 0x2bc0dde194d722fe98ed3912cad464380f2225ac
+     * @example cosmos13dd5eahz5xkytny9dqnpre7488hm7ahsnadr3w
      */
     BlockchainAddress: string;
     /**
@@ -2862,7 +2865,10 @@ export interface components {
       /** @description Option to set an alternative address to pay for fee. */
       payer?: components["schemas"]["AddressName"];
     };
-    /** TransactionName */
+    /**
+     * TransactionName
+     * @example transactions/123
+     */
     TransactionName: string;
     /**
      * TransactionError
@@ -4441,23 +4447,85 @@ export interface components {
     /** Call */
     Call: {
       name?: components["schemas"]["CallName"];
-      state?: components["schemas"]["BasicState"];
+      state?: components["schemas"]["TransferState"];
     } & components["schemas"]["Metadata"] &
       components["schemas"]["CallData"];
     /**
      * CallName
      * @description The name of a Call
-     * @example chains/SOL/calls/42
+     * @example calls/42
      */
     CallName: string;
-    /** CallData */
+    /**
+     * CallData
+     * @description The call `method` determines the variants of `request` and `response` that are permissible.
+     *
+     *     | driver | method | request | response |
+     *     | ------ | ------ | ------- |----------|
+     *     | EVM | personal_sign | UnsignedMessage | signature |
+     *     | EVM | eth_sendTransaction | UnsignedEvmTransaction | transaction |
+     *     | EVM | eth_signTransaction | UnsignedEvmTransaction | transaction |
+     *     | SVM | solana:signMessage | UnsignedMessage | signature |
+     *     | SVM | solana:signTransaction | UnsignedSvmTransaction | transaction |
+     *     | SVM | solana:signAndSendTransaction | UnsignedSvmTransaction | transaction |
+     *
+     *     The `method` must match the driver of the specified `chain`.
+     *
+     *     To determine the error causing a `failed` state, see the `error` field of the subordinate response resource.
+     */
     CallData: {
-      call?: object;
+      address: components["schemas"]["AddressName"];
+      method: components["schemas"]["CallMethod"];
+      request: components["schemas"]["CallRequest"];
+      response?: components["schemas"]["CallResponse"];
+    };
+    /**
+     * CallMethod
+     * @enum {string}
+     */
+    CallMethod:
+      | "eth_sendTransaction"
+      | "eth_signTransaction"
+      | "personal_sign"
+      | "solana:signIn"
+      | "solana:signMessage"
+      | "solana:signTransaction"
+      | "solana:sendAndSignTransaction";
+    /** CallRequest */
+    CallRequest:
+      | components["schemas"]["UnsignedMessage"]
+      | components["schemas"]["UnsignedEvmTransaction"]
+      | components["schemas"]["UnsignedSvmTransaction"];
+    /** UnsignedMessage */
+    UnsignedMessage: {
+      message: components["schemas"]["Hex"];
+    };
+    /** UnsignedEvmTransaction */
+    UnsignedEvmTransaction: {
+      amount?: components["schemas"]["PositiveDecimal"];
+      to: components["schemas"]["BlockchainAddress"];
+      data: components["schemas"]["Hex"];
+    };
+    /** UnsignedSvmTransaction */
+    UnsignedSvmTransaction: {
+      transaction: components["schemas"]["Hex"];
+    };
+    /**
+     * CallResponse
+     * @description Names the subordinate `signature` (for signing calls such as `personal_sign` and `solana:signMessage`) or `transaction` (for transactioning calls such as `eth_sendTransaction`, `eth_signTransaction`, `solana:signTransaction`, `solana:signAndSendTransaction`).
+     *
+     *     Exactly one of these fields must be set.
+     */
+    CallResponse:
+      | components["schemas"]["CallSignature"]
+      | components["schemas"]["CallTransaction"];
+    /** CallSignature */
+    CallSignature: {
+      signature?: components["schemas"]["SignatureName"];
+    };
+    /** CallTransaction */
+    CallTransaction: {
       transaction?: components["schemas"]["TransactionName"];
-      skip_broadcast?: boolean;
-      id?: string;
-      proposal_id?: string;
-      proposal?: string;
     };
     /** HostPage */
     HostPage: {

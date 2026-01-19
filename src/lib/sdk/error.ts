@@ -1,4 +1,4 @@
-import { Result as GenericResult } from "@/lib/types";
+import type { Result as GenericResult } from "@/lib/types";
 
 // https://grpc.io/docs/guides/status-codes/
 
@@ -33,6 +33,13 @@ export const Error = {
     return {
       code: 9,
       status: "Failed Precondition",
+      message,
+    };
+  },
+  internal(message: string): Error {
+    return {
+      code: 13,
+      status: "Internal",
       message,
     };
   },

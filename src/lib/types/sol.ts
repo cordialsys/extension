@@ -3,9 +3,9 @@ import type {
   WindowRegisterWalletEventCallback as Callback,
 } from "@wallet-standard/base";
 
-import type { WalletAccount } from "@wallet-standard/base";
-import type { IdentifierArray } from "@wallet-standard/base";
-export type { IdentifierArray } from "@wallet-standard/base";
+import type { IdentifierArray, WalletAccount } from "@wallet-standard/base";
+
+export { IdentifierArray };
 
 export interface Account extends WalletAccount {}
 

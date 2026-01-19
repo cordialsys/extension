@@ -7,8 +7,14 @@ import { components } from "./treasury.d";
 
 export type Call = components["schemas"]["Call"];
 export type CallPage = components["schemas"]["CallPage"];
+export type Signature = components["schemas"]["Signature"];
 export type Transaction = components["schemas"]["Transaction"];
 export type Treasury = components["schemas"]["Treasury"];
+export type UnsignedMessage = components["schemas"]["UnsignedMessage"];
+export type UnsignedEvmTransaction =
+  components["schemas"]["UnsignedEvmTransaction"];
+export type UnsignedSvmTransaction =
+  components["schemas"]["UnsignedSvmTransaction"];
 
 export const Call = {
   async byProposal(proposalName: string): Promise<Result<Call>> {
@@ -18,7 +24,7 @@ export const Call = {
       // const filter = `json(proposal).name = "${proposalName}"`;
       //
       // TODO: change the OpenAPI etc. to use `proposal_name` here.
-      const filter = `proposal_id = "${proposalName}"`;
+      const filter = `proposal.name = "${proposalName}"`;
       const callsResult = await Sdk.treasury.chains.calls.list({ filter });
       if (!callsResult.ok) return callsResult;
       const calls = callsResult.value;
@@ -49,7 +55,9 @@ export const Call = {
       await short_sleep();
     }
 
-    return Err(Error.unknown(`submittedTransaction timed out after ${timeoutMs}ms`));
+    return Err(
+      Error.unknown(`submittedTransaction timed out after ${timeoutMs}ms`),
+    );
   },
 
   async succeededTransaction(
@@ -65,6 +73,8 @@ export const Call = {
       await short_sleep();
     }
 
-    return Err(Error.unknown(`succeededTransaction timed out after ${timeoutMs}ms`));
+    return Err(
+      Error.unknown(`succeededTransaction timed out after ${timeoutMs}ms`),
+    );
   },
 };

@@ -117,19 +117,20 @@ async function process(
       JSON.stringify(superjson.serialize(request.params), null, 2),
     );
 
-    if (method === "solana:signTransaction")
-      return await svm.signTransaction(
-        request.params as solTypes.SolanaSignTransactionInput[],
-      );
+    // if (method === "solana:signTransaction")
+    //   return await svm.signTransaction(
+    //     request.params as solTypes.SolanaSignTransactionInput[],
+    //   );
 
-    if (method === "solana:signIn")
-      return await svm.signIn(request.params as solTypes.SolanaSignInInput[]);
+    // if (method === "solana:signIn")
+    //   return await svm.signIn(request.params as solTypes.SolanaSignInInput[]);
 
     return Err(Error.unimplemented(`method ${request.method} not implemented`));
   }
 
   if (provider === "ETH") {
-    if (method === "eth_sendTransaction") return evm.eth_sendTransaction(request)
+    // if (method === "eth_sendTransaction")
+    //   return evm.eth_sendTransaction(request);
     if (method === "eth_blockNumber") return evm.eth_blockNumber(config);
     if (method === "eth_chainId") return evm.eth_chainId(config);
     // https://docs.base.org/base-account/reference/core/provider-rpc-methods/eth_requestAccounts

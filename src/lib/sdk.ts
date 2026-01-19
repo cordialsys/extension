@@ -122,8 +122,12 @@ export namespace Sdk {
         // syntactic sugar
         export async function maybe(userId: string): Promise<Option<Config>> {
           const result = await get(userId);
-          if (!result.ok) return None;
+          if (!result.ok) {
+            // console.log("didn't get extension:", result);
+            return None;
+          }
           const extension = result.value as Extension;
+          // console.log("extension:", extension);
           return extension.config;
         }
       }
@@ -131,7 +135,8 @@ export namespace Sdk {
   }
 
   export namespace connector {
-    const API: string = "http://localhost:8080/";
+    // const API: string = "http://localhost:8080/";
+    const API: string = "https://connector.cordialapis.com/";
 
     export async function blockNumber(
       chainId: string,
@@ -151,7 +156,15 @@ export namespace Sdk {
       chainId: string,
     ): Promise<Option<string>> {
       const url = `${API}v1/chains/${chainId}?network=!mainnet`;
-      const response = await fetch(url);
+      console.log("url", url);
+      let response;
+      try {
+        response = await fetch(url);
+      } catch (error) {
+        console.log(error);
+        return None;
+      }
+
       if (!response.ok) return None;
       const chain = (await response.json()) as { network: string };
       return chain.network;
@@ -209,11 +222,8 @@ export namespace Sdk {
 
     export namespace chains {
       export namespace calls {
-        export async function create(
-          chain: string,
-          call: T.Call,
-        ): Promise<Result<string>> {
-          const url = `${PROPOSE_API}/chains/${chain}/calls`;
+        export async function create(call: T.Call): Promise<Result<string>> {
+          const url = `${PROPOSE_API}/calls`;
           console.log(
             "proposed call:",
             JSON.stringify(superjson.serialize(call), null, 2),

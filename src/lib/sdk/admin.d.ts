@@ -397,6 +397,13 @@ export interface components {
       size?: number;
       network?: string;
       software?: string;
+      variant: components["schemas"]["TreasuryVariant"];
+      /** @description For hosted Treasuries, this is the ID of the enclave cluster that the treasury is hosted on. */
+      host_id?: string;
+      /** @description Output only once if the treasury is `hosted` and newly created. */
+      invites?: components["schemas"]["Invite"][];
+      /** @description Optional, set of backup keys used when creating a `hosted` treasury. */
+      baks?: components["schemas"]["Bak"][];
     };
     /**
      * OrganizationName
@@ -408,6 +415,33 @@ export interface components {
      * @description Valid URL
      */
     Url: string;
+    /**
+     * TreasuryVariant
+     * @enum {string}
+     */
+    TreasuryVariant: "self-hosted" | "co-hosted" | "hosted";
+    /** Invite */
+    Invite: {
+      /** @description User ID on the treasury instance. */
+      user?: string;
+      /** @description The user's ID on single sign on. */
+      sso?: string;
+      /** @description The secret invite for the user to enroll into the Treasury. */
+      code?: string;
+    };
+    /**
+     * Bak
+     * @example {
+     *       "id": "cold",
+     *       "bak": "age1cxukt95cfede6mmppvvx4tnrkcrw9sslkhwtumlw6xzdmzlml58shn2am6"
+     *     }
+     */
+    Bak: {
+      /** @description Optional ID for the backup key. */
+      id?: string;
+      /** @description The age public key. */
+      bak: string;
+    };
     /** TreasuryCreate */
     TreasuryCreate: {
       mainnet?: boolean;
@@ -508,19 +542,6 @@ export interface components {
       creator: string;
       updater?: string;
       connector: boolean;
-    };
-    /**
-     * Bak
-     * @example {
-     *       "id": "cold",
-     *       "bak": "age1cxukt95cfede6mmppvvx4tnrkcrw9sslkhwtumlw6xzdmzlml58shn2am6"
-     *     }
-     */
-    Bak: {
-      /** @description Optional ID for the backup key. */
-      id?: string;
-      /** @description The age public key. */
-      bak: string;
     };
     /** Keys */
     Keys: {

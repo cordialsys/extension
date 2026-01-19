@@ -67,7 +67,9 @@ export const Config = {
     const color = allowed ? "#0F0" : "#F00";
     browser_action.setBadgeText({ tabId: tab, text });
     browser_action.setBadgeBackgroundColor({ tabId: tab, color });
-    browser_action.setTitle({ title: JSON.stringify(config, null, 2) });
+    browser_action.setTitle({
+      title: JSON.stringify(config, null, 2) ?? "No config yet",
+    });
   },
 };
 

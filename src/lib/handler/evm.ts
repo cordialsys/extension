@@ -3,32 +3,44 @@ import { Error, Result, Sdk } from "@/lib/sdk";
 import { Err, None, Ok, Option, Request } from "@/lib/types";
 import { Params } from "@/lib/types";
 import { Evm, Evms, Id, Ids } from "@/lib/types/eth";
+import { short_sleep } from "@/lib/util";
 
 import * as z from "zod";
 import * as T from "@/lib/sdk/treasury";
 
-export async function eth_sendTransaction(request: Request) {
-  const proposalNameResult = await Sdk.propose.chains.calls.create("ETH", {
-    skip_broadcast: false,
-    call: request,
-  });
-  if (!proposalNameResult.ok) return proposalNameResult;
-  const proposalName = proposalNameResult.value;
-  console.log("proposal name:", proposalName);
+// export async function eth_sendTransaction(request: Request) {
+//   const proposalNameResult = await Sdk.propose.chains.calls.create("ETH", {
+//     skip_broadcast: false,
+//     call: request,
+//   });
+//   if (!proposalNameResult.ok) return proposalNameResult;
+//   const proposalName = proposalNameResult.value;
+//   console.log("proposal name:", proposalName);
 
-  const callResult = await T.Call.byProposal(proposalName);
-  if (!callResult.ok) return callResult;
-  const call = callResult.value;
-  console.log("call:", call);
-  // biome-ignore lint/style/noNonNullAssertion: The schema is incorrect, name of a call is not optional.
-  const tx = await T.Call.succeededTransaction(call.transaction!);
-  if (!tx.ok) return Err(Error.unknown("transaction failed: " + tx.error + "\n"));
+//   const callResult = await T.Call.byProposal(proposalName);
+//   if (!callResult.ok) return callResult;
+//   const call = callResult.value;
+//   console.log("call:", call);
+//   // biome-ignore lint/style/noNonNullAssertion: The schema is incorrect, name of a call is not optional.
+//   const tx = await T.Call.succeededTransaction(call.transaction!);
+//   if (!tx.ok)
+//     return Err(Error.unknown("transaction failed: " + tx.error + "\n"));
 
-  return Ok(tx.value.hash);
-}
-
+//   return Ok(tx.value.hash);
+// }
 
 let EVM: Evm = "ETH";
+
+export function fromEthHex(s: string): Result<string> {
+  if (!s.startsWith("0x")) {
+    return Err(Error.invalidArgument("ETH hex string not starting with `0x`"));
+  }
+  return Ok(s.slice(2));
+}
+
+export function toEthHex(s: string): Result<string> {
+  return Ok(`0x${s}`);
+}
 
 export function eth_accounts(config: Config): string[] {
   const prefix = `chains/${EVM}/addresses/`;
@@ -38,13 +50,94 @@ export function eth_accounts(config: Config): string[] {
   return addresses;
 }
 
+const PersonalSign = z.string().array().length(2);
+
+// Don't need this for ETH
+function idNormalize(s: string): string {
+  return s;
+}
+
 export async function personal_sign(
   params: Option<Params>,
 ): Promise<Result<unknown>> {
-  const PersonalSign = z.string().array().length(2);
+  // 1. parse
   const result = PersonalSign.safeParse(params);
-  console.log(result);
-  return Err(Error.unimplemented("personal sign not implemented yet"));
+  if (!result.success)
+    return Err(Error.invalidArgument("Invalid arguments for `personal_sign`"));
+  const data = result.data;
+
+  // 2. transform
+  console.log("personal sign args:", data);
+  const messageResult = fromEthHex(data[0]);
+  const blockchainAddress = data[1];
+  if (!messageResult.ok) return messageResult;
+  const message = messageResult.value;
+
+  const address = `chains/${EVM}/addresses/${idNormalize(blockchainAddress)}`;
+  const proposal: T.Call = {
+    address,
+    method: "personal_sign",
+    request: {
+      message,
+    },
+  };
+  console.log("proposal for `personal_sign`:", proposal);
+
+  // 3. submit
+  const proposalNameResult = await Sdk.propose.chains.calls.create(proposal);
+  if (!proposalNameResult.ok) return proposalNameResult;
+  const proposalName = proposalNameResult.value;
+  console.log("proposal name:", proposalName);
+
+  // 4. wait for processing
+  const callResult = await T.Call.byProposal(proposalName);
+  if (!callResult.ok) return callResult;
+  const call = callResult.value;
+  console.log("call:", call);
+
+  // 5. handle response
+  const CallR = z.object({
+    response: z.object({
+      signature: z.string(),
+    }),
+  });
+  const callResult2 = CallR.safeParse(call);
+  if (!callResult2.success) {
+    return Err(Error.internal("Engine response missing signature"));
+  }
+  const signatureName = callResult2.data.response.signature;
+  while (true) {
+    // Once our API filtering implements JSON expansion, we will
+    // be able to do this, for now we have to use `proposal_id`.
+    // const filter = `json(proposal).name = "${proposalName}"`;
+    //
+    // TODO: change the OpenAPI etc. to use `proposal_name` here.
+    const signatureResult = await Sdk.treasury.get<T.Signature>(signatureName);
+    console.log("sig result:", signatureResult);
+    if (!signatureResult.ok) return signatureResult;
+    const sig = signatureResult.value;
+    if (sig.state === "failed") {
+      return Err(Error.internal("signing failed"));
+    }
+    if (!(sig.state === "signed")) {
+      await short_sleep();
+      continue;
+    }
+    if (!sig.signature) return Err(Error.internal("signature succeeded but"));
+    if (sig.signature.length > 0) {
+      const ethSignature = `0x${sig.signature}`;
+      console.log("returning sig", ethSignature);
+      return Ok(ethSignature);
+    }
+    await short_sleep();
+  }
+  // const signatureResult = await Sdk.treasury.get(signatureName);
+  // console.log("sig result:", signatureResult);
+  // if (!signatureResult.ok) return signatureResult;
+  // const signature = signatureResult.value;
+  // const ethSignature = `0x${signature}`;
+  // return Ok(ethSignature);
+  // return Err(Error.unimplemented("personal sign not implemented yet"));
   // if (!result.success)
   //   return Err(
   //     Error.invalidArgument("Incorrect arguments for `personal_sign`"),
@@ -107,7 +200,7 @@ export async function treasury_network(
 
 export async function eth_chainId(config: Config): Promise<Result<string>> {
   console.log("unused", config);
-  return Ok(Ids["ETH_SEPOLIA"]);
+  return Ok(Ids[EVM]); //Ids["ETH_SEPOLIA"]);
   // const network = await treasury_network(config);
   // if (!network) return Err(Error.unknown("not ok"));
   // if (network === "mainnet") {
