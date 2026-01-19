@@ -6,8 +6,128 @@ import { Error, Result } from "@/lib/sdk/error";
 import { hex } from "@scure/base";
 import * as T from "@/lib/sdk/treasury";
 
-import { base64 } from "@scure/base";
 import * as Sol from "@solana/wallet-standard-features";
+
+export async function signMessage(
+  params: unknown,
+): Promise<Result<Sol.SolanaSignMessageOutput[]>> {
+  // 1. transform
+  const proposalR = T.Call.newSolanaSignMessage(params);
+  if (!proposalR.ok) return proposalR;
+  const proposal = proposalR.value;
+  console.log("proposal for `solana:signMessage`:", proposal);
+
+  // 2. submit
+  const proposalNameR = await Sdk.propose.chains.calls.create(proposal);
+  if (!proposalNameR.ok) return proposalNameR;
+  const proposalName = proposalNameR.value;
+  console.log("proposal name:", proposalName);
+
+  // 3. wait for call
+  const callR = await T.Call.byProposal(proposalName);
+  if (!callR.ok) return callR;
+  const call = callR.value;
+  console.log("call name:", call.name);
+
+  // 4. wait for signature
+  const signatureN = (call.response as T.CallSignature).signature as string;
+  console.log("signature name:", signatureN);
+
+  const signatureR = await T.Signature.completed(signatureN);
+  if (!signatureR.ok) return signatureR;
+  const signature = signatureR.value;
+
+  return Ok([
+    {
+      signedMessage: hex.decode(signature.message as string),
+      signature: hex.decode(signature.signature as string),
+    },
+  ]);
+}
+
+export async function solanaTransactionSignature(
+  method: "solana:signTransaction" | "solana:signAndSendTransaction",
+  params: unknown,
+): Promise<Result<T.Signature>> {
+  // 1. transform
+  const proposalR = T.Call.newSvmTransaction(method, params);
+  if (!proposalR.ok) return proposalR;
+  const proposal = proposalR.value;
+  console.log(`proposal for \`${method}\`:`, proposal);
+
+  // 2. submit
+  const proposalNameR = await Sdk.propose.chains.calls.create(proposal);
+  if (!proposalNameR.ok) return proposalNameR;
+  const proposalName = proposalNameR.value;
+  console.log("proposal name:", proposalName);
+
+  // 3. wait for call
+  const callR = await T.Call.byProposal(proposalName);
+  if (!callR.ok) return callR;
+  const call = callR.value;
+  console.log("call name:", call.name);
+
+  const txName = (call.response as T.CallTransaction).transaction as string;
+  console.log("transaction name:", call);
+
+  // 4. wait for signature
+  const txR = await T.Transaction.completed(txName);
+  if (!txR.ok) return txR;
+  const tx = txR.value;
+
+  const sigs = tx.signatures;
+  if (!sigs || sigs.length !== 1)
+    return Err(
+      Error.unimplemented(
+        "Can only handle single signatures in solana:signTransaction currently",
+      ),
+    );
+  const sigName = sigs[0];
+
+  return Sdk.treasury.get(sigName);
+}
+
+export async function signTransaction(
+  params: unknown,
+): Promise<Result<{ signedTransaction: Uint8Array }[]>> {
+  const sigR = await solanaTransactionSignature(
+    "solana:signTransaction",
+    params,
+  );
+  if (!sigR.ok) return sigR;
+  const sig = sigR.value;
+  return Ok([
+    {
+      // TODO: They want this:
+      // /** Output of signing a transaction. */
+      // export interface SolanaSignTransactionOutput {
+      //     /**
+      //      * Signed, serialized transaction, as raw bytes.
+      //      * Returning a transaction rather than signatures allows multisig wallets, program wallets, and other wallets that
+      //      * use meta-transactions to return a modified, signed transaction.
+      //      */
+      //     readonly signedTransaction: Uint8Array;
+      // }
+      signedTransaction: hex.decode(sig.signature as string),
+    },
+  ]);
+}
+
+export async function signAndSendTransaction(
+  params: unknown,
+): Promise<Result<{ signature: Uint8Array }[]>> {
+  const sigR = await solanaTransactionSignature(
+    "solana:signTransaction",
+    params,
+  );
+  if (!sigR.ok) return sigR;
+  const sig = sigR.value;
+  return Ok([
+    {
+      signature: hex.decode(sig.signature as string),
+    },
+  ]);
+}
 
 // export async function signIn(
 //   inputs: Sol.SolanaSignInInput[],
@@ -56,43 +176,4 @@ import * as Sol from "@solana/wallet-standard-features";
 //   // console.log("completed call:", call);
 
 //   return Err(Error.unimplemented("SOL signIn not finished yet"));
-// }
-
-// export async function signTransaction(
-//   inputs: Sol.SolanaSignTransactionInput[],
-// ): Promise<Result<Sol.SolanaSignTransactionOutput[]>> {
-//   const txBytes = inputs[0].transaction;
-//   console.log("transaction bytes:", txBytes);
-//   const input = {
-//     // TODO: We shouldn't be doing ad-hoc replacements
-//     account: inputs[0].account.address,
-//     transaction: base64.encode(txBytes),
-//   };
-//   const proposalNameResult = await Sdk.propose.chains.calls.create("SOL", {
-//     skip_broadcast: true,
-//     call: input,
-//   });
-//   if (!proposalNameResult.ok) return proposalNameResult;
-//   const proposalName = proposalNameResult.value;
-//   console.log("proposal name:", proposalName);
-
-//   const submitUrl = `https://treasury.cordial.systems/propose/${proposalName}`;
-//   browser.windows.create({ url: submitUrl });
-
-//   const callResult = await T.Call.byProposal(proposalName);
-//   if (!callResult.ok) return callResult;
-//   const call = callResult.value;
-//   console.log("call:", call);
-
-//   // biome-ignore lint/style/noNonNullAssertion: The schema is incorrect, name of a call is not optional.
-//   const tx = await T.Call.submittedTransaction(call.transaction!);
-//   if (!tx.ok) return Err(Error.unknown("failed to sign transaction"));
-
-//   // biome-ignore lint/style/noNonNullAssertion: The schema is incorrect, payload of a transaction is not optional.
-//   const payload = tx.value.payload!;
-//   console.log("payload:", payload);
-//   const bytes: Uint8Array = hex.decode(payload);
-//   console.log("bytes:", bytes);
-
-//   return Ok([{ signedTransaction: bytes }]);
 // }

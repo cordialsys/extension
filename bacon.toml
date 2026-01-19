@@ -21,11 +21,10 @@ watch = ["src"]
 
 [jobs.lint]
 command = [
-    # "pnpm", "dlx",
-    # "--package", "jiti",
     "pnpm", "exec",
     "eslint",
-    "--color", "src"
+    "--color", "src",
+    "--ignore-pattern", "./src/gen/treasury.d.ts",
 ]
 need_stdout = true
 analyzer = "eslint"

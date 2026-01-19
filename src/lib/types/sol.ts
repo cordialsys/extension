@@ -5,7 +5,7 @@ import type {
 
 import type { IdentifierArray, WalletAccount } from "@wallet-standard/base";
 
-export { IdentifierArray };
+export type { IdentifierArray };
 
 export interface Account extends WalletAccount {}
 

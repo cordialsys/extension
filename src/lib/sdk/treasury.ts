@@ -1,12 +1,21 @@
 import { Error, Result } from "@/lib/sdk/error";
 import { Sdk } from "@/lib/sdk";
 import { Err, Ok } from "@/lib/types";
+import { Evm } from "@/lib/types/eth";
 import { short_sleep } from "@/lib/util";
 
 import { components } from "./treasury.d";
+import BigNumber from "bignumber.js";
+import { hex } from "@scure/base";
+import * as z from "zod";
 
+export type AddressName = components["schemas"]["AddressName"];
 export type Call = components["schemas"]["Call"];
 export type CallPage = components["schemas"]["CallPage"];
+export type CallSignature = components["schemas"]["CallSignature"];
+export type CallTransaction = components["schemas"]["CallTransaction"];
+export type Hex = components["schemas"]["Hex"];
+export type Id = components["schemas"]["Id"];
 export type Signature = components["schemas"]["Signature"];
 export type Transaction = components["schemas"]["Transaction"];
 export type Treasury = components["schemas"]["Treasury"];
@@ -16,7 +25,136 @@ export type UnsignedEvmTransaction =
 export type UnsignedSvmTransaction =
   components["schemas"]["UnsignedSvmTransaction"];
 
+const Id = {
+  new(s: string): Id {
+    return s
+      .trim()
+      .replace(/\s/g, "_")
+      .replace(/[^0-9A-Za-z-_]/g, "-");
+  },
+};
+
+const AddressName = {
+  new(chain: string, address: string): AddressName {
+    return `chains/${chain}/addresses/${Id.new(address)}`;
+  },
+};
+
+// https://docs.metamask.io/wallet/reference/json-rpc-methods/eth_sendtransaction
+const EthHexAddress = z.string().regex(/^0x[0-9a-fA-F]{40}$/);
+const EthHexData = z.string().regex(/^0x[0-9a-f]*$/);
+const EthHexValue = z.string().regex(/^0x([1-9a-f]+[0-9a-f]*|0)$/);
+
 export const Call = {
+  newEvmTransaction(
+    chain: Evm,
+    method: "eth_sendTransaction" | "eth_signTransaction",
+    params: unknown,
+  ): Result<Call> {
+    // https://docs.metamask.io/wallet/reference/json-rpc-methods/eth_sendtransaction/
+    const Input = z
+      .array(
+        z.looseObject({
+          from: EthHexAddress,
+          to: EthHexAddress,
+          value: EthHexValue,
+          data: EthHexData,
+        }),
+      )
+      .length(1);
+    const inputR = Input.safeParse(params);
+    if (!inputR.success)
+      return Err(Error.invalidArgument(`Invalid inputs for \`${method}\``));
+    const input = inputR.data[0];
+
+    const address = AddressName.new(chain, input.from.slice(2));
+    const amount = new BigNumber(input.value.slice(2)).shiftedBy(-18).toFixed();
+
+    return Ok({
+      address,
+      method,
+      request: { amount, to: input.to.slice(2), data: input.data.slice(2) },
+    });
+  },
+
+  newSvmTransaction(
+    method: "solana:signTransaction" | "solana:signAndSendTransaction",
+    params: unknown,
+  ): Result<Call> {
+    // SolanaSignTransactionInput[]
+    // https://github.com/anza-xyz/wallet-standard/blob/master/packages/core/features/src/signTransaction.ts
+    // https://github.com/anza-xyz/wallet-standard/blob/master/packages/core/features/src/signAndSendTransaction.ts
+    const Input = z
+      .array(
+        z.looseObject({
+          account: z.looseObject({
+            address: z.string().nonempty(),
+          }),
+          transaction: z.instanceof(Uint8Array),
+        }),
+      )
+      .length(1);
+    const inputR = Input.safeParse(params);
+    if (!inputR.success)
+      return Err(Error.invalidArgument(`Invalid inputs for \`${method}\``));
+    const input = inputR.data[0];
+
+    return Ok({
+      address: AddressName.new("SOL", input.account.address),
+      method,
+      request: { transaction: hex.encode(input.transaction) },
+    });
+  },
+
+  // construct from purported personal_sign inputs
+  newPersonalSign(chain: Evm, params: unknown): Result<Call> {
+    const Input = z.string().nonempty().array().length(2);
+    const inputR = Input.safeParse(params);
+    if (!inputR.success)
+      return Err(Error.invalidArgument("Invalid inputs for `personal_sign`"));
+    const input = inputR.data;
+
+    const blockchainAddress = input[1];
+    const address = AddressName.new(chain, blockchainAddress);
+
+    return Ok({
+      address,
+      method: "personal_sign",
+      request: { message: input[0].slice(2) },
+    });
+  },
+
+  // construct from purported solana:signMessage inputs
+  newSolanaSignMessage(params: unknown): Result<Call> {
+    // SolanaMessageInput[]
+    // https://github.com/anza-xyz/wallet-standard/blob/master/packages/core/features/src/signMessage.ts
+    const Input = z
+      .array(
+        z.looseObject({
+          account: z.looseObject({
+            address: z.string().nonempty(),
+          }),
+          message: z.instanceof(Uint8Array),
+        }),
+      )
+      .length(1);
+
+    const inputR = Input.safeParse(params);
+    if (!inputR.success)
+      return Err(
+        Error.invalidArgument("Invalid inputs for `solana:signMessage`"),
+      );
+    const input = inputR.data[0];
+
+    return Ok({
+      address: AddressName.new("SOL", input.account.address),
+      method: "solana:signMessage",
+      request: {
+        message: hex.encode(input.message),
+      },
+    });
+  },
+
   async byProposal(proposalName: string): Promise<Result<Call>> {
     while (true) {
       // Once our API filtering implements JSON expansion, we will
@@ -37,44 +175,89 @@ export const Call = {
     }
   },
 
-  async submittedTransaction(
-    txName: string,
-    timeoutMs = 120_000, // 2 minutes
-  ): Promise<Result<Transaction>> {
+  // async submittedTransaction(
+  //   txName: string,
+  //   timeoutMs = 120_000, // 2 minutes
+  // ): Promise<Result<Transaction>> {
+  //   const start = Date.now();
+
+  //   while (Date.now() - start < timeoutMs) {
+  //     const result = await Sdk.treasury.get<Transaction>(txName);
+
+  //     // propagate error
+  //     if (!result.ok) return result;
+
+  //     // succeed
+  //     if (result.value.state === "submitting") return Ok(result.value);
+
+  //     await short_sleep();
+  //   }
+
+  //   return Err(
+  //     Error.unknown(`submittedTransaction timed out after ${timeoutMs}ms`),
+  //   );
+  // },
+
+  // async succeededTransaction(
+  //   txName: string,
+  //   timeoutMs = 180_000, // 3 minutes
+  // ): Promise<Result<Transaction>> {
+  //   const start = Date.now();
+
+  //   while (Date.now() - start < timeoutMs) {
+  //     const result = await Sdk.treasury.get<Transaction>(txName);
+  //     if (!result.ok) return result;
+  //     if (result.value.state === "succeeded") return Ok(result.value);
+  //     await short_sleep();
+  //   }
+
+  //   return Err(
+  //     Error.unknown(`succeededTransaction timed out after ${timeoutMs}ms`),
+  //   );
+  // },
+};
+
+const TIMEOUT = 180_000;
+
+const timedOut = (resource: string) =>
+  Error.unknown(`${resource} failed to complete with ${TIMEOUT} milliseconds`);
+
+// function timeOut<T>(f: () => Promise<Result<T>>) => {
+//   const start = Date.now()
+//   while (Date.now() < start + TIMEOUT) {
+
+//   }
+
+// }
+
+export const Signature = {
+  async completed(name: string): Promise<Result<Signature>> {
     const start = Date.now();
-
-    while (Date.now() - start < timeoutMs) {
-      const result = await Sdk.treasury.get<Transaction>(txName);
-
-      // propagate error
+    while (Date.now() < start + TIMEOUT) {
+      const result = await Sdk.treasury.get<Signature>(name);
       if (!result.ok) return result;
-
-      // succeed
-      if (result.value.state === "submitting") return Ok(result.value);
-
+      const sig = result.value;
+      if (sig.state === "signed") return Ok(sig);
+      if (sig.state === "failed")
+        return Err(Error.unknown(sig.failure as string));
       await short_sleep();
     }
-
-    return Err(
-      Error.unknown(`submittedTransaction timed out after ${timeoutMs}ms`),
-    );
+    return Err(timedOut("Signature"));
   },
+};
 
-  async succeededTransaction(
-    txName: string,
-    timeoutMs = 180_000, // 3 minutes
-  ): Promise<Result<Transaction>> {
+export const Transaction = {
+  async completed(name: string): Promise<Result<Transaction>> {
     const start = Date.now();
-
-    while (Date.now() - start < timeoutMs) {
-      const result = await Sdk.treasury.get<Transaction>(txName);
+    while (Date.now() < start + TIMEOUT) {
+      const result = await Sdk.treasury.get<Transaction>(name);
       if (!result.ok) return result;
-      if (result.value.state === "succeeded") return Ok(result.value);
+      const tx = result.value;
+      if (tx.state === "succeeded") return Ok(tx);
+      if (tx.state === "failed")
+        return Err(Error.unknown(tx.error?.message ?? ""));
       await short_sleep();
     }
-
-    return Err(
-      Error.unknown(`succeededTransaction timed out after ${timeoutMs}ms`),
-    );
+    return Err(timedOut("Transaction"));
   },
 };

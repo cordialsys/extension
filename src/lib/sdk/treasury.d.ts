@@ -4490,7 +4490,7 @@ export interface components {
       | "solana:signIn"
       | "solana:signMessage"
       | "solana:signTransaction"
-      | "solana:sendAndSignTransaction";
+      | "solana:signAndSendTransaction";
     /** CallRequest */
     CallRequest:
       | components["schemas"]["UnsignedMessage"]
@@ -7004,8 +7004,22 @@ export interface operations {
       };
       cookie?: never;
     };
-    requestBody?: never;
-    responses: never;
+    requestBody?: {
+      content: {
+        "*/*"?: never;
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": Record<string, never>;
+        };
+      };
+    };
   };
   "list-software-updates": {
     parameters: {
@@ -7391,7 +7405,17 @@ export interface operations {
         "application/json": components["schemas"]["KeyResponse"];
       };
     };
-    responses: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": Record<string, never>;
+        };
+      };
+    };
   };
   "get-signature-response": {
     parameters: {
@@ -7431,7 +7455,17 @@ export interface operations {
         "application/json": components["schemas"]["SignatureResponse"];
       };
     };
-    responses: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": Record<string, never>;
+        };
+      };
+    };
   };
   "list-key-responses": {
     parameters: {
@@ -7513,7 +7547,17 @@ export interface operations {
       cookie?: never;
     };
     requestBody?: never;
-    responses: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": Record<string, never>;
+        };
+      };
+    };
   };
   "activate-transfer-rule": {
     parameters: {
@@ -7749,7 +7793,17 @@ export interface operations {
       cookie?: never;
     };
     requestBody?: never;
-    responses: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": Record<string, never>;
+        };
+      };
+    };
   };
   healthy: {
     parameters: {
@@ -8217,7 +8271,17 @@ export interface operations {
       cookie?: never;
     };
     requestBody?: never;
-    responses: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CallPage"];
+        };
+      };
+    };
   };
   "get-call": {
     parameters: {

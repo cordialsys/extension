@@ -157,7 +157,7 @@ export namespace Sdk {
     ): Promise<Option<string>> {
       const url = `${API}v1/chains/${chainId}?network=!mainnet`;
       console.log("url", url);
-      let response;
+      let response: Response;
       try {
         response = await fetch(url);
       } catch (error) {

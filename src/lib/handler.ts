@@ -6,7 +6,6 @@ import * as evm from "./handler/evm";
 import * as svm from "./handler/svm";
 
 import superjson from "superjson";
-import type * as solTypes from "@solana/wallet-standard-features";
 
 export function onMessage(
   requestJson: string,
@@ -117,20 +116,29 @@ async function process(
       JSON.stringify(superjson.serialize(request.params), null, 2),
     );
 
-    // if (method === "solana:signTransaction")
-    //   return await svm.signTransaction(
-    //     request.params as solTypes.SolanaSignTransactionInput[],
-    //   );
-
+    // signing calls
+    if (method === "solana:signMessage") return svm.signMessage(request.params);
     // if (method === "solana:signIn")
     //   return await svm.signIn(request.params as solTypes.SolanaSignInInput[]);
+
+    // transacting calls
+    if (method === "solana:signTransaction")
+      return await svm.signTransaction(request.params);
+    if (method === "solana:signAndSendTransaction")
+      return await svm.signAndSendTransaction(request.params);
 
     return Err(Error.unimplemented(`method ${request.method} not implemented`));
   }
 
   if (provider === "ETH") {
-    // if (method === "eth_sendTransaction")
-    //   return evm.eth_sendTransaction(request);
+    // signing calls
+    if (method === "personal_sign") return evm.personal_sign(request.params);
+
+    // transacting calls
+    if (method === "eth_sendTransaction")
+      return evm.eth_sendTransaction(request);
+
+    // helper calls
     if (method === "eth_blockNumber") return evm.eth_blockNumber(config);
     if (method === "eth_chainId") return evm.eth_chainId(config);
     // https://docs.base.org/base-account/reference/core/provider-rpc-methods/eth_requestAccounts
@@ -139,7 +147,6 @@ async function process(
     // We can probably handle both the same way (return empty array)
     if (method === "eth_requestAccounts" || method === "eth_accounts")
       return Ok(evm.eth_accounts(config));
-    if (method === "personal_sign") return evm.personal_sign(request.params);
     // https://eips.ethereum.org/EIPS/eip-2255
     if (method === "wallet_requestPermissions")
       return evm.wallet_requestPermissions(request.params);
