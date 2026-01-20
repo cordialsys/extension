@@ -4447,7 +4447,7 @@ export interface components {
     /** Call */
     Call: {
       name?: components["schemas"]["CallName"];
-      state?: components["schemas"]["TransferState"];
+      state?: components["schemas"]["CallState"];
     } & components["schemas"]["Metadata"] &
       components["schemas"]["CallData"];
     /**
@@ -4456,6 +4456,12 @@ export interface components {
      * @example calls/42
      */
     CallName: string;
+    /**
+     * CallState
+     * @description In the `active` state, the subordinate resource is being processed, lookup its state for more details.
+     * @enum {string}
+     */
+    CallState: "active" | "succeeded" | "failed";
     /**
      * CallData
      * @description The call `method` determines the variants of `request` and `response` that are permissible.
