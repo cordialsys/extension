@@ -174,47 +174,6 @@ export const Call = {
       await short_sleep();
     }
   },
-
-  // async submittedTransaction(
-  //   txName: string,
-  //   timeoutMs = 120_000, // 2 minutes
-  // ): Promise<Result<Transaction>> {
-  //   const start = Date.now();
-
-  //   while (Date.now() - start < timeoutMs) {
-  //     const result = await Sdk.treasury.get<Transaction>(txName);
-
-  //     // propagate error
-  //     if (!result.ok) return result;
-
-  //     // succeed
-  //     if (result.value.state === "submitting") return Ok(result.value);
-
-  //     await short_sleep();
-  //   }
-
-  //   return Err(
-  //     Error.unknown(`submittedTransaction timed out after ${timeoutMs}ms`),
-  //   );
-  // },
-
-  // async succeededTransaction(
-  //   txName: string,
-  //   timeoutMs = 180_000, // 3 minutes
-  // ): Promise<Result<Transaction>> {
-  //   const start = Date.now();
-
-  //   while (Date.now() - start < timeoutMs) {
-  //     const result = await Sdk.treasury.get<Transaction>(txName);
-  //     if (!result.ok) return result;
-  //     if (result.value.state === "succeeded") return Ok(result.value);
-  //     await short_sleep();
-  //   }
-
-  //   return Err(
-  //     Error.unknown(`succeededTransaction timed out after ${timeoutMs}ms`),
-  //   );
-  // },
 };
 
 const TIMEOUT = 180_000;

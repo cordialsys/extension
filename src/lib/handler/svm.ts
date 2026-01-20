@@ -45,10 +45,10 @@ export async function signMessage(
   ]);
 }
 
-export async function solanaTransactionSignature(
+export async function solanaTransaction(
   method: "solana:signTransaction" | "solana:signAndSendTransaction",
   params: unknown,
-): Promise<Result<T.Signature>> {
+): Promise<Result<T.Transaction>> {
   // 1. transform
   const proposalR = T.Call.newSvmTransaction(method, params);
   if (!proposalR.ok) return proposalR;
@@ -71,7 +71,22 @@ export async function solanaTransactionSignature(
   console.log("transaction name:", call);
 
   // 4. wait for signature
-  const txR = await T.Transaction.completed(txName);
+  return T.Transaction.completed(txName);
+}
+
+export async function signTransaction(
+  params: unknown,
+): Promise<Result<{ signedTransaction: Uint8Array }[]>> {
+  const txR = await solanaTransaction("solana:signTransaction", params);
+  if (!txR.ok) return txR;
+  const tx = txR.value;
+  return Ok([{ signedTransaction: hex.decode(tx.payload as string) }]);
+}
+
+export async function signAndSendTransaction(
+  params: unknown,
+): Promise<Result<{ signature: Uint8Array }[]>> {
+  const txR = await solanaTransaction("solana:signAndSendTransaction", params);
   if (!txR.ok) return txR;
   const tx = txR.value;
 
@@ -84,49 +99,10 @@ export async function solanaTransactionSignature(
     );
   const sigName = sigs[0];
 
-  return Sdk.treasury.get(sigName);
-}
-
-export async function signTransaction(
-  params: unknown,
-): Promise<Result<{ signedTransaction: Uint8Array }[]>> {
-  const sigR = await solanaTransactionSignature(
-    "solana:signTransaction",
-    params,
-  );
+  const sigR = await Sdk.treasury.get<T.Signature>(sigName);
   if (!sigR.ok) return sigR;
   const sig = sigR.value;
-  return Ok([
-    {
-      // TODO: They want this:
-      // /** Output of signing a transaction. */
-      // export interface SolanaSignTransactionOutput {
-      //     /**
-      //      * Signed, serialized transaction, as raw bytes.
-      //      * Returning a transaction rather than signatures allows multisig wallets, program wallets, and other wallets that
-      //      * use meta-transactions to return a modified, signed transaction.
-      //      */
-      //     readonly signedTransaction: Uint8Array;
-      // }
-      signedTransaction: hex.decode(sig.signature as string),
-    },
-  ]);
-}
-
-export async function signAndSendTransaction(
-  params: unknown,
-): Promise<Result<{ signature: Uint8Array }[]>> {
-  const sigR = await solanaTransactionSignature(
-    "solana:signTransaction",
-    params,
-  );
-  if (!sigR.ok) return sigR;
-  const sig = sigR.value;
-  return Ok([
-    {
-      signature: hex.decode(sig.signature as string),
-    },
-  ]);
+  return Ok([{ signature: hex.decode(sig.signature as string) }]);
 }
 
 // export async function signIn(
