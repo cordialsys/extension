@@ -8,10 +8,10 @@ export default defineConfig({
     // Required, don't open popup, only action
     action: {},
     icons: {
-      16: "/icons/gray/16.png",
-      24: "/icons/gray/24.png",
-      48: "/icons/gray/48.png",
-      128: "/icons/gray/128.png",
+      16: "/icons/color/16.png",
+      24: "/icons/color/24.png",
+      48: "/icons/color/48.png",
+      128: "/icons/color/128.png",
     },
     host_permissions: [
       "https://auth.cordial.systems/*",

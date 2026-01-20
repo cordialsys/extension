@@ -19,8 +19,8 @@ export const GRAY = {
 };
 
 export const COLOR = {
-  16: "/icons/16.png",
-  24: "/icons/24.png",
-  48: "/icons/48.png",
-  128: "/icons/128.png",
+  16: "/icons/color/16.png",
+  24: "/icons/color/24.png",
+  48: "/icons/color/48.png",
+  128: "/icons/color/128.png",
 };
