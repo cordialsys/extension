@@ -19,11 +19,12 @@ lint:
 api-gen project api:
 	pnpm dlx openapi-typescript https://api.stoplight.io/projects/{{ project }}/branches/main/export/reference/{{ api }}.yaml -o src/lib/sdk/{{ api }}.d.ts
 
-api-types:
+api:
     just api-gen cHJqOjIzOTcxNQ admin
     just api-gen cHJqOjIzOTcxOA connector
     just api-gen cHJqOjIzOTcxOQ oracle
     just api-gen cHJqOjIzOTcxNw treasury
+    just fmt
 
 # configures Edge at Mosyle-installed location
 setup-mac: install
