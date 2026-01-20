@@ -68,7 +68,8 @@ export const Call = {
     const input = inputR.data[0];
 
     const address = AddressName.new(chain, input.from.slice(2));
-    const amount = new BigNumber(input.value.slice(2)).shiftedBy(-18).toFixed();
+    // keep the `.slice(2)` out, BigNumber detects hex numbers using the `0x` prefix
+    const amount = new BigNumber(input.value).shiftedBy(-18).toFixed();
 
     return Ok({
       address,
