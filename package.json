@@ -1,5 +1,5 @@
 {
-  "name": "cordial-extension",
+  "name": "cordial-treasury-browser-wallet-extension",
   "description": "Silent crosschain browser wallet connecting to a Cordial Treasury deployment",
   "private": true,
   "version": "0.1.0",

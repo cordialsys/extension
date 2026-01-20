@@ -7,7 +7,7 @@ export default defineConfig({
   manifest: {
     // Required, don't open popup, only action
     action: {},
-    name: "Cordial Extension",
+    name: "Cordial Treasury",
     icons: {
       16: "/icons/color/16.png",
       24: "/icons/color/24.png",
@@ -15,11 +15,13 @@ export default defineConfig({
       128: "/icons/color/128.png",
     },
     host_permissions: [
-      "https://auth.cordial.systems/*",
-      "https://auth.cordialapis.com/*",
       "https://admin.cordialapis.com/*",
-      "https://clerk.cordial.systems/*",
+      // "https://sandbox.cordialapis.com/*",
+      // "https://treasury.cordialapis.com/*",
+      // "https://clerk.cordial.systems/*",
     ],
+    key: "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAloJLJ8XRkwR+gieAIt1Uc3DfHOZ7nB4LAr74ZkAkM2VBeoTMD8pXJiruJ/FOHNVDmDStBdW00szVFFp2ikySkPFIT/8RXEtVRAuLSLK9q0tVuoTFtFNvaDTMXf5YNV0dOxCv2HHjf/j5xpXNRyAbI2rnkiENJI0cu3zLCPYEufHoT5BhSAeXgtsEtKePHycCfvwLB8hmXZzYXlYX3Yobgssa2KFwL0yx/skVhnxOu3wKLUvzSrCGia6g83TfWjKlJCixMGAPaVdHhQRNTfdh19D2db2mRr/f60XfDCcw+FwVZarM906fd0x+ft1q8JKN32TnIWv0GFUW0Q87iHIeIQIDAQAB",
+    optional_host_permissions: ["https://*/*", "http://*/*"],
     permissions: ["storage", "tabs"],
     web_accessible_resources: [
       {
@@ -29,8 +31,6 @@ export default defineConfig({
     ],
   },
   webExt: {
-    // startUrls: ["https://example.com/"],
-    // startUrls: ["http://127.0.0.1:8080/"],
     startUrls: [
       "https://www.orca.so",
       "https://app.uniswap.org",
