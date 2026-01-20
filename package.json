@@ -1,8 +1,9 @@
 {
-  "name": "cordial-browser-extension",
+  "name": "cordial-extension",
   "description": "Silent crosschain browser wallet connecting to a Cordial Treasury deployment",
   "private": true,
   "version": "0.1.0",
+  "version_name": "0.1.0-alpha1",
   "type": "module",
   "scripts": {
     "dev": "wxt",

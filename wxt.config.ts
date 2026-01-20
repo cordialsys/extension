@@ -7,6 +7,7 @@ export default defineConfig({
   manifest: {
     // Required, don't open popup, only action
     action: {},
+    name: "Cordial Extension",
     icons: {
       16: "/icons/color/16.png",
       24: "/icons/color/24.png",

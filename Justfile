@@ -5,6 +5,9 @@ dev:
 build:
 	pnpm run build
 
+zip:
+	pnpm run zip
+
 feedback:
 	watchexec -r -w src/ "clear && pnpm run typecheck && pnpm dlx --package jiti eslint src"
 
