@@ -1998,7 +1998,9 @@ export interface components {
         query?: components["schemas"]["Query"];
       } & {
         body?: components["schemas"]["Body"];
-      } & components["schemas"]["Authentication"];
+      } & components["schemas"]["Authentication"] & {
+        sso?: components["schemas"]["SingleSignOn"];
+      };
     /**
      * Server
      * @description API server details.
@@ -2151,6 +2153,21 @@ export interface components {
      * @description Hex-encoded bytes
      */
     Hex: string;
+    /**
+     * SingleSignOn
+     * @description A single-sign-on assertion includes a signature from your single-sign-on provider over a temporary credential that can than be used to sign a request to Treasury.
+     *
+     *     Treasury typically requires this for `human` variant users in addition to a primary signature.
+     */
+    SingleSignOn: {
+      /** @description Unix timestamp. */
+      create_time?: number;
+      /** @description random number */
+      nonce?: number;
+      /** @description JWT from SSO provider that has included the public key of the credential used to produce the signature. */
+      id?: string;
+      signature?: components["schemas"]["Hex"];
+    };
     /**
      * AccountData
      * @description An account is a container for addresses. Adding or removing an address should usually be permissioned, as transfer rules may be formulated in terms of accounts, and have cascading effects on addresses.

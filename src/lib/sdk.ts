@@ -208,7 +208,8 @@ export namespace Sdk {
       const treasuryId = config.treasury.name.slice(prefix.length);
       try {
         if (LOCAL) request.headers.set("user", login.userId);
-        request = await sign("pro", login, request, treasuryId);
+        request.headers.set("treasury", treasuryId);
+        request = await sign("sso", login, request, treasuryId);
         const response = await fetch(request);
 
         if (!response.ok) {

@@ -267,6 +267,23 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/chains/{chain}/calls": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Prepare Call */
+    post: operations["prepare-call"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -713,6 +730,19 @@ export interface components {
       transaction_ids: string[];
       transaction_count: number;
     };
+    /**
+     * CallRequest
+     * @description See https://cordialapis.stoplight.io/docs/treasury/3yedjk8bpx858-call-data
+     *     for more info.
+     */
+    CallRequest: {
+      /** @description Chain specific call request */
+      request: Record<string, never>;
+      /** @description Signing addresses associated with the call.  There must be at least 1. */
+      addresses: string[];
+      /** @description See https://cordialapis.stoplight.io/docs/treasury/jknvarxw4t7mh-call-method */
+      method: string;
+    };
   };
   responses: never;
   parameters: never;
@@ -1082,6 +1112,32 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["BlockWithTransactions"];
+        };
+      };
+    };
+  };
+  "prepare-call": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        chain: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["CallRequest"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": Record<string, never>;
         };
       };
     };

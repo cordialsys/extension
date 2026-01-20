@@ -4,7 +4,7 @@ import { utf8ToBytes } from "@noble/hashes/utils.js";
 import { base64 } from "@scure/base";
 
 export async function sign(
-  name: "iam" | "pro" | "sso",
+  name: "iam" | "sso",
   login: Login,
   request: Request,
   treasuryId: string,
