@@ -1,15 +1,16 @@
 import { Config } from "@/lib/config";
 import { Error, Result, Sdk } from "@/lib/sdk";
-import { Err, None, Ok, Option } from "@/lib/types";
+import { Err, Eth, None, Ok, Option } from "@/lib/types";
 import { Params } from "@/lib/types";
-import { Evm, Evms, Id, Ids } from "@/lib/types/eth";
 
 import * as z from "zod";
 import * as T from "@/lib/sdk/treasury";
 
+let CHAIN: Eth.Chain = "ETH";
+
 export async function personal_sign(params: unknown): Promise<Result<string>> {
   // 1. transform
-  const proposalR = T.Call.newPersonalSign(EVM, params);
+  const proposalR = T.Call.newPersonalSign(CHAIN, params);
   if (!proposalR.ok) return proposalR;
   const proposal = proposalR.value;
   console.log("proposal for `personal_sign`:", proposal);
@@ -51,7 +52,7 @@ export async function eth_sendTransaction(
 ): Promise<Result<string>> {
   // 1. transform
   const proposalR = T.Call.newEvmTransaction(
-    EVM,
+    CHAIN,
     "eth_sendTransaction",
     params,
   );
@@ -84,10 +85,8 @@ export async function eth_sendTransaction(
   return Ok(hash);
 }
 
-let EVM: Evm = "ETH";
-
 export function eth_accounts(config: Config): string[] {
-  const prefix = `chains/${EVM}/addresses/`;
+  const prefix = `chains/${CHAIN}/addresses/`;
   const addresses: string[] = config.addresses
     .filter((a) => a.startsWith(prefix))
     .map((a) => a.slice(prefix.length));
@@ -107,12 +106,15 @@ export async function wallet_switchEthereumChain(
   if (!result.success)
     return Err(Error.unimplemented(`💔 Chain in ${params} not supported`));
 
-  const evm = Evms[result.data[0].chainId as Id];
-  if (!evm)
-    return Err(Error.unimplemented(`💔 Chain in ${params} not supported`));
+  const chainId = result.data[0].chainId as Eth.Id;
+  const chain = Eth.Chains[chainId];
+  if (!chain)
+    return Err(
+      Error.unimplemented(`💔 Chain ${chainId} in ${params} not supported`),
+    );
 
-  console.log(`switching to ${evm}`);
-  EVM = evm;
+  console.log(`switching to ${chain}`);
+  CHAIN = chain;
   return Ok(null);
 }
 
@@ -150,7 +152,7 @@ export async function treasury_network(
 
 export async function eth_chainId(config: Config): Promise<Result<string>> {
   console.log("unused", config);
-  return Ok(Ids[EVM]); //Ids["ETH_SEPOLIA"]);
+  return Ok(Eth.Ids[CHAIN]); //Ids["ETH_SEPOLIA"]);
   // const network = await treasury_network(config);
   // if (!network) return Err(Error.unknown("not ok"));
   // if (network === "mainnet") {
@@ -167,6 +169,6 @@ export async function eth_blockNumber(config: Config): Promise<Result<string>> {
   if (!network) return Err(Error.unknown("not ok"));
   const mainnet = network === "mainnet";
   return Ok(
-    `0x${Number(await Sdk.connector.blockNumber(EVM, mainnet)).toString(16)}`,
+    `0x${Number(await Sdk.connector.blockNumber(CHAIN, mainnet)).toString(16)}`,
   );
 }

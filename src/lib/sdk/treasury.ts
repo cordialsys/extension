@@ -1,7 +1,6 @@
 import { Error, Result } from "@/lib/sdk/error";
 import { Sdk } from "@/lib/sdk";
-import { Err, Ok } from "@/lib/types";
-import { Evm } from "@/lib/types/eth";
+import { Err, Eth, Ok, Sol } from "@/lib/types";
 import { short_sleep } from "@/lib/util";
 
 import { components } from "./treasury.d";
@@ -40,25 +39,6 @@ const AddressName = {
   },
 };
 
-// https://docs.metamask.io/wallet/reference/json-rpc-methods/eth_sendtransaction
-const EthHexAddress = z.string().regex(/^0x[0-9a-fA-F]{40}$/);
-// 0 or more hex characters
-const EthHexData0 = z.string().regex(/^0x[0-9a-f]*$/);
-// 1 or more hex characters
-const EthHexData1 = z.string().regex(/^0x[a-fA-F\d]+$/);
-const EthHexValue = z.string().regex(/^0x([1-9a-f]+[0-9a-f]*|0)$/);
-const EvmTransactionInput = z.looseObject({
-  from: EthHexAddress,
-  to: EthHexAddress,
-  value: EthHexValue,
-  data: EthHexData0,
-});
-export const EvmTransactionInputs = z.array(EvmTransactionInput).length(1);
-
-const SolBase58Address = z.string().regex(/^[1-9A-HJ-NP-Za-km-z]{32,44}$/);
-const SolData = z.instanceof(Uint8Array);
-const SolAccount = z.looseObject({ address: SolBase58Address });
-
 function parseError(method: string, error: z.ZodError): Result<Call> {
   return Err(
     Error.invalidArgument(
@@ -69,13 +49,11 @@ function parseError(method: string, error: z.ZodError): Result<Call> {
 
 export const Call = {
   newEvmTransaction(
-    chain: Evm,
+    chain: Eth.Chain,
     method: "eth_sendTransaction" | "eth_signTransaction",
     params: unknown,
   ): Result<Call> {
-    // https://docs.metamask.io/wallet/reference/json-rpc-methods/eth_sendtransaction/
-    const Input = EvmTransactionInputs;
-    const inputR = Input.safeParse(params);
+    const inputR = Eth.SignTransactionInputs.safeParse(params);
     if (!inputR.success) return parseError(method, inputR.error);
     const input = inputR.data[0];
 
@@ -94,18 +72,7 @@ export const Call = {
     method: "solana:signTransaction" | "solana:signAndSendTransaction",
     params: unknown,
   ): Result<Call> {
-    // SolanaSignTransactionInput[]
-    // https://github.com/anza-xyz/wallet-standard/blob/master/packages/core/features/src/signTransaction.ts
-    // https://github.com/anza-xyz/wallet-standard/blob/master/packages/core/features/src/signAndSendTransaction.ts
-    const Input = z
-      .array(
-        z.looseObject({
-          account: SolAccount,
-          transaction: SolData,
-        }),
-      )
-      .length(1);
-    const inputR = Input.safeParse(params);
+    const inputR = Sol.SignTransactionInputs.safeParse(params);
     if (!inputR.success) return parseError(method, inputR.error);
     const input = inputR.data[0];
 
@@ -117,10 +84,8 @@ export const Call = {
   },
 
   // construct from purported personal_sign inputs
-  newPersonalSign(chain: Evm, params: unknown): Result<Call> {
-    //https://docs.metamask.io/wallet/reference/json-rpc-methods/personal_sign/
-    const Input = z.tuple([EthHexData1, EthHexAddress]);
-    const inputR = Input.safeParse(params);
+  newPersonalSign(chain: Eth.Chain, params: unknown): Result<Call> {
+    const inputR = Eth.SignMessageInputs.safeParse(params);
     if (!inputR.success) return parseError("personal_sign", inputR.error);
     const input = inputR.data;
 
@@ -136,18 +101,7 @@ export const Call = {
 
   // construct from purported solana:signMessage inputs
   newSolanaSignMessage(params: unknown): Result<Call> {
-    // SolanaMessageInput[]
-    // https://github.com/anza-xyz/wallet-standard/blob/master/packages/core/features/src/signMessage.ts
-    const Input = z
-      .array(
-        z.looseObject({
-          account: SolAccount,
-          message: SolData,
-        }),
-      )
-      .length(1);
-
-    const inputR = Input.safeParse(params);
+    const inputR = Sol.SignMessageInputs.safeParse(params);
     if (!inputR.success) return parseError("solana:signMessage", inputR.error);
     const input = inputR.data[0];
 

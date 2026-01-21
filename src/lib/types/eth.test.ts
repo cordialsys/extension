@@ -1,7 +1,8 @@
-import { assert, expect, test } from "vitest";
-import { EvmTransactionInputs } from "./treasury";
+import { expect, test } from "vitest";
+import * as Evm from "./eth";
+// import * as z from "zod";
 
-function sum(a, b) {
+function sum(a: number, b: number) {
   return a + b;
 }
 
@@ -9,7 +10,7 @@ test("adds 1 + 2 to equal 3", () => {
   expect(sum(1, 2)).toBe(3);
 });
 
-test("EVM transaction input validates", () => {
+test("EVM transaction input validation", () => {
   const data = [
     {
       from: "0x598c0BACd8bC713e385f07a95bBf81Ca231aE80b",
@@ -23,6 +24,5 @@ test("EVM transaction input validates", () => {
     },
   ];
 
-  const result = EvmTransactionInputs.safeParse(data);
-  assert(result.success, result.error);
+  Evm.SignTransactionInputs.parse(data);
 });

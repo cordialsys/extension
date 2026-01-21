@@ -1,3 +1,5 @@
+import * as z from "zod";
+
 import type {
   WindowRegisterWalletEvent,
   WindowRegisterWalletEventCallback as Callback,
@@ -73,3 +75,31 @@ export class RegisterWalletEvent
     throw new Error("stopPropagation cannot be called");
   }
 }
+
+const Base58Address = z.string().regex(/^[1-9A-HJ-NP-Za-km-z]{32,44}$/);
+const Data = z.instanceof(Uint8Array);
+// just Account clashes with Account above
+const AccountAddress = z.looseObject({ address: Base58Address });
+
+// SolanaMessageInput[]
+// https://github.com/anza-xyz/wallet-standard/blob/master/packages/core/features/src/signMessage.ts
+export const SignMessageInputs = z
+  .array(
+    z.looseObject({
+      account: AccountAddress,
+      message: Data,
+    }),
+  )
+  .length(1);
+
+// SolanaSignTransactionInput[]
+// https://github.com/anza-xyz/wallet-standard/blob/master/packages/core/features/src/signTransaction.ts
+// https://github.com/anza-xyz/wallet-standard/blob/master/packages/core/features/src/signAndSendTransaction.ts
+export const SignTransactionInputs = z
+  .array(
+    z.looseObject({
+      account: AccountAddress,
+      transaction: Data,
+    }),
+  )
+  .length(1);
