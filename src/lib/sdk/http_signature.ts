@@ -36,6 +36,7 @@ content-digest: ${contentDigestHeader}:
 treasury: ${treasuryId}
 "@signature-params": ${signatureParams}
 `;
+  console.log(`signature base:\n${signatureBase}`);
 
   const signatureBytes = await crypto.subtle.sign(
     { name: "Ed25519" },
@@ -51,8 +52,6 @@ treasury: ${treasuryId}
   headers.append("Signature-Input", signatureInputHeader);
   headers.append("Signature", signatureHeader);
   headers.append("Treasury", treasuryId);
-  // headers.append("User", "36wmfPUiYuoh6E4yCb9lEdijCj0");
-  console.log("headers", headers);
   for (const [h, v] of headers) {
     console.log(h, ":", v);
   }

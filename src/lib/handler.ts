@@ -34,7 +34,6 @@ async function handle(
   const config = await Config.load();
 
   const log = `${request.header.provider} :: ${request.header.id} :: ${request.method} :: ${JSON.stringify(request.params)} ::`;
-  // console.log("❓", log, request.params);
   console.log("➡️", log, request.params);
 
   const result = await process(request, config, sender.origin, sender.tab?.id);

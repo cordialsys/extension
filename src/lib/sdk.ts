@@ -2,7 +2,7 @@
 // and setting e.g.
 // ```
 // VITE_CONNECTOR_API=http://localhost:8080/
-// VITE_PROPOSE_API=https://treasury.cordialapis.com/v1/propose
+// VITE_PROPOSE_API=http://127.0.0.1:8777/
 // ```
 
 import { Config, Extension } from "./config";
@@ -163,7 +163,6 @@ export namespace Sdk {
       chainId: string,
     ): Promise<Option<string>> {
       const url = `${API}v1/chains/${chainId}?network=!mainnet`;
-      console.log("url", url);
       let response: Response;
       try {
         response = await fetch(url);
@@ -188,7 +187,7 @@ export namespace Sdk {
   }
 
   export namespace propose {
-    const _API = "https://treasury.cordialapis.com/v1/propose";
+    const _API = "https://treasury.cordialapis.com/";
     export const API: boolean = import.meta.env.VITE_PROPOSE_API ?? _API;
 
     export async function executeSigned<T>(
@@ -212,7 +211,6 @@ export namespace Sdk {
       }
       const treasuryId = config.treasury.name.slice(prefix.length);
       try {
-        request.headers.set("treasury", treasuryId);
         request.headers.set("user", login.userId);
         request = await sign("sso", login, request, treasuryId);
         const response = await fetch(request);
@@ -229,7 +227,7 @@ export namespace Sdk {
     export namespace chains {
       export namespace calls {
         export async function create(call: T.Call): Promise<Result<string>> {
-          const url = `${API}/calls`;
+          const url = `${API}v1/propose/calls`;
           console.log(
             "proposed call:",
             JSON.stringify(superjson.serialize(call), null, 2),
