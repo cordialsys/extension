@@ -147,6 +147,8 @@ async function process(
     if (method === "eth_requestAccounts" || method === "eth_accounts")
       return Ok(evm.eth_accounts(config));
     // https://eips.ethereum.org/EIPS/eip-2255
+    if (method === "wallet_getCapabilities")
+      return evm.wallet_getCapabilities(request.params);
     if (method === "wallet_requestPermissions")
       return evm.wallet_requestPermissions(request.params);
     if (method === "wallet_switchEthereumChain")

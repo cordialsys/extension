@@ -93,6 +93,16 @@ export function eth_accounts(config: Config): string[] {
   return addresses;
 }
 
+export async function wallet_getCapabilities(
+  params: Option<Params>,
+): Promise<Result<unknown>> {
+  // Uniswap sends undefined..
+  // It's supposed to send
+  // https://docs.metamask.io/wallet/reference/json-rpc-methods/wallet_getcapabilities
+  console.log("wallet_getCapabilities params:", params);
+  return Ok({});
+}
+
 export async function wallet_switchEthereumChain(
   params: Option<Params>,
 ): Promise<Result<unknown>> {
@@ -151,7 +161,7 @@ export async function treasury_network(
 }
 
 export async function eth_chainId(config: Config): Promise<Result<string>> {
-  console.log("unused", config);
+  // console.log("unused", config);
   return Ok(Eth.Ids[CHAIN]); //Ids["ETH_SEPOLIA"]);
   // const network = await treasury_network(config);
   // if (!network) return Err(Error.unknown("not ok"));
