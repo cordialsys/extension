@@ -32,7 +32,7 @@ export async function sign(
   const signatureBase = `"@method": ${method}
 "@path": ${path}
 "@query": ${query}
-content-digest: ${contentDigestHeader}:
+content-digest: ${contentDigestHeader}
 treasury: ${treasuryId}
 "@signature-params": ${signatureParams}
 `;
