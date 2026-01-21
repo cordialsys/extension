@@ -19,6 +19,9 @@ lint:
 	pnpm run typecheck
 	pnpm dlx --package jiti eslint src
 
+test:
+    pnpm run test
+
 api-gen project api:
 	pnpm dlx openapi-typescript https://api.stoplight.io/projects/{{ project }}/branches/main/export/reference/{{ api }}.yaml -o src/lib/sdk/{{ api }}.d.ts
 

@@ -47,6 +47,13 @@ const EthHexData0 = z.string().regex(/^0x[0-9a-f]*$/);
 // 1 or more hex characters
 const EthHexData1 = z.string().regex(/^0x[a-fA-F\d]+$/);
 const EthHexValue = z.string().regex(/^0x([1-9a-f]+[0-9a-f]*|0)$/);
+const EvmTransactionInput = z.looseObject({
+  from: EthHexAddress,
+  to: EthHexAddress,
+  value: EthHexValue,
+  data: EthHexData0,
+});
+export const EvmTransactionInputs = z.array(EvmTransactionInput).length(1);
 
 const SolBase58Address = z.string().regex(/^[1-9A-HJ-NP-Za-km-z]{32,44}$/);
 const SolData = z.instanceof(Uint8Array);
@@ -67,16 +74,7 @@ export const Call = {
     params: unknown,
   ): Result<Call> {
     // https://docs.metamask.io/wallet/reference/json-rpc-methods/eth_sendtransaction/
-    const Input = z
-      .array(
-        z.looseObject({
-          from: EthHexAddress,
-          to: EthHexAddress,
-          value: EthHexValue,
-          data: EthHexData0,
-        }),
-      )
-      .length(1);
+    const Input = EvmTransactionInputs;
     const inputR = Input.safeParse(params);
     if (!inputR.success) return parseError(method, inputR.error);
     const input = inputR.data[0];
