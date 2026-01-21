@@ -35,12 +35,12 @@ async function handle(
 
   const log = `${request.header.provider} :: ${request.header.id} :: ${request.method} :: ${JSON.stringify(request.params)} ::`;
   // console.log("❓", log, request.params);
-  console.log("▶️", log, request.params);
+  console.log("➡️", log, request.params);
 
   const result = await process(request, config, sender.origin, sender.tab?.id);
 
   if (result.ok) console.log("⬅️", log, result.value);
-  else console.error("💔", log, result.error);
+  else console.log("◀️", log, result.error);
 
   return {
     header: request.header,
