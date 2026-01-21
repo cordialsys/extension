@@ -1,3 +1,10 @@
+// The API endpoints can be customized by creating an `.env` or `.env.local` file,
+// and setting e.g.
+// ```
+// VITE_CONNECTOR_API=http://localhost:8080/
+// VITE_PROPOSE_API=https://treasury.cordialapis.com/v1/propose
+// ```
+
 import { Config, Extension } from "./config";
 import { Login } from "./login";
 import { Error, Result } from "./sdk/error";
@@ -63,7 +70,7 @@ async function apiList<R>(
 
 export namespace Sdk {
   export namespace admin {
-    const API: string = "https://admin.cordialapis.com/";
+    export const API: string = "https://admin.cordialapis.com/";
 
     async function genericGet<R>(name: string): Promise<Result<R>> {
       const url = `${API}v1/${name}`;
@@ -135,8 +142,8 @@ export namespace Sdk {
   }
 
   export namespace connector {
-    // const API: string = "http://localhost:8080/";
-    const API: string = "https://connector.cordialapis.com/";
+    const _API: string = "https://connector.cordialapis.com/";
+    export const API: boolean = import.meta.env.VITE_CONNECTOR_API ?? _API;
 
     export async function blockNumber(
       chainId: string,
@@ -181,10 +188,8 @@ export namespace Sdk {
   }
 
   export namespace propose {
-    // const PUBLIC_PROPOSE = "https://treasury.cordialapis.com/v1/propose";
-    const LOCAL_PROPOSE = "http://127.0.0.1:8777/v1/propose";
-    export const PROPOSE_API = LOCAL_PROPOSE;
-    const LOCAL: boolean = PROPOSE_API === LOCAL_PROPOSE;
+    const _API = "https://treasury.cordialapis.com/v1/propose";
+    export const API: boolean = import.meta.env.VITE_PROPOSE_API ?? _API;
 
     export async function executeSigned<T>(
       request: Request,
@@ -207,8 +212,8 @@ export namespace Sdk {
       }
       const treasuryId = config.treasury.name.slice(prefix.length);
       try {
-        if (LOCAL) request.headers.set("user", login.userId);
         request.headers.set("treasury", treasuryId);
+        request.headers.set("user", login.userId);
         request = await sign("sso", login, request, treasuryId);
         const response = await fetch(request);
 
@@ -224,7 +229,7 @@ export namespace Sdk {
     export namespace chains {
       export namespace calls {
         export async function create(call: T.Call): Promise<Result<string>> {
-          const url = `${PROPOSE_API}/calls`;
+          const url = `${API}/calls`;
           console.log(
             "proposed call:",
             JSON.stringify(superjson.serialize(call), null, 2),
