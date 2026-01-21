@@ -42,8 +42,23 @@ const AddressName = {
 
 // https://docs.metamask.io/wallet/reference/json-rpc-methods/eth_sendtransaction
 const EthHexAddress = z.string().regex(/^0x[0-9a-fA-F]{40}$/);
-const EthHexData = z.string().regex(/^0x[0-9a-f]*$/);
+// 0 or more hex characters
+const EthHexData0 = z.string().regex(/^0x[0-9a-f]*$/);
+// 1 or more hex characters
+const EthHexData1 = z.string().regex(/^0x[a-fA-F\d]+$/);
 const EthHexValue = z.string().regex(/^0x([1-9a-f]+[0-9a-f]*|0)$/);
+
+const SolBase58Address = z.string().regex(/^[1-9A-HJ-NP-Za-km-z]{32,44}$/);
+const SolData = z.instanceof(Uint8Array);
+const SolAccount = z.looseObject({ address: SolBase58Address });
+
+function parseError(method: string, error: z.ZodError): Result<Call> {
+  return Err(
+    Error.invalidArgument(
+      `Invalid inputs for \`${method}\`: ${z.treeifyError(error)}`,
+    ),
+  );
+}
 
 export const Call = {
   newEvmTransaction(
@@ -58,13 +73,12 @@ export const Call = {
           from: EthHexAddress,
           to: EthHexAddress,
           value: EthHexValue,
-          data: EthHexData,
+          data: EthHexData0,
         }),
       )
       .length(1);
     const inputR = Input.safeParse(params);
-    if (!inputR.success)
-      return Err(Error.invalidArgument(`Invalid inputs for \`${method}\``));
+    if (!inputR.success) return parseError(method, inputR.error);
     const input = inputR.data[0];
 
     const address = AddressName.new(chain, input.from.slice(2));
@@ -88,16 +102,13 @@ export const Call = {
     const Input = z
       .array(
         z.looseObject({
-          account: z.looseObject({
-            address: z.string().nonempty(),
-          }),
-          transaction: z.instanceof(Uint8Array),
+          account: SolAccount,
+          transaction: SolData,
         }),
       )
       .length(1);
     const inputR = Input.safeParse(params);
-    if (!inputR.success)
-      return Err(Error.invalidArgument(`Invalid inputs for \`${method}\``));
+    if (!inputR.success) return parseError(method, inputR.error);
     const input = inputR.data[0];
 
     return Ok({
@@ -109,10 +120,10 @@ export const Call = {
 
   // construct from purported personal_sign inputs
   newPersonalSign(chain: Evm, params: unknown): Result<Call> {
-    const Input = z.string().nonempty().array().length(2);
+    //https://docs.metamask.io/wallet/reference/json-rpc-methods/personal_sign/
+    const Input = z.tuple([EthHexData1, EthHexAddress]);
     const inputR = Input.safeParse(params);
-    if (!inputR.success)
-      return Err(Error.invalidArgument("Invalid inputs for `personal_sign`"));
+    if (!inputR.success) return parseError("personal_sign", inputR.error);
     const input = inputR.data;
 
     const blockchainAddress = input[1];
@@ -132,19 +143,14 @@ export const Call = {
     const Input = z
       .array(
         z.looseObject({
-          account: z.looseObject({
-            address: z.string().nonempty(),
-          }),
-          message: z.instanceof(Uint8Array),
+          account: SolAccount,
+          message: SolData,
         }),
       )
       .length(1);
 
     const inputR = Input.safeParse(params);
-    if (!inputR.success)
-      return Err(
-        Error.invalidArgument("Invalid inputs for `solana:signMessage`"),
-      );
+    if (!inputR.success) return parseError("solana:signMessage", inputR.error);
     const input = inputR.data[0];
 
     return Ok({
