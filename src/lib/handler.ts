@@ -137,7 +137,7 @@ async function process(
 
     // transacting calls
     if (method === "eth_sendTransaction")
-      return evm.eth_sendTransaction(request);
+      return evm.eth_sendTransaction(request.params);
 
     // helper calls
     if (method === "eth_blockNumber") return evm.eth_blockNumber(config);
