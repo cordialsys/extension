@@ -23,6 +23,7 @@ export type UnsignedEvmTransaction =
   components["schemas"]["UnsignedEvmTransaction"];
 export type UnsignedSvmTransaction =
   components["schemas"]["UnsignedSvmTransaction"];
+export type TypedData = components["schemas"]["Eip712TypedData"];
 
 const Id = {
   new(s: string): Id {
@@ -96,6 +97,42 @@ export const Call = {
       address,
       method: "personal_sign",
       request: { message: input[0].slice(2) },
+    });
+  },
+
+  newSignTypedData(chain: Eth.Chain, params: unknown): Result<Call> {
+    const inputR = Eth.SignTypedDataInputs.safeParse(params);
+    if (!inputR.success)
+      return parseError("eth_signTypedData_v4", inputR.error);
+    const input = inputR.data;
+
+    const blockchainAddress = input[0];
+    const address = AddressName.new(chain, blockchainAddress);
+
+    let typedData: z.infer<typeof Eth.Eip712TypedData>;
+    const directR = Eth.Eip712TypedData.safeParse(input[1]);
+    if (directR.success) typedData = directR.data;
+    else {
+      try {
+        const dejson = JSON.parse(input[1] as string);
+        const jsonR = Eth.Eip712TypedData.safeParse(dejson);
+        if (!jsonR.success) {
+          return Err(
+            Error.invalidArgument(
+              "Invalid TypedData, whether directly or as JSON",
+            ),
+          );
+        }
+        typedData = jsonR.data;
+      } catch {
+        return Err(Error.invalidArgument("Invalid TypedData"));
+      }
+    }
+
+    return Ok({
+      address,
+      method: "eth_signTypedData_v4",
+      request: typedData,
     });
   },
 

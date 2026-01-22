@@ -86,3 +86,56 @@ const SignTransactionInput = z.looseObject({
 export const SignTransactionInputs = z.array(SignTransactionInput).length(1);
 //https://docs.metamask.io/wallet/reference/json-rpc-methods/personal_sign/
 export const SignMessageInputs = z.tuple([HexData1, HexAddress]);
+
+// // TODO: unravel more explicitly
+// export const Eip712TypedData = z.fromJSONSchema({
+//   type: "object",
+//   properties: {
+//     types: {
+//       type: "object",
+//       properties: {
+//         EIP712Domain: { type: "array" },
+//       },
+//       additionalProperties: {
+//         type: "array",
+//         items: {
+//           type: "object",
+//           properties: {
+//             name: { type: "string" },
+//             type: { type: "string" },
+//           },
+//           required: ["name", "type"],
+//         },
+//       },
+//       required: ["EIP712Domain"],
+//     },
+//     primaryType: { type: "string" },
+//     domain: { type: "object" },
+//     message: { type: "object" },
+//   },
+//   required: ["types", "primaryType", "domain", "message"],
+// });
+
+export const Eip712Domain = z.object({
+  name: z.string().optional(),
+  version: z.string().optional(),
+  chainId: z.string().or(z.number()).optional(),
+  verifyingContract: HexAddress.optional(),
+  salt: z.string().optional(),
+});
+
+export const Eip712DomainType = z.object({
+  name: z.string(),
+  type: z.string(),
+});
+
+export const Eip712TypedData = z.object({
+  domain: Eip712Domain,
+  types: z.record(z.string(), z.array(Eip712DomainType)),
+  primaryType: z.string(),
+  message: z.record(z.string(), z.unknown()),
+});
+
+// we don't set the second parameter to Eip712TypedData yet,
+// as it could be both literal or encoded as JSON
+export const SignTypedDataInputs = z.tuple([HexData1, z.unknown()]);

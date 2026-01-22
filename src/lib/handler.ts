@@ -132,6 +132,8 @@ async function process(
   if (provider === "ETH") {
     // signing calls
     if (method === "personal_sign") return evm.personal_sign(request.params);
+    if (method === "eth_signTypedData_v4")
+      return evm.eth_signTypedData_v4(request.params);
 
     // transacting calls
     if (method === "eth_sendTransaction")

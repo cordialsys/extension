@@ -737,7 +737,7 @@ export interface components {
      */
     CallRequest: {
       /** @description Chain specific call request */
-      request: Record<string, never>;
+      request: Record<string, unknown>;
       /** @description Signing addresses associated with the call.  There must be at least 1. */
       addresses: string[];
       /** @description See https://cordialapis.stoplight.io/docs/treasury/jknvarxw4t7mh-call-method */
@@ -851,7 +851,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": Record<string, never>;
+          "application/json": Record<string, unknown>;
         };
       };
     };
@@ -1137,7 +1137,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": Record<string, never>;
+          "application/json": Record<string, unknown>;
         };
       };
     };

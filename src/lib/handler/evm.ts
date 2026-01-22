@@ -8,20 +8,16 @@ import * as T from "@/lib/sdk/treasury";
 
 let CHAIN: Eth.Chain = "ETH";
 
-export async function personal_sign(params: unknown): Promise<Result<string>> {
-  // 1. transform
-  const proposalR = T.Call.newPersonalSign(CHAIN, params);
-  if (!proposalR.ok) return proposalR;
-  const proposal = proposalR.value;
-  console.log("proposal for `personal_sign`:", proposal);
-
-  // 2. submit
+export async function ethereumSignature(
+  proposal: T.Call,
+): Promise<Result<string>> {
+  // 1. propose
   const proposalNameR = await Sdk.propose.chains.calls.create(proposal);
   if (!proposalNameR.ok) return proposalNameR;
   const proposalName = proposalNameR.value;
   console.log("proposal name:", proposalName);
 
-  // 3. wait for call
+  // 2. wait for call
   const callR = await T.Call.byProposal(proposalName);
   if (!callR.ok) return callR;
   const call = callR.value;
@@ -30,13 +26,68 @@ export async function personal_sign(params: unknown): Promise<Result<string>> {
   const signatureName = (call.response as T.CallSignature).signature as string;
   console.log("signature name:", call);
 
-  // 4. wait for signature
+  // 3. wait for signature
   const signatureR = await T.Signature.completed(signatureName);
   if (!signatureR.ok) return signatureR;
-  const signature = signatureR.value.signature as string;
+  let signature = signatureR.value.signature as string;
+
+  // 4. add 27 to the last (recovery) byte
+  const recovery = parseInt(signature.slice(-2), 16);
+  const v = recovery + 27;
+  signature = signature.slice(0, -2) + v.toString(16);
 
   const ethSignature = `0x${signature}`;
   return Ok(ethSignature);
+}
+
+export async function personal_sign(params: unknown): Promise<Result<string>> {
+  // 1. transform
+  const proposalR = T.Call.newPersonalSign(CHAIN, params);
+  if (!proposalR.ok) return proposalR;
+  const proposal = proposalR.value;
+  console.log("proposal for `personal_sign`:", proposal);
+
+  return ethereumSignature(proposal);
+
+  // // 2. submit
+  // const proposalNameR = await Sdk.propose.chains.calls.create(proposal);
+  // if (!proposalNameR.ok) return proposalNameR;
+  // const proposalName = proposalNameR.value;
+  // console.log("proposal name:", proposalName);
+
+  // // 3. wait for call
+  // const callR = await T.Call.byProposal(proposalName);
+  // if (!callR.ok) return callR;
+  // const call = callR.value;
+  // console.log("call name:", call.name);
+
+  // const signatureName = (call.response as T.CallSignature).signature as string;
+  // console.log("signature name:", call);
+
+  // // 4. wait for signature
+  // const signatureR = await T.Signature.completed(signatureName);
+  // if (!signatureR.ok) return signatureR;
+  // const signature = signatureR.value.signature as string;
+
+  // // 5. add 27 to the last (recovery) byte
+  // const recovery = parseInt(signature.slice(-2), 16);
+  // const adjustedRecoveryByte = recovery + 27;
+  // const adjustedSignature =
+  //   signature.slice(0, -2) + adjustedRecoveryByte.toString(16);
+
+  // const ethSignature = `0x${adjustedSignature}`;
+  // return Ok(ethSignature);
+}
+
+export async function eth_signTypedData_v4(
+  params: unknown,
+): Promise<Result<string>> {
+  const proposalR = T.Call.newSignTypedData(CHAIN, params);
+  if (!proposalR.ok) return proposalR;
+  const proposal = proposalR.value;
+  console.log("proposal for `eth_signTypedData_v4`:", proposal);
+
+  return ethereumSignature(proposal);
 }
 
 export async function eth_signTransaction(
@@ -161,6 +212,7 @@ export async function treasury_network(
 }
 
 export async function eth_chainId(config: Config): Promise<Result<string>> {
+  const _ = config;
   // console.log("unused", config);
   return Ok(Eth.Ids[CHAIN]); //Ids["ETH_SEPOLIA"]);
   // const network = await treasury_network(config);

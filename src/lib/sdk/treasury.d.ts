@@ -1942,7 +1942,7 @@ export interface components {
     Tags: string[];
     /** Proposal */
     Proposal: {
-      name?: string;
+      name: string;
       request?: components["schemas"]["Request"];
     };
     /**
@@ -2742,7 +2742,7 @@ export interface components {
       status: components["schemas"]["ErrorStatus"];
       message: string;
       /** @description Details may be set on some requests where additional structured data may help troubleshoot.  For example, this will be set when policy rejects a request. */
-      details?: Record<string, never>[];
+      details?: Record<string, unknown>[];
     };
     /** ErrorCode */
     ErrorCode: number;
@@ -3177,7 +3177,7 @@ export interface components {
      */
     DisableableState: "active" | "disabled" | "deleted";
     /** FeatureData */
-    FeatureData: Record<string, never>;
+    FeatureData: Record<string, unknown>;
     /** AccessRulePage */
     AccessRulePage: {
       "access-rules"?: components["schemas"]["AccessRule"][];
@@ -3407,7 +3407,7 @@ export interface components {
      *
      *     Currently, we may only support primitive types (integer, string, boolean) as values, and top-level keys.
      */
-    DataFilter: Record<string, never>;
+    DataFilter: Record<string, unknown>;
     /** AccessQuorumFilter */
     AccessQuorumFilter: {
       initiate?: components["schemas"]["ExplicitUserFilter"];
@@ -3747,7 +3747,7 @@ export interface components {
       retention?: components["schemas"]["Retention"];
       keys?: {
         /** @description Signing Json Web Keys, used to validate OpenPubkey credential signatures (the "keys" array in a JWKS). */
-        sso?: Record<string, never>[];
+        sso?: Record<string, unknown>[];
         /** @description Not currently implemented. */
         bak?: components["schemas"]["BackupKey"][];
       };
@@ -4486,6 +4486,7 @@ export interface components {
      *     | driver | method | request | response |
      *     | ------ | ------ | ------- |----------|
      *     | EVM | personal_sign | UnsignedMessage | signature |
+     *     | EVM | eth_signTypedData_v4 | Eip712TypedData | signature |
      *     | EVM | eth_sendTransaction | UnsignedEvmTransaction | transaction |
      *     | EVM | eth_signTransaction | UnsignedEvmTransaction | transaction |
      *     | SVM | solana:signMessage | UnsignedMessage | signature |
@@ -4510,6 +4511,7 @@ export interface components {
       | "eth_sendTransaction"
       | "eth_signTransaction"
       | "personal_sign"
+      | "eth_signTypedData_v4"
       | "solana:signIn"
       | "solana:signMessage"
       | "solana:signTransaction"
@@ -4518,7 +4520,8 @@ export interface components {
     CallRequest:
       | components["schemas"]["UnsignedMessage"]
       | components["schemas"]["UnsignedEvmTransaction"]
-      | components["schemas"]["UnsignedSvmTransaction"];
+      | components["schemas"]["UnsignedSvmTransaction"]
+      | components["schemas"]["Eip712TypedData"];
     /** UnsignedMessage */
     UnsignedMessage: {
       message: components["schemas"]["Hex"];
@@ -4532,6 +4535,37 @@ export interface components {
     /** UnsignedSvmTransaction */
     UnsignedSvmTransaction: {
       transaction: components["schemas"]["Hex"];
+    };
+    /** Eip712TypedData */
+    Eip712TypedData: {
+      domain: components["schemas"]["Eip712Domain"];
+      types: {
+        [key: string]: components["schemas"]["Eip712DomainTypes"];
+      };
+      primaryType: string;
+      message: Record<string, unknown>;
+    };
+    /** Eip712Domain */
+    Eip712Domain: {
+      name?: string;
+      version?: string;
+      chainId?: components["schemas"]["NumberOrString"];
+      verifyingContract?: components["schemas"]["BlockchainAddress"];
+      salt?: string;
+    };
+    /**
+     * NumberOrString
+     * @description ETH chain ID are sometimes sent as numbers, or as strings (sometimes decimal, sometimes hexadecimal with 0x prefix)
+     * @example 1
+     * @example 0x1
+     */
+    NumberOrString: number | string;
+    /** Eip712DomainTypes */
+    Eip712DomainTypes: components["schemas"]["Eip712DomainType"][];
+    /** Eip712DomainType */
+    Eip712DomainType: {
+      name: string;
+      type: string;
     };
     /**
      * CallResponse
@@ -7039,7 +7073,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": Record<string, never>;
+          "application/json": Record<string, unknown>;
         };
       };
     };
@@ -7435,7 +7469,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": Record<string, never>;
+          "application/json": Record<string, unknown>;
         };
       };
     };
@@ -7485,7 +7519,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": Record<string, never>;
+          "application/json": Record<string, unknown>;
         };
       };
     };
@@ -7577,7 +7611,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": Record<string, never>;
+          "application/json": Record<string, unknown>;
         };
       };
     };
@@ -7823,7 +7857,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": Record<string, never>;
+          "application/json": Record<string, unknown>;
         };
       };
     };
@@ -7846,7 +7880,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "text/html": Record<string, never>;
+          "text/html": Record<string, unknown>;
         };
       };
       /** @description Treasury is not healthy */
@@ -7927,7 +7961,7 @@ export interface operations {
     };
     requestBody?: {
       content: {
-        "application/json": Record<string, never>;
+        "application/json": Record<string, unknown>;
       };
     };
     responses: {
@@ -8257,7 +8291,7 @@ export interface operations {
     };
     requestBody?: {
       content: {
-        "application/json": Record<string, never>;
+        "application/json": Record<string, unknown>;
       };
     };
     responses: {
