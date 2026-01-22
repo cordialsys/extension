@@ -74,7 +74,7 @@ const HexAddress = z.string().regex(/^0x[0-9a-fA-F]{40}$/);
 const HexData0 = z.string().regex(/^0x[0-9a-f]*$/);
 // 1 or more hex characters
 const HexData1 = z.string().regex(/^0x[a-fA-F\d]+$/);
-const HexValue = z.string().regex(/^0x([1-9a-f]+[0-9a-f]*|0)$/);
+const HexValue = z.string().regex(/^0x([0-9a-fA-F]{2})*$/);
 // https://docs.metamask.io/wallet/reference/json-rpc-methods/eth_sendtransaction
 // https://docs.metamask.io/snaps/reference/keyring-api/chain-methods#eth_signtransaction
 const SignTransactionInput = z.looseObject({
