@@ -1,18 +1,24 @@
 import * as z from "zod";
 
-export type Chain = "ETH" | "ETH_SEPOLIA" | "MATIC";
-export type Id = "0x1" | "0xaa36a7" | "0x89";
+export type Chain = "ETH" | "MATIC";
 
-export const Ids: { [chain in Chain]: Id } = {
-  ETH: "0x1",
-  ETH_SEPOLIA: "0xaa36a7",
-  MATIC: "0x89",
+export const Chains: Record<string, Chain> = {
+  "0x1": "ETH",
+  // sepolia
+  "0xaa36a7": "ETH",
+  "11155111": "ETH",
+  // hoodi
+  "0x88bb0": "ETH",
+  "560048": "ETH",
+  // polygon
+  "0x89": "MATIC",
 };
 
-export const Chains: { [id in Id]: Chain } = {
-  "0x1": "ETH",
-  "0xaa36a7": "ETH_SEPOLIA",
-  "0x89": "MATIC",
+export type Id = keyof typeof Chains;
+
+export const Mainnet: { [chain in Chain]: Id } = {
+  ETH: "0x1",
+  MATIC: "0x89",
 };
 
 export interface Info {

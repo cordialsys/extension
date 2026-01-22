@@ -6,7 +6,10 @@ import { Params } from "@/lib/types";
 import * as z from "zod";
 import * as T from "@/lib/sdk/treasury";
 
-let CHAIN: Eth.Chain = "ETH";
+// TODO: Initialize this with the Config
+// Also make it an option (in case we have no EVM addresses)
+let ID: Eth.Id = "0x1";
+let MAINNET: boolean = true;
 
 export async function ethereumSignature(
   proposal: T.Call,
@@ -42,7 +45,7 @@ export async function ethereumSignature(
 
 export async function personal_sign(params: unknown): Promise<Result<string>> {
   // 1. transform
-  const proposalR = T.Call.newPersonalSign(CHAIN, params);
+  const proposalR = T.Call.newPersonalSign(ID, params);
   if (!proposalR.ok) return proposalR;
   const proposal = proposalR.value;
   console.log("proposal for `personal_sign`:", proposal);
@@ -82,7 +85,7 @@ export async function personal_sign(params: unknown): Promise<Result<string>> {
 export async function eth_signTypedData_v4(
   params: unknown,
 ): Promise<Result<string>> {
-  const proposalR = T.Call.newSignTypedData(CHAIN, params);
+  const proposalR = T.Call.newSignTypedData(ID, params);
   if (!proposalR.ok) return proposalR;
   const proposal = proposalR.value;
   console.log("proposal for `eth_signTypedData_v4`:", proposal);
@@ -102,11 +105,7 @@ export async function eth_sendTransaction(
   params: unknown,
 ): Promise<Result<string>> {
   // 1. transform
-  const proposalR = T.Call.newEvmTransaction(
-    CHAIN,
-    "eth_sendTransaction",
-    params,
-  );
+  const proposalR = T.Call.newEvmTransaction(ID, "eth_sendTransaction", params);
   if (!proposalR.ok) return proposalR;
   const proposal = proposalR.value;
   console.log("proposal for `eth_sendTransaction`:", proposal);
@@ -137,7 +136,7 @@ export async function eth_sendTransaction(
 }
 
 export function eth_accounts(config: Config): string[] {
-  const prefix = `chains/${CHAIN}/addresses/`;
+  const prefix = `chains/${Eth.Chains[ID]}/addresses/`;
   const addresses: string[] = config.addresses
     .filter((a) => a.startsWith(prefix))
     .map((a) => a.slice(prefix.length));
@@ -175,7 +174,7 @@ export async function wallet_switchEthereumChain(
     );
 
   console.log(`switching to ${chain}`);
-  CHAIN = chain;
+  ID = chainId;
   return Ok(null);
 }
 
@@ -214,7 +213,7 @@ export async function treasury_network(
 export async function eth_chainId(config: Config): Promise<Result<string>> {
   const _ = config;
   // console.log("unused", config);
-  return Ok(Eth.Ids[CHAIN]); //Ids["ETH_SEPOLIA"]);
+  return Ok(ID); //Ids["ETH_SEPOLIA"]);
   // const network = await treasury_network(config);
   // if (!network) return Err(Error.unknown("not ok"));
   // if (network === "mainnet") {
@@ -231,6 +230,6 @@ export async function eth_blockNumber(config: Config): Promise<Result<string>> {
   if (!network) return Err(Error.unknown("not ok"));
   const mainnet = network === "mainnet";
   return Ok(
-    `0x${Number(await Sdk.connector.blockNumber(CHAIN, mainnet)).toString(16)}`,
+    `0x${Number(await Sdk.connector.blockNumber(ID, mainnet)).toString(16)}`,
   );
 }

@@ -50,7 +50,7 @@ function parseError(method: string, error: z.ZodError): Result<Call> {
 
 export const Call = {
   newEvmTransaction(
-    chain: Eth.Chain,
+    id: Eth.Id,
     method: "eth_sendTransaction" | "eth_signTransaction",
     params: unknown,
   ): Result<Call> {
@@ -58,7 +58,7 @@ export const Call = {
     if (!inputR.success) return parseError(method, inputR.error);
     const input = inputR.data[0];
 
-    const address = AddressName.new(chain, input.from.slice(2));
+    const address = AddressName.new(Eth.Chains[id], input.from.slice(2));
     // keep the `.slice(2)` out, BigNumber detects hex numbers using the `0x` prefix
     const amount = new BigNumber(input.value).shiftedBy(-18).toFixed();
 
@@ -85,13 +85,13 @@ export const Call = {
   },
 
   // construct from purported personal_sign inputs
-  newPersonalSign(chain: Eth.Chain, params: unknown): Result<Call> {
+  newPersonalSign(id: Eth.Id, params: unknown): Result<Call> {
     const inputR = Eth.SignMessageInputs.safeParse(params);
     if (!inputR.success) return parseError("personal_sign", inputR.error);
     const input = inputR.data;
 
     const blockchainAddress = input[1];
-    const address = AddressName.new(chain, blockchainAddress);
+    const address = AddressName.new(Eth.Chains[id], blockchainAddress);
 
     return Ok({
       address,
@@ -100,14 +100,14 @@ export const Call = {
     });
   },
 
-  newSignTypedData(chain: Eth.Chain, params: unknown): Result<Call> {
+  newSignTypedData(id: Eth.Id, params: unknown): Result<Call> {
     const inputR = Eth.SignTypedDataInputs.safeParse(params);
     if (!inputR.success)
       return parseError("eth_signTypedData_v4", inputR.error);
     const input = inputR.data;
 
     const blockchainAddress = input[0];
-    const address = AddressName.new(chain, blockchainAddress);
+    const address = AddressName.new(Eth.Chains[id], blockchainAddress);
 
     let typedData: z.infer<typeof Eth.Eip712TypedData>;
     const directR = Eth.Eip712TypedData.safeParse(input[1]);
