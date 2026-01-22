@@ -14,19 +14,22 @@ import { cordialRequest, response } from "@/lib/relay";
 
 export default defineUnlistedScript(() => {
   console.log("♥️ Running the Cordial Provider");
-  // TODO: Introduce a notion of instance?
-  // The worry is that e.g. two ETH providers will compete
-  // over then chain (say Polymarket wants Polygon, Uniswap wants Ethereum).
-  // const instance = Nonce.new();
+
+  // first of all, listen to responses from the extension
   window.addEventListener("message", response);
+
+  // send a kind of heartbeat, this can update the extension icon
   cordialRequest("cordial:ping");
-  // TODO: Only expose providers if the origin is allowed (can tell by response of ping)
-  // This would be easy to do.. but we also have to then expose
-  // it later on (if the user allows the origin by clicking on the extension)
-  const eth = new Ethereum(/*instance*/);
+
+  // construct the providers
+  const eth = new Ethereum();
+  const sol = new Solana();
+
+  // make them available in global name space for easy debug access
+  const attach = window as unknown as { cordial: unknown };
+  attach.cordial = { eth, sol };
+
+  // start them (they will detect whether to reveal themselves)
   setTimeout(eth.start.bind(eth), 0);
-  const sol = new Solana(/*instance*/);
   setTimeout(sol.start.bind(sol), 0);
-  // clobber the global name space for easy debug access
-  (window as unknown as { cordial: unknown }).cordial = { eth, sol };
 });

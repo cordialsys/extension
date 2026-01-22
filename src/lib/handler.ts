@@ -80,10 +80,10 @@ async function process(
 
   if (method === "cordial:ping") return Ok("pong");
 
-  console.log(
-    "request params:",
-    JSON.stringify(superjson.serialize(request.params ?? null), null, 2),
-  );
+  // console.log(
+  //   "request params:",
+  //   JSON.stringify(superjson.serialize(request.params ?? null), null, 2),
+  // );
 
   if (provider === "SOL") {
     // custom calls
