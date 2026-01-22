@@ -19,7 +19,7 @@
 // IN THE SOFTWARE.
 
 import { solRequest } from "@/lib/relay";
-import { Sol } from "@/lib/types";
+import { Ok, Option, Sol } from "@/lib/types";
 
 // import { PublicKey } from "@solana/web3.js";
 import type {
@@ -136,19 +136,22 @@ export class Solana implements Wallet {
 
   async start(this: Solana) {
     console.log("Initializing Cordial Solana Provider");
-    // console.log(await solRequest("cordial_ping"));
     try {
-      const changes = (await solRequest("cordial_preconnect")) as Sol.Changes;
-      // console.log("preconnect response:", changes);
-      this.#accounts = changes.addresses.map((a) =>
-        newAccount(changes.chain as IdentifierString, a),
+      const config = (await solRequest(
+        "cordial:svm:config",
+      )) as Option<Sol.Config>;
+      console.log("Initial SVM config", config);
+      if (!config) return;
+
+      this.#accounts = config.addresses.map((a) =>
+        newAccount(config.chain as IdentifierString, a),
       );
 
       // TODO: only announce if origin is allowed
       // and we have an address (e.g. Orca totally ignores us if there are no addresses)
       this.announce();
     } catch (error) {
-      console.error(`preconnect error: ${error}`);
+      console.error(`configuration error: ${error}`);
     }
   }
 

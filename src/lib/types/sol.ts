@@ -6,8 +6,9 @@ import type {
 } from "@wallet-standard/base";
 
 import type { IdentifierArray, WalletAccount } from "@wallet-standard/base";
+import type { SolanaSignMessageOutput } from "@solana/wallet-standard-features";
 
-export type { IdentifierArray };
+export type { IdentifierArray, SolanaSignMessageOutput };
 
 export interface Account extends WalletAccount {}
 
@@ -22,7 +23,7 @@ export const Account = {
   },
 };
 
-export interface Changes {
+export interface Config {
   addresses: string[];
   // https://github.com/ChainAgnostic/CAIPs/blob/main/CAIPs/caip-2.md
   // chains?: string[];

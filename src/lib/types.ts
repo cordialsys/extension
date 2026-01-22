@@ -63,6 +63,10 @@ export interface Response<T = unknown, E = unknown> {
 export type Option<T> = Some<T> | None;
 
 export type Some<T> = T;
+// setting this to null instead of undefined
+// as superjson says undefined is not valid JSON
+// export type None = null;
+// export const None = null;
 export type None = undefined;
 export const None = undefined;
 

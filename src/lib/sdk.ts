@@ -230,7 +230,7 @@ export namespace Sdk {
           const url = `${API}v1/propose/calls`;
           console.log(
             "proposed call:",
-            JSON.stringify(superjson.serialize(call), null, 2),
+            JSON.stringify(superjson.serialize(call ?? null), null, 2),
           );
           const request = new Request(url, {
             method: "POST",

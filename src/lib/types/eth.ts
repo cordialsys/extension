@@ -21,6 +21,15 @@ export const Mainnet: { [chain in Chain]: Id } = {
   MATIC: "0x89",
 };
 
+export interface AddressChain {
+  address: string;
+  chain: Id;
+}
+
+export interface Config {
+  addresses: AddressChain[];
+}
+
 export interface Info {
   uuid: string;
   name: string;
@@ -76,11 +85,14 @@ export namespace Provider {
 }
 
 const HexAddress = z.string().regex(/^0x[0-9a-fA-F]{40}$/);
-// 0 or more hex characters
-const HexData0 = z.string().regex(/^0x[0-9a-f]*$/);
-// 1 or more hex characters
-const HexData1 = z.string().regex(/^0x[a-fA-F\d]+$/);
-const HexValue = z.string().regex(/^0x([0-9a-fA-F]{2})*$/);
+// 0 or more hex character pairs (or just '0')
+// This means Vec<u8>
+const HexData0 = z.string().regex(/^0x([[0-9a-fA-F]{2})*|0]$/);
+// 1 or more hex character pairs (or just '0')
+// This means non-empty Vec<u8>
+const HexData1 = z.string().regex(/^0x([[0-9a-fA-F]{2})+|0]$/);
+const HexValue = HexData1;
+
 // https://docs.metamask.io/wallet/reference/json-rpc-methods/eth_sendtransaction
 // https://docs.metamask.io/snaps/reference/keyring-api/chain-methods#eth_signtransaction
 const SignTransactionInput = z.looseObject({
@@ -93,7 +105,41 @@ export const SignTransactionInputs = z.array(SignTransactionInput).length(1);
 //https://docs.metamask.io/wallet/reference/json-rpc-methods/personal_sign/
 export const SignMessageInputs = z.tuple([HexData1, HexAddress]);
 
-// // TODO: unravel more explicitly
+export const Eip712Domain = z.object({
+  name: z.string().optional(),
+  version: z.string().optional(),
+  chainId: z.string().or(z.number()).optional(),
+  verifyingContract: HexAddress.optional(),
+  salt: z.string().optional(),
+});
+
+export const Eip712DomainType = z.object({
+  name: z.string(),
+  type: z.string(),
+});
+
+export const Eip712TypedData = z.object({
+  domain: Eip712Domain,
+  types: z.record(z.string(), z.array(Eip712DomainType)),
+  primaryType: z.string(),
+  message: z.record(z.string(), z.unknown()),
+});
+
+// we don't set the second parameter to Eip712TypedData yet,
+// as it could be both literal or encoded as JSON
+export const SignTypedDataInputs = z.tuple([HexData1, z.unknown()]);
+
+// The specified JSON Schema is a bit more implicit
+// about `domain` and the `EIP712Domain` property.
+//
+// In reality, the keys are all optional, and their types are fixed to
+//
+// string name: the user readable name of signing domain, i.e. the name of the DApp or the protocol.
+// string version: the current major version of the signing domain. Signatures from different versions are not compatible.
+// uint256 chainId: the EIP-155 chain id. The user-agent should refuse signing if it does not match the currently active chain.
+// address verifyingContract: the address of the contract that will verify the signature. The user-agent may do contract specific phishing prevention.
+// bytes32: salt
+//
 // export const Eip712TypedData = z.fromJSONSchema({
 //   type: "object",
 //   properties: {
@@ -121,27 +167,3 @@ export const SignMessageInputs = z.tuple([HexData1, HexAddress]);
 //   },
 //   required: ["types", "primaryType", "domain", "message"],
 // });
-
-export const Eip712Domain = z.object({
-  name: z.string().optional(),
-  version: z.string().optional(),
-  chainId: z.string().or(z.number()).optional(),
-  verifyingContract: HexAddress.optional(),
-  salt: z.string().optional(),
-});
-
-export const Eip712DomainType = z.object({
-  name: z.string(),
-  type: z.string(),
-});
-
-export const Eip712TypedData = z.object({
-  domain: Eip712Domain,
-  types: z.record(z.string(), z.array(Eip712DomainType)),
-  primaryType: z.string(),
-  message: z.record(z.string(), z.unknown()),
-});
-
-// we don't set the second parameter to Eip712TypedData yet,
-// as it could be both literal or encoded as JSON
-export const SignTypedDataInputs = z.tuple([HexData1, z.unknown()]);

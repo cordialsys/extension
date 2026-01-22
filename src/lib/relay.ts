@@ -72,13 +72,13 @@ export function relayRequest(event: MessageEvent<Request>) {
   if (!request || request.kind !== "cordial:provider:request") return;
 
   // relay
-  // console.log("  provider 👉 relay ::", request);
-  const requestJson: string = superjson.stringify(request);
+  console.log("  provider 👉 relay ::", request);
+  const requestJson: string = superjson.stringify(request ?? null);
   browser.runtime.sendMessage(requestJson, relayResponse);
 }
 
 function relayResponse(responseJson: string) {
-  const response: Response = superjson.parse(responseJson);
+  const response: Response = superjson.parse(responseJson ?? null);
   // console.log("    relay 👈 extension ::", response);
 
   // checks

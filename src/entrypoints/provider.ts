@@ -19,7 +19,7 @@ export default defineUnlistedScript(() => {
   // over then chain (say Polymarket wants Polygon, Uniswap wants Ethereum).
   // const instance = Nonce.new();
   window.addEventListener("message", response);
-  cordialRequest("cordial_ping");
+  cordialRequest("cordial:ping");
   // TODO: Only expose providers if the origin is allowed (can tell by response of ping)
   // This would be easy to do.. but we also have to then expose
   // it later on (if the user allows the origin by clicking on the extension)

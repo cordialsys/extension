@@ -11,6 +11,10 @@ import * as T from "@/lib/sdk/treasury";
 let ID: Eth.Id = "0x1";
 let MAINNET: boolean = true;
 
+export async function config(config: Config): Promise<Option<Eth.Config>> {
+  return None;
+}
+
 export async function ethereumSignature(
   proposal: T.Call,
 ): Promise<Result<string>> {

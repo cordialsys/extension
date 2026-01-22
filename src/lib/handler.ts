@@ -12,7 +12,7 @@ export function onMessage(
   sender: globalThis.Browser.runtime.MessageSender,
   respond: (response: string) => void,
 ) {
-  const request: Request = superjson.parse(requestJson);
+  const request: Request = superjson.parse(requestJson ?? null);
   // console.log("request:", request);
   if (!request || request.kind !== "cordial:provider:request") return;
 
@@ -21,7 +21,7 @@ export function onMessage(
   //
   // Seems with Chrome 144 (out January 7, 2026), should be able to use async/await normally.
   handle(request, sender).then((response) => {
-    const responseJson = superjson.stringify(response);
+    const responseJson = superjson.stringify(response ?? null);
     respond(responseJson);
   });
   return true;
@@ -60,60 +60,34 @@ async function process(
 
   if (!tab) return Err(Error.permissionDenied("Not a tab"));
 
-  if (!config) {
-    await Config.setBadge(None, tab, false);
-    return Err(Error.permissionDenied("Not configured"));
-  }
-
-  if (!origin || !config.origins.includes(origin)) {
+  if (!config || !origin || !config.origins.includes(origin)) {
     await Config.setBadge(config, tab, false);
-    return Err(Error.permissionDenied(`Origin ${origin} not allowed`));
+    switch (method) {
+      case "cordial:evm:config":
+        return Ok(None);
+      case "cordial:svm:config":
+        return Ok(None);
+      case "cordial:ping":
+        return Ok("pong");
+      default:
+        return Err(
+          Error.permissionDenied(`Origin ${origin ?? "<unknown>"} not allowed`),
+        );
+    }
   }
 
   await Config.setBadge(config, tab, true);
 
-  if (method === "cordial_ping") return Ok("pong");
+  if (method === "cordial:ping") return Ok("pong");
+
+  console.log(
+    "request params:",
+    JSON.stringify(superjson.serialize(request.params ?? null), null, 2),
+  );
 
   if (provider === "SOL") {
-    // const request = the_request;
-    if (method === "cordial_preconnect") {
-      const treasury = await Sdk.treasury.treasury(
-        config.treasury.url,
-        config.treasury.name,
-      );
-      if (!treasury) {
-        return Err(Error.unknown("not ok"));
-      }
-      let chain = Sol.MAINNET;
-      if (treasury.network !== "mainnet") {
-        const network = await Sdk.connector.testnetChainNetwork("SOL");
-        if (!network) {
-          return Err(Error.unknown("not ok"));
-        }
-        // console.log("network", network);
-        if (network === "devnet") {
-          chain = Sol.DEVNET;
-        } else if (network === "testnet") {
-          chain = Sol.TESTNET;
-        } else {
-          return Err(Error.unknown("not ok"));
-        }
-        // TODO: Query connector.cordialapis.com to get configured !mainnet
-      }
-      const prefix = "chains/SOL/addresses/";
-      const addresses: string[] = config.addresses
-        .filter((a) => a.startsWith(prefix))
-        .map((a) => a.slice(prefix.length));
-      return Ok({
-        addresses,
-        chain,
-      } as Sol.Changes);
-    }
-
-    console.log(
-      "request params:",
-      JSON.stringify(superjson.serialize(request.params), null, 2),
-    );
+    // custom calls
+    if (method === "cordial:svm:config") return Ok(await svm.config(config));
 
     // signing calls
     if (method === "solana:signMessage") return svm.signMessage(request.params);
@@ -130,6 +104,9 @@ async function process(
   }
 
   if (provider === "ETH") {
+    // custom calls
+    if (method === "cordial:evm:config") return Ok(await evm.config(config));
+
     // signing calls
     if (method === "personal_sign") return evm.personal_sign(request.params);
     if (method === "eth_signTypedData_v4")

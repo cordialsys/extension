@@ -33,8 +33,8 @@ test("EVM transaction input validation", () => {
       maxFeePerGas: "0x83c9630c",
       maxPriorityFeePerGas: "0x443f1c40",
     },
-  ]
+  ];
   vectors.forEach((v) => {
     Evm.SignTransactionInputs.parse([v]);
-  })
+  });
 });

@@ -1,4 +1,5 @@
-import { Err, Ok } from "@/lib/types";
+import { Config } from "@/lib/config";
+import { Err, None, Ok, Option, Sol, Some } from "@/lib/types";
 import { Sdk } from "@/lib/sdk";
 import { Error, Result } from "@/lib/sdk/error";
 
@@ -6,8 +7,37 @@ import { Error, Result } from "@/lib/sdk/error";
 import { hex } from "@scure/base";
 import * as T from "@/lib/sdk/treasury";
 
-import * as Sol from "@solana/wallet-standard-features";
+// import * as Sol from "@solana/wallet-standard-features";
 
+export async function config(config: Config): Promise<Option<Sol.Config>> {
+  const treasury = await Sdk.treasury.treasury(
+    config.treasury.url,
+    config.treasury.name,
+  );
+  if (!treasury) return None;
+  let chain = Sol.MAINNET;
+  if (treasury.network !== "mainnet") {
+    const network = await Sdk.connector.testnetChainNetwork("SOL");
+    if (!network) return None;
+    // console.log("network", network);
+    if (network === "devnet") {
+      chain = Sol.DEVNET;
+    } else if (network === "testnet") {
+      chain = Sol.TESTNET;
+    } else {
+      return None;
+    }
+    // TODO: Query connector.cordialapis.com to get configured !mainnet
+  }
+  const prefix = "chains/SOL/addresses/";
+  const addresses: string[] = config.addresses
+    .filter((a) => a.startsWith(prefix))
+    .map((a) => a.slice(prefix.length));
+  return Some({
+    addresses,
+    chain,
+  } as Sol.Config);
+}
 export async function signMessage(
   params: unknown,
 ): Promise<Result<Sol.SolanaSignMessageOutput[]>> {
