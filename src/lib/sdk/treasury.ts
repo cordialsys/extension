@@ -208,6 +208,9 @@ export const Transaction = {
       const result = await Sdk.treasury.get<Transaction>(name);
       if (!result.ok) return result;
       const tx = result.value;
+      if (tx.state === "submitting" && tx.skip_broadcast) {
+        return Ok(tx);
+      }
       if (tx.state === "succeeded") return Ok(tx);
       if (tx.state === "failed")
         return Err(Error.unknown(tx.error?.message ?? ""));
