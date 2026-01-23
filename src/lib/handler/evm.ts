@@ -95,10 +95,9 @@ export async function ethereumSignature(
   if (!signatureR.ok) return signatureR;
   let signature = signatureR.value.signature as string;
 
-  // 4. add 27 to the last (recovery) byte
-  const recovery = parseInt(signature.slice(-2), 16);
-  const v = recovery + 27;
-  signature = signature.slice(0, -2) + v.toString(16);
+  const chainId = 137; // Polygon (MATIC) chain ID
+  const v = (chainId * 2) + 35; // 309
+  signature = signature.slice(0, -2) + v.toString(16).slice(-2); // Maybe this last slice is a mistake, but I'm trying to convert v to a single byte
 
   const ethSignature = `0x${signature}`;
   return Ok(ethSignature);
