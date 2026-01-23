@@ -74,38 +74,14 @@ export const Request = {
   },
 };
 
-export async function turnOff() {
+export async function showOff() {
   console.log("🥺 Turning off");
-  await set("on", false);
-  // await del("login");
   await browser_action.setIcon({ path: GRAY });
 }
 
-// TODO: Would be pretty cool to set extension icon to "rotating"
-// while logging in. This can be done with timers: https://stackoverflow.com/a/44082232
-export async function turnOn() {
+export async function showOn() {
   console.log("🤩 Turning on");
-  const login = await Login.new();
-  await set("login", login);
-
-  // set extension to active
-  await set("on", true);
   await browser_action.setIcon({ path: COLOR });
-
-  // // The rest is just fooling around.
-  // let url = "https://admin.cordialapis.com/v1/users";
-  // let response = await fetch(url);
-  // const users = await response.text();
-  // console.log("users", users);
-  //
-  const url = `https://admin.cordialapis.com/v1/users/${login.userId}`;
-  const response = await fetch(url);
-  const firstName = ((await response.json()) as { first_name: string })
-    .first_name;
-  console.log(`👋 Hello, ${firstName}, extension is active!`);
-
-  // refresh every five minutes
-  setTimeout(Login.track, LOGIN_REFRESH);
 }
 
 function parseJwt(jwt: string): unknown {
@@ -149,6 +125,26 @@ async function clerkLoggedIn(): Promise<boolean> {
 }
 
 export const Login = {
+  // TODO: Would be pretty cool to set extension icon to "rotating"
+  // while logging in. This can be done with timers: https://stackoverflow.com/a/44082232
+  async login() {
+    const login = await Login.new();
+    await set("login", login);
+
+    // set extension to active
+    await showOn();
+
+    // The rest is just fooling around.
+    const url = `https://admin.cordialapis.com/v1/users/${login.userId}`;
+    const response = await fetch(url);
+    const firstName = ((await response.json()) as { first_name: string })
+      .first_name;
+    console.log(`👋 Hello, ${firstName}!`);
+
+    // refresh every five minutes
+    setTimeout(Login.track, LOGIN_REFRESH);
+  },
+
   async new(): Promise<Login> {
     const prevLogin = await Login.load();
     if (prevLogin) return prevLogin;
@@ -216,13 +212,14 @@ export const Login = {
 
   // TODO: Only refresh if we're somewhat close to expiry of cookie or certificate
   async track(): Promise<Option<Login>> {
-    if (!(await get("on"))) {
+    if (!(await Login.load())) {
       setTimeout(Login.track, LOGIN_REFRESH);
       return;
     }
+
     if (!(await clerkLoggedIn())) {
       // can't refresh silently
-      await turnOff();
+      await showOff();
       setTimeout(Login.track, LOGIN_REFRESH);
       return;
     }

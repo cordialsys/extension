@@ -1,34 +1,41 @@
+import { None, Option } from "@/lib/types";
 import * as z from "zod";
 
 export type Chain = "ETH" | "MATIC";
 
-export const Chains: Record<string, Chain> = {
+export type Id =
+  // ETH
+  | "0x1"
+  // ETH+sepolia
+  | "0xaa36a7"
+  // ETH+hoodi
+  | "0x88bb0"
+  // MATIC
+  | "0x89";
+
+export const Id = {
+  normalize(id: string | number): Option<string> {
+    const num = Number(id);
+    if (!Number.isFinite(num)) return None;
+    return `0x${num.toString(16)}`;
+  },
+};
+
+// This typechecks that we have each Id exactly once
+// Note that definining `type Id = keyof typeof Chains`
+// would simply set `type Id = string`, which is not what we want.
+export const Chains: { [id in Id]: Chain } = {
   "0x1": "ETH",
-  // sepolia
   "0xaa36a7": "ETH",
-  "11155111": "ETH",
-  // hoodi
   "0x88bb0": "ETH",
-  "560048": "ETH",
-  // polygon
   "0x89": "MATIC",
 };
 
-export type Id = keyof typeof Chains;
-
-export const Mainnet: { [chain in Chain]: Id } = {
-  ETH: "0x1",
-  MATIC: "0x89",
+export type Config = {
+  chain: Chain;
+  addresses: string[];
+  mainnet: boolean;
 };
-
-export interface AddressChain {
-  address: string;
-  chain: Id;
-}
-
-export interface Config {
-  addresses: AddressChain[];
-}
 
 export interface Info {
   uuid: string;

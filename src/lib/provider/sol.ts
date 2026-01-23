@@ -19,7 +19,7 @@
 // IN THE SOFTWARE.
 
 import { solRequest } from "@/lib/relay";
-import { Ok, Option, Sol } from "@/lib/types";
+import { Option, Sol } from "@/lib/types";
 
 // import { PublicKey } from "@solana/web3.js";
 import type {
@@ -137,9 +137,7 @@ export class Solana implements Wallet {
   async start(this: Solana) {
     console.log("Initializing Cordial Solana Provider");
     try {
-      const config = (await solRequest(
-        "cordial:svm:config",
-      )) as Option<Sol.Config>;
+      const config = (await solRequest("cordial:config")) as Option<Sol.Config>;
       console.log("Initial SVM config", config);
       if (!config) return;
 

@@ -5,6 +5,7 @@ import { Login } from "./login";
 import { Sdk } from "./sdk";
 import * as A from "./sdk/admin";
 import { Option } from "./types";
+import { evm, svm } from "./handler";
 
 export const Config = {
   // fetches the latest config if logged in
@@ -46,17 +47,17 @@ export const Config = {
     }
   },
 
+  async init() {
+    const config = await Config.fetch();
+    await store(config);
+  },
+
   async track() {
     const config = await Config.fetch();
 
-    if (!config) {
-      setTimeout(Config.track, CONFIG_REFRESH);
-      return;
-    }
-
     if (JSON.stringify(await Config.load()) !== JSON.stringify(config)) {
-      console.log("Config changed:", config);
-      await set("config", config);
+      console.log("Config changed", config);
+      await store(config);
     }
 
     setTimeout(Config.track, CONFIG_REFRESH);
@@ -72,6 +73,12 @@ export const Config = {
     });
   },
 };
+
+async function store(config: Option<Config>) {
+  await set("config", config);
+  await evm.updateConfig(config);
+  await svm.updateConfig(config);
+}
 
 export interface Config extends A.ExtensionConfig {}
 export interface Extension extends A.Extension {}

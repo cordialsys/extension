@@ -12,7 +12,6 @@ export { Error, Result } from "./sdk/error";
 import { sign } from "./sdk/http_signature";
 import { Err, None, Ok, Option } from "./types";
 
-import superjson from "superjson";
 import * as A from "./sdk/admin";
 import * as T from "./sdk/treasury";
 
@@ -228,10 +227,10 @@ export namespace Sdk {
       export namespace calls {
         export async function create(call: T.Call): Promise<Result<string>> {
           const url = `${API}v1/propose/calls`;
-          console.log(
-            "proposed call:",
-            JSON.stringify(superjson.serialize(call ?? null), null, 2),
-          );
+          // console.log(
+          //   "proposed call:",
+          //   JSON.stringify(superjson.serialize(call ?? null), null, 2),
+          // );
           const request = new Request(url, {
             method: "POST",
             body: JSON.stringify(call),
@@ -243,15 +242,17 @@ export namespace Sdk {
   }
 
   export namespace treasury {
+    function notConfigured(): Err<Error> {
+      return Err(Error.failedPrecondition("not configured"));
+    }
+
     export async function genericList<R>(
       path: string,
       plural: string,
       options?: ListOptions,
     ): Promise<Result<R[]>> {
       const config = await Config.load();
-      if (!config) {
-        return Err(Error.failedPrecondition("not configured"));
-      }
+      if (!config) return notConfigured();
       const url = `${config.treasury.url}v1/${path}`;
       return await apiList<R>(url, plural, options);
     }
@@ -274,19 +275,11 @@ export namespace Sdk {
         }
       }
     }
-    export async function treasury(
-      api: string,
-      treasuryName: string,
-    ): Promise<Option<T.Treasury>> {
-      const url = `${api}v1/${treasuryName}`;
-      // console.log("url:", url);
-      const response = await fetch(url);
-      if (!response.ok) {
-        console.log("Failed to fetch treasury data", response);
-        return None;
-      }
-      const treasury = (await response.json()) as T.Treasury;
-      return treasury;
+
+    export async function treasury(): Promise<Result<T.Treasury>> {
+      const config = await Config.load();
+      if (!config) return notConfigured();
+      return get<T.Treasury>(config.treasury.name);
     }
   }
 }

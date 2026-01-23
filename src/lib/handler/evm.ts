@@ -1,18 +1,72 @@
 import { Config } from "@/lib/config";
 import { Error, Result, Sdk } from "@/lib/sdk";
-import { Err, Eth, None, Ok, Option } from "@/lib/types";
-import { Params } from "@/lib/types";
+import { Err, Eth, None, Ok, Option, Some } from "@/lib/types";
 
 import * as z from "zod";
 import * as T from "@/lib/sdk/treasury";
 
-// TODO: Initialize this with the Config
-// Also make it an option (in case we have no EVM addresses)
 let ID: Eth.Id = "0x1";
-let MAINNET: boolean = true;
+// Invariant: If this is set, then Config.addresses should be non-empty
+let CONFIG: Option<Eth.Config> = None;
 
-export async function config(config: Config): Promise<Option<Eth.Config>> {
-  return None;
+export function config(): Option<Eth.Config> {
+  return CONFIG;
+}
+
+function notifyConfig(config: Option<Eth.Config>) {
+  const notify = CONFIG !== config;
+  CONFIG = config;
+  if (notify) {
+    // TODO: Notify providers
+    console.log("EVM config changed", config);
+  }
+}
+
+function clearConfig() {
+  notifyConfig(None);
+}
+
+function setConfig(config: Eth.Config) {
+  notifyConfig(Some(config));
+}
+
+export async function updateConfig(config: Option<Config>) {
+  // console.log("updating EVM config with", config);
+  if (!config) return clearConfig();
+  const treasuryR = await Sdk.treasury.treasury();
+  // console.log("treasuryR", treasuryR);
+  if (!treasuryR.ok) return clearConfig();
+  const treasury = treasuryR.value;
+
+  const chain = Eth.Chains[ID];
+  // console.log("current chain", chain);
+
+  // ensure id
+  const mainnet = treasury.network === "mainnet";
+  // Hack: suppress this
+  // Connector API lists !mainnet MATIC as "testnet" instead of chain ID
+  // In general our chain registry is a mess
+  //
+  // if (!mainnet && chain !== "MATIC") {
+  //   // console.log("EVM not mainnet");
+  //   const network = await Sdk.connector.testnetChainNetwork(chain);
+  //   if (!network) return clearConfig();
+  //   // console.log("network", network);
+  //   const id = Eth.Id.normalize(network);
+  //   // console.log("id", id);
+  //   if (!id) return clearConfig();
+  //   if (id !== ID) return clearConfig();
+  // }
+
+  // set addresses
+  const prefix = `chains/${chain}/addresses/`;
+  const addresses = config.addresses
+    .filter((a) => a.startsWith(prefix))
+    .map((a) => a.slice(prefix.length));
+  if (!addresses.length) return clearConfig();
+
+  // finally update config
+  return setConfig({ addresses, chain, mainnet });
 }
 
 export async function ethereumSignature(
@@ -23,6 +77,7 @@ export async function ethereumSignature(
   if (!proposalNameR.ok) return proposalNameR;
   const proposalName = proposalNameR.value;
   console.log("proposal name:", proposalName);
+  T.prompt(proposalName);
 
   // 2. wait for call
   const callR = await T.Call.byProposal(proposalName);
@@ -55,35 +110,6 @@ export async function personal_sign(params: unknown): Promise<Result<string>> {
   console.log("proposal for `personal_sign`:", proposal);
 
   return ethereumSignature(proposal);
-
-  // // 2. submit
-  // const proposalNameR = await Sdk.propose.chains.calls.create(proposal);
-  // if (!proposalNameR.ok) return proposalNameR;
-  // const proposalName = proposalNameR.value;
-  // console.log("proposal name:", proposalName);
-
-  // // 3. wait for call
-  // const callR = await T.Call.byProposal(proposalName);
-  // if (!callR.ok) return callR;
-  // const call = callR.value;
-  // console.log("call name:", call.name);
-
-  // const signatureName = (call.response as T.CallSignature).signature as string;
-  // console.log("signature name:", call);
-
-  // // 4. wait for signature
-  // const signatureR = await T.Signature.completed(signatureName);
-  // if (!signatureR.ok) return signatureR;
-  // const signature = signatureR.value.signature as string;
-
-  // // 5. add 27 to the last (recovery) byte
-  // const recovery = parseInt(signature.slice(-2), 16);
-  // const adjustedRecoveryByte = recovery + 27;
-  // const adjustedSignature =
-  //   signature.slice(0, -2) + adjustedRecoveryByte.toString(16);
-
-  // const ethSignature = `0x${adjustedSignature}`;
-  // return Ok(ethSignature);
 }
 
 export async function eth_signTypedData_v4(
@@ -119,6 +145,7 @@ export async function eth_sendTransaction(
   if (!proposalNameR.ok) return proposalNameR;
   const proposalName = proposalNameR.value;
   console.log("proposal name:", proposalName);
+  T.prompt(proposalName);
 
   // 3. wait for call
   const callR = await T.Call.byProposal(proposalName);
@@ -139,16 +166,24 @@ export async function eth_sendTransaction(
   return Ok(hash);
 }
 
-export function eth_accounts(config: Config): string[] {
-  const prefix = `chains/${Eth.Chains[ID]}/addresses/`;
-  const addresses: string[] = config.addresses
-    .filter((a) => a.startsWith(prefix))
-    .map((a) => a.slice(prefix.length));
-  return addresses;
+// https://docs.base.org/base-account/reference/core/provider-rpc-methods/eth_requestAccounts
+// eth_requestAccounts should return an error if user doesn't give permission
+export function eth_requestAccounts(): Result<string[]> {
+  // For instance Polymarket can't handle this
+  // if (!CONFIG) return Err(Error.permissionDenied("No accounts authorized"));
+  if (!CONFIG) return Ok([]);
+  return Ok(CONFIG.addresses);
 }
 
+// eth_accounts should return an empty array
+export function eth_accounts(): string[] {
+  if (!CONFIG) return [];
+  return CONFIG.addresses;
+}
+
+// https://eips.ethereum.org/EIPS/eip-2255
 export async function wallet_getCapabilities(
-  params: Option<Params>,
+  params: unknown,
 ): Promise<Result<unknown>> {
   // Uniswap sends undefined..
   // It's supposed to send
@@ -158,32 +193,35 @@ export async function wallet_getCapabilities(
 }
 
 export async function wallet_switchEthereumChain(
-  params: Option<Params>,
+  params: unknown,
 ): Promise<Result<unknown>> {
   const EthChain = z
     .looseObject({
-      chainId: z.string(),
+      chainId: z.string().or(z.number()),
     })
     .array()
     .length(1);
   const result = EthChain.safeParse(params);
-  if (!result.success)
-    return Err(Error.unimplemented(`💔 Chain in ${params} not supported`));
+  if (!result.success) return Err(Error.unimplemented(`Chain not supported`));
 
-  const chainId = result.data[0].chainId as Eth.Id;
-  const chain = Eth.Chains[chainId];
-  if (!chain)
-    return Err(
-      Error.unimplemented(`💔 Chain ${chainId} in ${params} not supported`),
-    );
+  const requestedId = result.data[0].chainId;
+  const idMaybe = Eth.Id.normalize(requestedId);
 
-  console.log(`switching to ${chain}`);
-  ID = chainId;
+  if (!idMaybe || !Object.keys(Eth.Chains).includes(idMaybe)) {
+    return Err(Error.unimplemented(`Chain ${requestedId} not supported`));
+  }
+
+  const id = idMaybe as Eth.Id;
+  // const chain = Eth.Chains[id];
+  // console.log(`switching to ${chain} with ID ${id}`);
+
+  ID = id;
+  await updateConfig(await Config.load());
   return Ok(null);
 }
 
 export async function wallet_requestPermissions(
-  params: Option<Params>,
+  params: unknown,
 ): Promise<Result<unknown>> {
   const EthAccounts = z
     .looseObject({
@@ -191,49 +229,22 @@ export async function wallet_requestPermissions(
     })
     .array()
     .length(1);
-  // With EthAccounts.parse(params), this would throw a ZodError on failure
   const result = EthAccounts.safeParse(params);
   if (result.success) {
     const parsed = result.data;
     if (parsed.length > 0) {
-      console.log("accounts requested");
       return Ok([{ parentCapability: "eth_accounts" }]);
     }
   }
   return Err(Error.unimplemented(`💔 Permission in ${params} not supported`));
 }
 
-export async function treasury_network(
-  config: Config,
-): Promise<Option<string>> {
-  const treasury = await Sdk.treasury.treasury(
-    config.treasury.url,
-    config.treasury.name,
-  );
-  if (!treasury) return None;
-  return treasury.network;
+export function eth_chainId(): Eth.Id {
+  return ID;
 }
 
-export async function eth_chainId(config: Config): Promise<Result<string>> {
-  const _ = config;
-  // console.log("unused", config);
-  return Ok(ID); //Ids["ETH_SEPOLIA"]);
-  // const network = await treasury_network(config);
-  // if (!network) return Err(Error.unknown("not ok"));
-  // if (network === "mainnet") {
-  //   return Ok("0x1");
-  // } else {
-  //   return Ok(
-  //     `0x${Number(await Sdk.connector.testnetChainId("ETH")).toString(16)}`,
-  //   );
-  // }
-}
-
-export async function eth_blockNumber(config: Config): Promise<Result<string>> {
-  const network = await treasury_network(config);
-  if (!network) return Err(Error.unknown("not ok"));
-  const mainnet = network === "mainnet";
-  return Ok(
-    `0x${Number(await Sdk.connector.blockNumber(ID, mainnet)).toString(16)}`,
-  );
+export async function eth_blockNumber(): Promise<Result<string>> {
+  if (!CONFIG) return Err(Error.permissionDenied("Not configured"));
+  const blockNumber = await Sdk.connector.blockNumber(ID, CONFIG.mainnet);
+  return Ok(`0x${Number(blockNumber).toString(16)}`);
 }

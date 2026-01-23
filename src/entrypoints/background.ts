@@ -6,12 +6,10 @@
 //
 // THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import { get } from "idb-keyval";
-
 import { browser_action, COLOR } from "@/lib/constants";
 import { onClicked } from "@/lib/click";
 import { Config } from "@/lib/config";
-import { Login, loginFirstName, turnOff } from "@/lib/login";
+import { Login, /*loginFirstName,*/ showOff } from "@/lib/login";
 import { onMessage } from "@/lib/handler";
 
 // figure out what state we're in, and ensure the keys
@@ -20,24 +18,24 @@ import { onMessage } from "@/lib/handler";
 // - ...
 // are setup
 async function init() {
+  // start tracking config (whether or not we're logged in)
+  await Config.init();
   Config.track();
-  if (!(await get("on"))) {
-    // console.log("didn't get `on`");
-    return await turnOff();
-  }
-  const login = await Login.load();
-  if (!login) {
-    console.log("didn't get `login`");
-    return await turnOff();
-  }
 
+  // check if we're logged in
+  const login = await Login.load();
+  if (!login) return await showOff();
+
+  // stay logged in (once triggered by click on extension icon)
   setTimeout(Login.track, 5 * 1000);
-  const firstName = await loginFirstName(login);
-  console.log(`👋 Welcome back, ${firstName}`);
-  const config = await Config.load();
-  if (config) {
-    console.log("Configuration:", config);
-  }
+
+  // const firstName = await loginFirstName(login);
+  // console.log(`👋 Welcome back, ${firstName}`);
+  // const config = await Config.load();
+  // if (config) {
+  //   console.log("Configuration:", config);
+  // }
+
   await browser_action.setIcon({ path: COLOR });
 }
 

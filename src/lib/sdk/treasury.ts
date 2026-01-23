@@ -40,6 +40,13 @@ const AddressName = {
   },
 };
 
+export function prompt(proposalName: string) {
+  const _ = proposalName;
+  // uncomment once it's implemented
+  // const url = `https://treasury.cordial.systems/propose/${proposalName}`;
+  // browser.windows.create({ url });
+}
+
 function parseError(method: string, error: z.ZodError): Result<Call> {
   return Err(
     Error.invalidArgument(

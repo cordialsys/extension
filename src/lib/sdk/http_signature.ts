@@ -3,6 +3,8 @@ import { sha256 } from "@noble/hashes/sha2.js";
 import { utf8ToBytes } from "@noble/hashes/utils.js";
 import { base64 } from "@scure/base";
 
+const DEBUG = false;
+
 export async function sign(
   name: "iam" | "sso",
   login: Login,
@@ -36,7 +38,7 @@ content-digest: ${contentDigestHeader}
 treasury: ${treasuryId}
 "@signature-params": ${signatureParams}
 `;
-  console.log(`signature base:\n${signatureBase}`);
+  if (DEBUG) console.log(`signature base:\n${signatureBase}`);
 
   const signatureBytes = await crypto.subtle.sign(
     { name: "Ed25519" },
@@ -52,9 +54,10 @@ treasury: ${treasuryId}
   headers.append("Signature-Input", signatureInputHeader);
   headers.append("Signature", signatureHeader);
   headers.append("Treasury", treasuryId);
-  for (const [h, v] of headers) {
-    console.log(h, ":", v);
-  }
+  if (DEBUG)
+    for (const [h, v] of headers) {
+      console.log(h, ":", v);
+    }
 
   const signed = new Request(url, {
     method,

@@ -72,7 +72,7 @@ export function relayRequest(event: MessageEvent<Request>) {
   if (!request || request.kind !== "cordial:provider:request") return;
 
   // relay
-  console.log("  provider 👉 relay ::", request);
+  // console.log("  provider 👉 relay ::", request);
   const requestJson: string = superjson.stringify(request ?? null);
   browser.runtime.sendMessage(requestJson, relayResponse);
 }

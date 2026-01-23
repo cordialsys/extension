@@ -27,7 +27,7 @@ export interface Config {
   addresses: string[];
   // https://github.com/ChainAgnostic/CAIPs/blob/main/CAIPs/caip-2.md
   // chains?: string[];
-  chain: string;
+  chain: Chain;
 }
 
 /** Solana Mainnet (beta) cluster, e.g. https://api.mainnet-beta.solana.com */

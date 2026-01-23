@@ -9,35 +9,64 @@ import * as T from "@/lib/sdk/treasury";
 
 // import * as Sol from "@solana/wallet-standard-features";
 
-export async function config(config: Config): Promise<Option<Sol.Config>> {
-  const treasury = await Sdk.treasury.treasury(
-    config.treasury.url,
-    config.treasury.name,
-  );
-  if (!treasury) return None;
-  let chain = Sol.MAINNET;
-  if (treasury.network !== "mainnet") {
+// Invariant: If this is set, then Config.addresses should be non-empty
+let CONFIG: Option<Sol.Config> = None;
+
+export function config(): Option<Sol.Config> {
+  return CONFIG;
+}
+
+function notifyConfig(config: Option<Sol.Config>) {
+  const notify = CONFIG !== config;
+  CONFIG = config;
+  if (notify) {
+    // TODO: Notify providers
+    console.log("SVM config changed", config);
+  }
+}
+
+function clearConfig() {
+  notifyConfig(None);
+}
+
+function setConfig(config: Sol.Config) {
+  notifyConfig(Some(config));
+}
+
+export async function updateConfig(config: Option<Config>) {
+  // console.log("updating SVM config with", config);
+  if (!config) return clearConfig();
+  const treasuryR = await Sdk.treasury.treasury();
+  if (!treasuryR.ok) return clearConfig();
+  const treasury = treasuryR.value;
+
+  // extract chain
+  let chain: Sol.Chain;
+  if (treasury.network === "mainnet") {
+    chain = Sol.MAINNET;
+  } else {
     const network = await Sdk.connector.testnetChainNetwork("SOL");
-    if (!network) return None;
-    // console.log("network", network);
+    if (!network) return clearConfig();
     if (network === "devnet") {
       chain = Sol.DEVNET;
     } else if (network === "testnet") {
       chain = Sol.TESTNET;
     } else {
-      return None;
+      return clearConfig();
     }
-    // TODO: Query connector.cordialapis.com to get configured !mainnet
   }
+
+  // set addresses
   const prefix = "chains/SOL/addresses/";
-  const addresses: string[] = config.addresses
+  const addresses = config.addresses
     .filter((a) => a.startsWith(prefix))
     .map((a) => a.slice(prefix.length));
-  return Some({
-    addresses,
-    chain,
-  } as Sol.Config);
+  if (!addresses.length) return clearConfig();
+
+  // finally update config
+  return setConfig({ addresses, chain });
 }
+
 export async function signMessage(
   params: unknown,
 ): Promise<Result<Sol.SolanaSignMessageOutput[]>> {
@@ -47,11 +76,12 @@ export async function signMessage(
   const proposal = proposalR.value;
   console.log("proposal for `solana:signMessage`:", proposal);
 
-  // 2. submit
+  // 2. propose
   const proposalNameR = await Sdk.propose.chains.calls.create(proposal);
   if (!proposalNameR.ok) return proposalNameR;
   const proposalName = proposalNameR.value;
   console.log("proposal name:", proposalName);
+  T.prompt(proposalName);
 
   // 3. wait for call
   const callR = await T.Call.byProposal(proposalName);
@@ -90,6 +120,7 @@ export async function solanaTransaction(
   if (!proposalNameR.ok) return proposalNameR;
   const proposalName = proposalNameR.value;
   console.log("proposal name:", proposalName);
+  T.prompt(proposalName);
 
   // 3. wait for call
   const callR = await T.Call.byProposal(proposalName);
@@ -134,52 +165,3 @@ export async function signAndSendTransaction(
   const sig = sigR.value;
   return Ok([{ signature: hex.decode(sig.signature as string) }]);
 }
-
-// export async function signIn(
-//   inputs: Sol.SolanaSignInInput[],
-// ): Promise<Result<Sol.SolanaSignInOutput>> {
-//   console.log("inputs:", inputs);
-//   // For https://anza-xyz.github.io/wallet-adapter/example/, this is
-//   // domain: "anza-xyz.github.io",
-//   // statement: "Please sign in",
-//   //
-//   // We shouldn't trust the "domain" key.
-//   const msg = {};
-//   //   domain: inputs[0].domain,
-//   //   statement: inputs[0].statement,
-//   // };
-//   const proposal = { call: msg };
-
-//   // 1. Create the proposal via Propose API
-//   const proposalNameResult = await Sdk.propose.chains.calls.create(
-//     "SOL",
-//     proposal,
-//   );
-//   if (!proposalNameResult.ok) return proposalNameResult;
-//   const proposalName = proposalNameResult.value;
-//   console.log("proposal name:", proposalName);
-//   const proposalId = proposalName.slice("chains/SOL/calls/".length);
-
-//   // 2. Locate the call via Treasury API
-//   const callResult = await T.Call.byProposal(proposalId);
-//   if (!callResult.ok) return callResult;
-//   // biome-ignore lint/style/noNonNullAssertion: The schema is incorrect, name of a call is not optional.
-//   const callName = callResult.value.name!;
-//   console.log("call name:", callName);
-
-//   // =======
-//   //   let callResult = await T.Call.byProposal(proposalId);
-//   //   if (!callResult.ok) return callResult;
-//   //   // biome-ignore lint/style/noNonNullAssertion: The schema is incorrect, name of a call is not optional.
-//   //   const callName: string = callResult.value.name!;
-//   //   console.log("call name:", callName);
-
-//   //   // 3. Wait for the call to complete
-//   //   callResult = await T.Call.completed(callName);
-//   // >>>>>>> 47ecaeda9 (extension: Type gymnastics)
-//   // if (!callResult.ok) return callResult;
-//   // const call = callResult.value;
-//   // console.log("completed call:", call);
-
-//   return Err(Error.unimplemented("SOL signIn not finished yet"));
-// }

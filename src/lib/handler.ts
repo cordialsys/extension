@@ -1,9 +1,10 @@
 import { Config } from "./config";
-import { Error, Result, Sdk } from "./sdk";
-import { Sol } from "./types";
+import { Error, Result } from "./sdk";
 import { Err, None, Ok, Option, Request, Response } from "./types";
+
 import * as evm from "./handler/evm";
 import * as svm from "./handler/svm";
+export { evm, svm };
 
 import superjson from "superjson";
 
@@ -33,7 +34,7 @@ async function handle(
 ): Promise<Response> {
   const config = await Config.load();
 
-  const log = `${request.header.provider} :: ${request.header.id} :: ${request.method} :: ${JSON.stringify(request.params)} ::`;
+  const log = `${request.header.provider} :: ${request.header.id} :: ${sender.origin} :: ${request.method} ::`;
   console.log("➡️", log, request.params);
 
   const result = await process(request, config, sender.origin, sender.tab?.id);
@@ -63,9 +64,7 @@ async function process(
   if (!config || !origin || !config.origins.includes(origin)) {
     await Config.setBadge(config, tab, false);
     switch (method) {
-      case "cordial:evm:config":
-        return Ok(None);
-      case "cordial:svm:config":
+      case "cordial:config":
         return Ok(None);
       case "cordial:ping":
         return Ok("pong");
@@ -87,7 +86,7 @@ async function process(
 
   if (provider === "SOL") {
     // custom calls
-    if (method === "cordial:svm:config") return Ok(await svm.config(config));
+    if (method === "cordial:config") return Ok(svm.config());
 
     // signing calls
     if (method === "solana:signMessage") return svm.signMessage(request.params);
@@ -105,7 +104,7 @@ async function process(
 
   if (provider === "ETH") {
     // custom calls
-    if (method === "cordial:evm:config") return Ok(await evm.config(config));
+    if (method === "cordial:config") return Ok(evm.config());
 
     // signing calls
     if (method === "personal_sign") return evm.personal_sign(request.params);
@@ -117,15 +116,10 @@ async function process(
       return evm.eth_sendTransaction(request.params);
 
     // helper calls
-    if (method === "eth_blockNumber") return evm.eth_blockNumber(config);
-    if (method === "eth_chainId") return evm.eth_chainId(config);
-    // https://docs.base.org/base-account/reference/core/provider-rpc-methods/eth_requestAccounts
-    // eth_requestAccounts should return an error if user doesn't give permission
-    // eth_accounts should return an empty array
-    // We can probably handle both the same way (return empty array)
-    if (method === "eth_requestAccounts" || method === "eth_accounts")
-      return Ok(evm.eth_accounts(config));
-    // https://eips.ethereum.org/EIPS/eip-2255
+    if (method === "eth_blockNumber") return evm.eth_blockNumber();
+    if (method === "eth_chainId") return Ok(evm.eth_chainId());
+    if (method === "eth_requestAccounts") return evm.eth_requestAccounts();
+    if (method === "eth_accounts") return Ok(evm.eth_accounts());
     if (method === "wallet_getCapabilities")
       return evm.wallet_getCapabilities(request.params);
     if (method === "wallet_requestPermissions")

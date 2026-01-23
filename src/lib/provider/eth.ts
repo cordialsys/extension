@@ -27,7 +27,12 @@ export class Ethereum extends EventEmitter implements Eth.Provider {
   // }
 
   async start() {
+    console.log("Initializing Cordial Ethereum Provider");
     try {
+      const config = (await ethRequest("cordial:config")) as Option<Eth.Config>;
+      console.log("Initial EVM config", config);
+      if (!config) return;
+
       window.addEventListener("eip6963:requestProvider", this.announce);
       this.announce();
     } catch (error) {
