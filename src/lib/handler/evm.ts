@@ -43,20 +43,22 @@ export async function updateConfig(config: Option<Config>) {
 
   // ensure id
   const mainnet = treasury.network === "mainnet";
-  // Hack: suppress this
-  // Connector API lists !mainnet MATIC as "testnet" instead of chain ID
-  // In general our chain registry is a mess
-  //
-  // if (!mainnet && chain !== "MATIC") {
-  //   // console.log("EVM not mainnet");
-  //   const network = await Sdk.connector.testnetChainNetwork(chain);
-  //   if (!network) return clearConfig();
-  //   // console.log("network", network);
-  //   const id = Eth.Id.normalize(network);
-  //   // console.log("id", id);
-  //   if (!id) return clearConfig();
-  //   if (id !== ID) return clearConfig();
-  // }
+  if (!(import.meta.env.VITE_MAINNET_ONLY ?? false)) {
+    // Hack: suppress this
+    // Connector API lists !mainnet MATIC as "testnet" instead of chain ID
+    // In general our chain registry is a mess
+    //
+    if (!mainnet) {
+      // console.log("EVM not mainnet");
+      const network = await Sdk.connector.testnetChainNetwork(chain);
+      if (!network) return clearConfig();
+      // console.log("network", network);
+      const id = Eth.Id.normalize(network);
+      // console.log("id", id);
+      if (!id) return clearConfig();
+      if (id !== ID) return clearConfig();
+    }
+  }
 
   // set addresses
   const prefix = `chains/${chain}/addresses/`;

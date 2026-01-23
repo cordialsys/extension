@@ -8,6 +8,9 @@ export { evm, svm };
 
 import superjson from "superjson";
 
+const MAINNET_ONLY: boolean = !!(import.meta.env.VITE_MAINNET_ONLY ?? false);
+if (MAINNET_ONLY) console.log("mainnet only");
+
 export function onMessage(
   requestJson: string,
   sender: globalThis.Browser.runtime.MessageSender,

@@ -42,17 +42,21 @@ export async function updateConfig(config: Option<Config>) {
 
   // extract chain
   let chain: Sol.Chain;
-  if (treasury.network === "mainnet") {
+  if (import.meta.env.VITE_MAINNET_ONLY ?? false) {
     chain = Sol.MAINNET;
   } else {
-    const network = await Sdk.connector.testnetChainNetwork("SOL");
-    if (!network) return clearConfig();
-    if (network === "devnet") {
-      chain = Sol.DEVNET;
-    } else if (network === "testnet") {
-      chain = Sol.TESTNET;
+    if (treasury.network === "mainnet") {
+      chain = Sol.MAINNET;
     } else {
-      return clearConfig();
+      const network = await Sdk.connector.testnetChainNetwork("SOL");
+      if (!network) return clearConfig();
+      if (network === "devnet") {
+        chain = Sol.DEVNET;
+      } else if (network === "testnet") {
+        chain = Sol.TESTNET;
+      } else {
+        return clearConfig();
+      }
     }
   }
 

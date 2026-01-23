@@ -12,7 +12,7 @@
 
 import { EventEmitter } from "@/lib/event_emitter";
 import { ethRequest } from "@/lib/relay";
-import { Eth } from "@/lib/types";
+import { Eth, Option } from "@/lib/types";
 
 const INFO: Eth.Info = {
   uuid: "db69fd17-3a07-453d-92c9-e51a6027de1d",
@@ -22,10 +22,6 @@ const INFO: Eth.Info = {
 };
 
 export class Ethereum extends EventEmitter implements Eth.Provider {
-  // constructor() {
-  //   super();
-  // }
-
   async start() {
     console.log("Initializing Cordial Ethereum Provider");
     try {
