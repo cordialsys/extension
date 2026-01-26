@@ -137,8 +137,9 @@ export const Call = {
     }
 
     if (typedData.domain.chainId) {
-      const chainId = Number(typedData.domain.chainId);
-      typedData.domain.chainId = `0x${chainId.toString(16)}`;
+      const chainId = Eth.Id.normalize(typedData.domain.chainId);
+      if (!chainId) return Err(Error.invalidArgument("Invalid chainId"));
+      typedData.domain.chainId = chainId;
     }
 
     return Ok({

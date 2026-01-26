@@ -35,7 +35,7 @@ async function handle(
   request: Request,
   sender: globalThis.Browser.runtime.MessageSender,
 ): Promise<Response> {
-  const config = await Config.load();
+  const config = Config.current();
 
   const log = `${request.header.provider} :: ${request.header.id} :: ${sender.origin} :: ${request.method} ::`;
   console.log("➡️", log, request.params);

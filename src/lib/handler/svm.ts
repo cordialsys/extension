@@ -33,7 +33,7 @@ function setConfig(config: Sol.Config) {
   notifyConfig(Some(config));
 }
 
-export async function updateConfig(config: Option<Config>) {
+export async function propogate(config: Option<Config>) {
   // console.log("updating SVM config with", config);
   if (!config) return clearConfig();
   const treasuryR = await Sdk.treasury.treasury();

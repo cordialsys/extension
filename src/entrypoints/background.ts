@@ -31,10 +31,6 @@ async function init() {
 
   // const firstName = await loginFirstName(login);
   // console.log(`👋 Welcome back, ${firstName}`);
-  // const config = await Config.load();
-  // if (config) {
-  //   console.log("Configuration:", config);
-  // }
 
   await browser_action.setIcon({ path: COLOR });
 }

@@ -196,7 +196,7 @@ export namespace Sdk {
       if (!login) {
         return Err(notLoggedIn());
       }
-      const config = await Config.load();
+      const config = Config.current();
       if (!config) {
         return Err(notConfigured());
       }
@@ -251,14 +251,14 @@ export namespace Sdk {
       plural: string,
       options?: ListOptions,
     ): Promise<Result<R[]>> {
-      const config = await Config.load();
+      const config = Config.current();
       if (!config) return notConfigured();
       const url = `${config.treasury.url}v1/${path}`;
       return await apiList<R>(url, plural, options);
     }
 
     export async function get<T>(name: string): Promise<Result<T>> {
-      const config = await Config.load();
+      const config = Config.current();
       if (!config) {
         return Err(Error.failedPrecondition("not configured"));
       }
@@ -277,7 +277,7 @@ export namespace Sdk {
     }
 
     export async function treasury(): Promise<Result<T.Treasury>> {
-      const config = await Config.load();
+      const config = Config.current();
       if (!config) return notConfigured();
       return get<T.Treasury>(config.treasury.name);
     }

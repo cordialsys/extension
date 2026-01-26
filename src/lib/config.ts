@@ -1,11 +1,11 @@
-import { get, set } from "idb-keyval";
-
 import { browser_action, CONFIG_REFRESH } from "./constants";
 import { Login } from "./login";
 import { Sdk } from "./sdk";
 import * as A from "./sdk/admin";
-import { Option } from "./types";
+import { None, Option } from "./types";
 import { evm, svm } from "./handler";
+
+let CONFIG: Option<Config> = None;
 
 export const Config = {
   // fetches the latest config if logged in
@@ -15,19 +15,24 @@ export const Config = {
     return await Sdk.admin.users.extension.maybe(login.userId);
   },
 
-  // loads the currently active config, assumed fetched/refreshed in the background
-  async load(): Promise<Option<Config>> {
-    return get("config");
+  current(): Option<Config> {
+    return CONFIG;
   },
 
-  async allowed(origin: string): Promise<boolean> {
-    const config = await Config.load();
+  async propogate(config: Option<Config>) {
+    CONFIG = config;
+    await evm.propogate(config);
+    await svm.propogate(config);
+  },
+
+  allowed(origin: string): boolean {
+    const config = Config.current();
     if (!config) return false;
     return config.origins.includes(origin);
   },
 
   async toggle(origin: string, tab: number) {
-    const config = await Config.load();
+    const config = Config.current();
     const login = await Login.load();
     if (!config || !login) return;
     const allowed = config.origins.includes(origin);
@@ -36,28 +41,28 @@ export const Config = {
       config.origins = config.origins.filter((o) => o !== origin);
       const result = await Sdk.admin.users.extension.set(login.userId, config);
       if (!result.ok) return;
-      await set("config", config);
+      await Config.propogate(config);
       Config.setBadge(config, tab, false);
     } else {
       config.origins.push(origin);
       const result = await Sdk.admin.users.extension.set(login.userId, config);
       if (!result.ok) return;
-      await set("config", config);
+      await Config.propogate(config);
       Config.setBadge(config, tab, true);
     }
   },
 
   async init() {
     const config = await Config.fetch();
-    await store(config);
+    await Config.propogate(config);
   },
 
   async track() {
     const config = await Config.fetch();
 
-    if (JSON.stringify(await Config.load()) !== JSON.stringify(config)) {
+    if (JSON.stringify(Config.current()) !== JSON.stringify(config)) {
       console.log("Config changed", config);
-      await store(config);
+      await Config.propogate(config);
     }
 
     setTimeout(Config.track, CONFIG_REFRESH);
@@ -73,12 +78,6 @@ export const Config = {
     });
   },
 };
-
-async function store(config: Option<Config>) {
-  await set("config", config);
-  await evm.updateConfig(config);
-  await svm.updateConfig(config);
-}
 
 export interface Config extends A.ExtensionConfig {}
 export interface Extension extends A.Extension {}

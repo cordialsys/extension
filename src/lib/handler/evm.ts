@@ -30,7 +30,7 @@ function setConfig(config: Eth.Config) {
   notifyConfig(Some(config));
 }
 
-export async function updateConfig(config: Option<Config>) {
+export async function propogate(config: Option<Config>) {
   // console.log("updating EVM config with", config);
   if (!config) return clearConfig();
   const treasuryR = await Sdk.treasury.treasury();
@@ -218,7 +218,7 @@ export async function wallet_switchEthereumChain(
   // console.log(`switching to ${chain} with ID ${id}`);
 
   ID = id;
-  await updateConfig(await Config.load());
+  await propogate(Config.current());
   return Ok(null);
 }
 
