@@ -136,6 +136,11 @@ export const Call = {
       }
     }
 
+    if (typedData.domain.chainId) {
+      const chainId = Number(typedData.domain.chainId);
+      typedData.domain.chainId = `0x${chainId.toString(16)}`;
+    }
+
     return Ok({
       address,
       method: "eth_signTypedData_v4",
