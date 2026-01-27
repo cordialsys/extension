@@ -117,7 +117,7 @@ export function message(event: MessageEvent<Broadcast | Response>) {
 }
 
 export function broadcast(broadcast: Broadcast) {
-  console.log("received broadcast in app", broadcast);
+  // console.log("received broadcast in app", broadcast);
   if (!CONFIGURATOR || broadcast.method !== "cordial:config") return;
   const value: unknown = broadcast.value;
   switch (broadcast.provider) {
@@ -157,6 +157,6 @@ export function response(response: Response) {
 
 export function relayBroadcast(broadcastJson: string) {
   const broadcast: Broadcast = superjson.parse(broadcastJson);
-  console.log("received broadcast:", broadcast);
+  // console.log("received broadcast:", broadcast);
   window.postMessage(broadcast);
 }

@@ -46,8 +46,7 @@ export async function propagate(
   if (!treasuryR.ok) return clearConfig();
   const treasury = treasuryR.value;
 
-  // TODO: Instead of 0x1, we should probably pick an ID for which
-  // we have a treasury address (if we have any EVM addresses)
+  // Pick a chain ID that has addresses (if any)
   let ID = maybeID;
   if (!ID) {
     for (const [chain, id] of Object.entries(Eth.Mainnet)) {
@@ -216,7 +215,7 @@ export async function wallet_getCapabilities(
   // Uniswap sends undefined..
   // It's supposed to send
   // https://docs.metamask.io/wallet/reference/json-rpc-methods/wallet_getcapabilities
-  console.log("wallet_getCapabilities params:", params);
+  // console.log("wallet_getCapabilities params:", params);
   return Ok({});
 }
 

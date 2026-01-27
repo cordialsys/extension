@@ -19,7 +19,10 @@
 // IN THE SOFTWARE.
 
 import { solRequest } from "@/lib/relay";
-import { Option, Sol } from "@/lib/types";
+import { None, Option, Sol } from "@/lib/types";
+
+type Config = Sol.Config;
+let CONFIG: Option<Config> = None;
 
 // import { PublicKey } from "@solana/web3.js";
 import type {
@@ -92,8 +95,8 @@ function newAccount(chain: IdentifierString, addr: string): Sol.Account {
   return Sol.Account.new(addr, pubKey, [chain], features);
 }
 
-async function requestConfig(): Promise<Option<Sol.Config>> {
-  return solRequest("cordial:config") as Promise<Option<Sol.Config>>;
+async function requestConfig(): Promise<Option<Config>> {
+  return solRequest("cordial:config") as Promise<Option<Config>>;
 }
 
 export class Solana implements Wallet {
@@ -134,31 +137,55 @@ export class Solana implements Wallet {
     return features;
   }
 
-  async config(): Promise<Option<Sol.Config>> {
+  async config(): Promise<Option<Config>> {
     return requestConfig();
   }
 
-  async configure(config: Option<Sol.Config>) {
-    console.log("SOL provider received config", config);
+  // manually trigger a reconfiguration, returning the config that was used
+  async reconfigure(): Promise<Option<Config>> {
+    const config = await requestConfig();
+    await this.configure(config);
+    return config;
   }
 
-  async start(this: Solana) {
-    console.log("Initializing Cordial Solana Provider");
+  async configure(config: Option<Config>) {
+    // console.log("SOL provider received config", config);
+
     try {
-      const config = await requestConfig();
-      console.log("Initial SVM config", config);
-      if (!config) return;
-
-      this.#accounts = config.addresses.map((a) =>
-        newAccount(config.chain as IdentifierString, a),
-      );
-
-      // TODO: only announce if origin is allowed
-      // and we have an address (e.g. Orca totally ignores us if there are no addresses)
-      this.announce();
+      if (!!config && !CONFIG) await this._start(config);
+      if (!!config && !!CONFIG) await this._update(config);
+      if (!config && !!CONFIG) await this._stop();
     } catch (error) {
-      console.error(`configuration error: ${error}`);
+      console.error(`Ethereum provider configuration error: ${error}`);
+      return;
     }
+
+    CONFIG = config;
+  }
+
+  async _start(config: Config) {
+    console.log("🚀 Starting Cordial Solana Provider with", config);
+
+    this.#accounts = config.addresses.map((a) =>
+      newAccount(config.chain as IdentifierString, a),
+    );
+
+    // TODO: only announce if origin is allowed
+    // and we have an address (e.g. Orca totally ignores us if there are no addresses)
+    this.announce();
+  }
+
+  async _stop() {
+    console.log("Stopping Cordial Solana Provider not implemented yet");
+  }
+
+  async _update(config: Config) {
+    if (JSON.stringify(config) === JSON.stringify(CONFIG)) return;
+    console.log(
+      "Updating Cordial Solana Provider to",
+      config,
+      "not implemented yet",
+    );
   }
 
   announce(this: Solana) {

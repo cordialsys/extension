@@ -15,6 +15,7 @@ import { ethRequest } from "@/lib/relay";
 import { Eth, None, Option } from "@/lib/types";
 
 type Config = Eth.Config;
+let CONFIG: Option<Config> = None;
 
 const INFO: Eth.Info = {
   uuid: "db69fd17-3a07-453d-92c9-e51a6027de1d",
@@ -26,8 +27,6 @@ const INFO: Eth.Info = {
 async function requestConfig(): Promise<Option<Eth.Config>> {
   return ethRequest("cordial:config") as Promise<Option<Eth.Config>>;
 }
-
-let CONFIG: Option<Config> = None;
 
 export class Ethereum extends EventEmitter implements Eth.Provider {
   config(): Option<Config> {
@@ -49,7 +48,7 @@ export class Ethereum extends EventEmitter implements Eth.Provider {
   // https://eips.ethereum.org/EIPS/eip-6963
   // https://docs.metamask.io/wallet/reference/provider-api
   async configure(config: Option<Config>) {
-    console.log("ETH provider received config", config);
+    // console.log("ETH provider received config", config);
 
     try {
       if (!!config && !CONFIG) await this._start(config);
@@ -65,7 +64,7 @@ export class Ethereum extends EventEmitter implements Eth.Provider {
 
   // allowed to throw
   async _start(config: Config) {
-    console.log("Starting Cordial Ethereum Provider with", config);
+    console.log("🚀 Starting Cordial Ethereum Provider with", config);
     window.addEventListener("eip6963:requestProvider", this.announce);
     // set CONFIG early since "announce" has no argument
     CONFIG = config;
@@ -88,6 +87,7 @@ export class Ethereum extends EventEmitter implements Eth.Provider {
 
   // allowed to throw
   async _update(config: Config) {
+    if (JSON.stringify(config) === JSON.stringify(CONFIG)) return;
     console.log("Updating Cordial Ethereum Provider to", config);
     this.emit("chainChanged", config.chain);
     this.emit("accountsChanged", Array.from(config.addresses));

@@ -19,14 +19,12 @@ const PORTS: Port[] = [];
 export const Port = {
   set(port: Port) {
     // 1. Validate and store port
-    console.log("Setting port");
     if (!port.sender?.tab?.id) {
-      console.log("No tab id for port", port);
       return;
     }
     const id: number = port.sender.tab.id;
     const url: Option<string> = port.sender.tab.url;
-    console.log("for tab", id, "with url", url);
+    console.log("Connecting tab", id, "running", url);
     PORTS[id] = port;
 
     // 2. Initialize provider if allowed
@@ -52,14 +50,15 @@ export const Port = {
   },
 
   broadcast(message: Broadcast) {
-    console.log("Broadcasting", message);
+    // console.log("Broadcasting", message);
     const messageJson = Port.encode(message);
+    message.value = None;
+    const nullJson = Port.encode(message);
     for (const id in PORTS) {
       const port = PORTS[id];
-      console.log("...to port", port);
-      console.log("...to tab", id);
       try {
-        port.postMessage(messageJson);
+        const nullify = allowed(Config.current(), port.sender?.origin);
+        port.postMessage(nullify ? messageJson : nullJson);
       } catch {
         console.log("Tab", id, "disconnected");
         delete PORTS[id];
