@@ -9,22 +9,25 @@
 // "unlisted script" that is injected by content.ts into the defi app
 import { Ethereum } from "@/lib/provider/eth";
 import { Solana } from "@/lib/provider/sol";
-import { cordialRequest, message } from "@/lib/relay";
+import { cordialRequest, init, message } from "@/lib/relay";
 
 export default defineUnlistedScript(() => {
   console.log("♥️ Running the Cordial Provider");
-
-  // first of all, listen to responses from the extension
-  window.addEventListener("message", message);
-
-  // send a kind of heartbeat, this can update the extension icon
-  cordialRequest("cordial:ping");
 
   // construct the providers
   const eth = new Ethereum();
   const sol = new Solana();
 
-  // make them available in global name space for easy debug access
+  init({
+    eth: eth.configure.bind(eth),
+    sol: sol.configure.bind(sol),
+  });
+
+  // listen to broadcasts + responses from the extension
+  window.addEventListener("message", message);
+
+  // make providers available in global name space for easy debug access
+  // e.g. can do `await cordial.eth.config()` or  `await cordial.eth.reconfigure()`
   const attach = window as unknown as { cordial: unknown };
   attach.cordial = {
     eth,
@@ -32,7 +35,12 @@ export default defineUnlistedScript(() => {
     ping: () => cordialRequest("cordial:ping"),
   };
 
+  // send a kind of heartbeat, this can update the extension icon
+  cordialRequest("cordial:ping");
+
   // start them (they will detect whether to reveal themselves)
-  setTimeout(eth.start.bind(eth), 0);
+  // ETH: Should "come alive" automatically, if the origin is allowed
+  // setTimeout(eth.start.bind(eth), 0);
+  // SOL: TODO: Implement same behavior as for ETH
   setTimeout(sol.start.bind(sol), 0);
 });

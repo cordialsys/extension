@@ -1,7 +1,7 @@
 import * as Eth from "@/lib/types/eth";
 export * as Eth from "@/lib/types/eth";
 
-// import * as Sol from "@/lib/types/sol";
+import * as Sol from "@/lib/types/sol";
 export * as Sol from "@/lib/types/sol";
 
 export type Nonce = string;
@@ -19,6 +19,11 @@ export const Nonce = {
 
 export type Provider = "cordial" | "ETH" | "SOL";
 export type Params = unknown[] | object;
+
+export type Configurator = {
+  eth: Eth.Configurator;
+  sol: Sol.Configurator;
+};
 
 // as opposed to Response<T, E>, which is in response to a request
 export interface Broadcast<T = unknown> {

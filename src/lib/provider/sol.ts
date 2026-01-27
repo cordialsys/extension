@@ -138,6 +138,10 @@ export class Solana implements Wallet {
     return requestConfig();
   }
 
+  async configure(config: Option<Sol.Config>) {
+    console.log("SOL provider received config", config);
+  }
+
   async start(this: Solana) {
     console.log("Initializing Cordial Solana Provider");
     try {

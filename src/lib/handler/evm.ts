@@ -6,7 +6,6 @@ import { Err, Eth, None, Ok, Option, Some } from "@/lib/types";
 import * as z from "zod";
 import * as T from "@/lib/sdk/treasury";
 
-let ID: Eth.Id = "0x1";
 // Invariant: If this is set, then Config.addresses should be non-empty
 let CONFIG: Option<Eth.Config> = None;
 
@@ -36,7 +35,10 @@ function setConfig(config: Eth.Config) {
   notifyConfig(Some(config));
 }
 
-export async function propogate(config: Option<Config>) {
+export async function propagate(
+  maybeID: Option<Eth.Id>,
+  config: Option<Config>,
+) {
   // console.log("updating EVM config with", config);
   if (!config) return clearConfig();
   const treasuryR = await Sdk.treasury.treasury();
@@ -44,8 +46,22 @@ export async function propogate(config: Option<Config>) {
   if (!treasuryR.ok) return clearConfig();
   const treasury = treasuryR.value;
 
+  // TODO: Instead of 0x1, we should probably pick an ID for which
+  // we have a treasury address (if we have any EVM addresses)
+  let ID = maybeID;
+  if (!ID) {
+    for (const [chain, id] of Object.entries(Eth.Mainnet)) {
+      if (Config.chainAddresses(chain).length) {
+        ID = id;
+        break;
+      }
+    }
+  }
+  // need this case? could also clearConfig();
+  if (!ID) {
+    ID = "0x1";
+  }
   const chain = Eth.Chains[ID];
-  // console.log("current chain", chain);
 
   // ensure id
   const mainnet = treasury.network === "mainnet";
@@ -67,14 +83,11 @@ export async function propogate(config: Option<Config>) {
   }
 
   // set addresses
-  const prefix = `chains/${chain}/addresses/`;
-  const addresses = config.addresses
-    .filter((a) => a.startsWith(prefix))
-    .map((a) => a.slice(prefix.length));
+  const addresses = Config.chainAddresses(chain);
   if (!addresses.length) return clearConfig();
 
   // finally update config
-  return setConfig({ addresses, chain, mainnet });
+  return setConfig({ addresses, chain, id: ID, mainnet });
 }
 
 export async function ethereumSignature(
@@ -111,8 +124,9 @@ export async function ethereumSignature(
 }
 
 export async function personal_sign(params: unknown): Promise<Result<string>> {
+  if (!CONFIG) return Err(Error.permissionDenied("Not configured"));
   // 1. transform
-  const proposalR = T.Call.newPersonalSign(ID, params);
+  const proposalR = T.Call.newPersonalSign(CONFIG.id, params);
   if (!proposalR.ok) return proposalR;
   const proposal = proposalR.value;
   console.log("proposal for `personal_sign`:", proposal);
@@ -123,7 +137,8 @@ export async function personal_sign(params: unknown): Promise<Result<string>> {
 export async function eth_signTypedData_v4(
   params: unknown,
 ): Promise<Result<string>> {
-  const proposalR = T.Call.newSignTypedData(ID, params);
+  if (!CONFIG) return Err(Error.permissionDenied("Not configured"));
+  const proposalR = T.Call.newSignTypedData(CONFIG.id, params);
   if (!proposalR.ok) return proposalR;
   const proposal = proposalR.value;
   console.log("proposal for `eth_signTypedData_v4`:", proposal);
@@ -142,8 +157,13 @@ export async function eth_signTransaction(
 export async function eth_sendTransaction(
   params: unknown,
 ): Promise<Result<string>> {
+  if (!CONFIG) return Err(Error.permissionDenied("Not configured"));
   // 1. transform
-  const proposalR = T.Call.newEvmTransaction(ID, "eth_sendTransaction", params);
+  const proposalR = T.Call.newEvmTransaction(
+    CONFIG.id,
+    "eth_sendTransaction",
+    params,
+  );
   if (!proposalR.ok) return proposalR;
   const proposal = proposalR.value;
   console.log("proposal for `eth_sendTransaction`:", proposal);
@@ -223,8 +243,7 @@ export async function wallet_switchEthereumChain(
   // const chain = Eth.Chains[id];
   // console.log(`switching to ${chain} with ID ${id}`);
 
-  ID = id;
-  await propogate(Config.current());
+  await propagate(id, Config.current());
   return Ok(null);
 }
 
@@ -247,12 +266,16 @@ export async function wallet_requestPermissions(
   return Err(Error.unimplemented(`💔 Permission in ${params} not supported`));
 }
 
-export function eth_chainId(): Eth.Id {
-  return ID;
+export function eth_chainId(): Result<Eth.Id> {
+  if (!CONFIG) return Err(Error.permissionDenied("Not configured"));
+  return Ok(CONFIG.id);
 }
 
 export async function eth_blockNumber(): Promise<Result<string>> {
   if (!CONFIG) return Err(Error.permissionDenied("Not configured"));
-  const blockNumber = await Sdk.connector.blockNumber(ID, CONFIG.mainnet);
+  const blockNumber = await Sdk.connector.blockNumber(
+    CONFIG.id,
+    CONFIG.mainnet,
+  );
   return Ok(`0x${Number(blockNumber).toString(16)}`);
 }

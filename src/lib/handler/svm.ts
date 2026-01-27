@@ -39,7 +39,7 @@ function setConfig(config: Sol.Config) {
   notifyConfig(Some(config));
 }
 
-export async function propogate(config: Option<Config>) {
+export async function propagate(config: Option<Config>) {
   // console.log("updating SVM config with", config);
   if (!config) return clearConfig();
   const treasuryR = await Sdk.treasury.treasury();
@@ -67,10 +67,7 @@ export async function propogate(config: Option<Config>) {
   }
 
   // set addresses
-  const prefix = "chains/SOL/addresses/";
-  const addresses = config.addresses
-    .filter((a) => a.startsWith(prefix))
-    .map((a) => a.slice(prefix.length));
+  const addresses = Config.chainAddresses("SOL");
   if (!addresses.length) return clearConfig();
 
   // finally update config

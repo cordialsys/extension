@@ -186,7 +186,7 @@ async function process(
 
     // helper calls
     if (method === "eth_blockNumber") return evm.eth_blockNumber();
-    if (method === "eth_chainId") return Ok(evm.eth_chainId());
+    if (method === "eth_chainId") return evm.eth_chainId();
     if (method === "eth_requestAccounts") return evm.eth_requestAccounts();
     if (method === "eth_accounts") return Ok(evm.eth_accounts());
     if (method === "wallet_getCapabilities")

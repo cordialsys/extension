@@ -31,11 +31,19 @@ export const Chains: { [id in Id]: Chain } = {
   "0x89": "MATIC",
 };
 
+export const Mainnet: { [chain in Chain]: Id } = {
+  ETH: "0x1",
+  MATIC: "0x89",
+};
+
 export type Config = {
   chain: Chain;
+  id: Id;
   addresses: string[];
   mainnet: boolean;
 };
+
+export type Configurator = (config: Option<Config>) => Promise<void>;
 
 export interface Info {
   uuid: string;

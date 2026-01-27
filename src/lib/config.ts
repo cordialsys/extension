@@ -19,10 +19,20 @@ export const Config = {
     return CONFIG;
   },
 
-  async propogate(config: Option<Config>) {
+  chainAddresses(chain: string): string[] {
+    const config = Config.current();
+    if (!config) return [];
+    const prefix = `chains/${chain}/addresses/`;
+    // TODO: Lookup actual address
+    return config.addresses
+      .filter((a) => a.startsWith(prefix))
+      .map((a) => a.slice(prefix.length));
+  },
+
+  async propagate(config: Option<Config>) {
     CONFIG = config;
-    await evm.propogate(config);
-    await svm.propogate(config);
+    await evm.propagate(None, config);
+    await svm.propagate(config);
   },
 
   allowed(origin: string): boolean {
@@ -41,20 +51,20 @@ export const Config = {
       config.origins = config.origins.filter((o) => o !== origin);
       const result = await Sdk.admin.users.extension.set(login.userId, config);
       if (!result.ok) return;
-      await Config.propogate(config);
+      await Config.propagate(config);
       Config.setBadge(config, tab, false);
     } else {
       config.origins.push(origin);
       const result = await Sdk.admin.users.extension.set(login.userId, config);
       if (!result.ok) return;
-      await Config.propogate(config);
+      await Config.propagate(config);
       Config.setBadge(config, tab, true);
     }
   },
 
   async init() {
     const config = await Config.fetch();
-    await Config.propogate(config);
+    await Config.propagate(config);
   },
 
   async track() {
@@ -62,7 +72,7 @@ export const Config = {
 
     if (JSON.stringify(Config.current()) !== JSON.stringify(config)) {
       console.log("Config changed", config);
-      await Config.propogate(config);
+      await Config.propagate(config);
     }
 
     setTimeout(Config.track, CONFIG_REFRESH);

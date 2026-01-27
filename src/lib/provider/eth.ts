@@ -12,7 +12,9 @@
 
 import { EventEmitter } from "@/lib/event_emitter";
 import { ethRequest } from "@/lib/relay";
-import { Eth, Option } from "@/lib/types";
+import { Eth, None, Option } from "@/lib/types";
+
+type Config = Eth.Config;
 
 const INFO: Eth.Info = {
   uuid: "db69fd17-3a07-453d-92c9-e51a6027de1d",
@@ -25,23 +27,70 @@ async function requestConfig(): Promise<Option<Eth.Config>> {
   return ethRequest("cordial:config") as Promise<Option<Eth.Config>>;
 }
 
+let CONFIG: Option<Config> = None;
+
 export class Ethereum extends EventEmitter implements Eth.Provider {
-  async config(): Promise<Option<Eth.Config>> {
-    return requestConfig();
+  config(): Option<Config> {
+    return CONFIG;
   }
 
-  async start() {
-    console.log("Initializing Cordial Ethereum Provider");
-    try {
-      const config = await requestConfig();
-      console.log("Initial EVM config", config);
-      if (!config) return;
+  // manually trigger a reconfiguration, returning the config that was used
+  async reconfigure(): Promise<Option<Config>> {
+    const config = await requestConfig();
+    await this.configure(config);
+    return config;
+  }
 
-      window.addEventListener("eip6963:requestProvider", this.announce);
-      this.announce();
+  // triggered either in response to a broadcast by the extension,
+  // or manually by the above `reconfigure` method
+  //
+  // https://eips.ethereum.org/EIPS/eip-1193
+  // https://eips.ethereum.org/EIPS/eip-2786
+  // https://eips.ethereum.org/EIPS/eip-6963
+  // https://docs.metamask.io/wallet/reference/provider-api
+  async configure(config: Option<Config>) {
+    console.log("ETH provider received config", config);
+
+    try {
+      if (!!config && !CONFIG) await this._start(config);
+      if (!!config && !!CONFIG) await this._update(config);
+      if (!config && !!CONFIG) await this._stop();
     } catch (error) {
-      console.error(`Ethereum provider start error: ${error}`);
+      console.error(`Ethereum provider configuration error: ${error}`);
+      return;
     }
+
+    CONFIG = config;
+  }
+
+  // allowed to throw
+  async _start(config: Config) {
+    console.log("Starting Cordial Ethereum Provider with", config);
+    window.addEventListener("eip6963:requestProvider", this.announce);
+    // set CONFIG early since "announce" has no argument
+    CONFIG = config;
+    this.announce();
+    this.emit("chainChanged", config.chain);
+    this.emit("accountsChanged", Array.from(config.addresses));
+  }
+
+  // allowed to throw
+  async _stop() {
+    console.log("Stopping Cordial Ethereum Provider");
+    // window.removeEventListener("eip6963:requestProvider", this.announce);
+    // Probably shouldn't emit "disconnect":
+    // > When the provider emits this event, it doesn't accept new requests until the connection
+    // > to the chain is re-established, which requires reloading the page.
+    // https://docs.metamask.io/wallet/reference/provider-api#accountschanged:~:text=When%20the%20provider%20emits%20this%20event%2C%20it%20doesn%27t%20accept%20new%20requests%20until%20the%20connection%20to%20the%20chain%20is%20re%2Destablished%2C%20which%20requires%20reloading%20the%20page.%20You%20can%20also%20use%20the%20isConnected()%20provider%20method%20to%20determine%20if%20the%20provider%20is%20disconnected.
+    // this.emit("disconnect");
+    this.emit("accountsChanged", new Array(0));
+  }
+
+  // allowed to throw
+  async _update(config: Config) {
+    console.log("Updating Cordial Ethereum Provider to", config);
+    this.emit("chainChanged", config.chain);
+    this.emit("accountsChanged", Array.from(config.addresses));
   }
 
   private announce() {

@@ -10,7 +10,19 @@ are thrown when rejecting the promise
 */
 
 import superjson from "superjson";
-import { Broadcast, Nonce, Params, Provider, Request, Response } from "./types";
+import {
+  Broadcast,
+  Configurator,
+  Eth,
+  Nonce,
+  None,
+  Option,
+  Params,
+  Provider,
+  Request,
+  Response,
+  Sol,
+} from "./types";
 
 // Map object keys are compared by reference (object identity), not value
 // Currently, Nonce is the primitive type string so it works.
@@ -19,6 +31,12 @@ type Rejecter = (reason?: unknown) => void;
 export type Promises = Map<Nonce, [Resolver, Rejecter]>;
 
 const PROMISES: Promises = new Map();
+
+let CONFIGURATOR: Option<Configurator> = None;
+
+export function init(configurator: Configurator) {
+  CONFIGURATOR = configurator;
+}
 
 export function cordialRequest(
   method: string,
@@ -100,6 +118,16 @@ export function message(event: MessageEvent<Broadcast | Response>) {
 
 export function broadcast(broadcast: Broadcast) {
   console.log("received broadcast in app", broadcast);
+  if (!CONFIGURATOR || broadcast.method !== "cordial:config") return;
+  const value: unknown = broadcast.value;
+  switch (broadcast.provider) {
+    case "ETH":
+      CONFIGURATOR.eth(value as Option<Eth.Config>);
+      break;
+    case "SOL":
+      CONFIGURATOR.sol(value as Option<Sol.Config>);
+      break;
+  }
 }
 
 export function response(response: Response) {

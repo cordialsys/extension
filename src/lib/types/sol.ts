@@ -1,3 +1,4 @@
+import { Option } from "@/lib/types";
 import * as z from "zod";
 
 import type {
@@ -29,6 +30,8 @@ export interface Config {
   // chains?: string[];
   chain: Chain;
 }
+
+export type Configurator = (config: Option<Config>) => Promise<void>;
 
 /** Solana Mainnet (beta) cluster, e.g. https://api.mainnet-beta.solana.com */
 export const MAINNET = "solana:mainnet";
