@@ -4,6 +4,26 @@
  */
 
 export interface paths {
+  "/addresses": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List Addresses
+     * @description Lists all the addresses the user is subscribed to.
+     */
+    get: operations["list-addresses"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/assets": {
     parameters: {
       query?: never;
@@ -47,24 +67,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/chains/{chain}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get Chain */
-    get: operations["get-chain"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/chains/{chain}/status": {
+  "/balances": {
     parameters: {
       query?: never;
       header?: never;
@@ -72,10 +75,10 @@ export interface paths {
       cookie?: never;
     };
     /**
-     * Get Chain Status
-     * @description Check the health of chain and it's indexer state.  The JSON content is not API stable. Please use HTTP status (e.g. 200) for machine logic.
+     * List Balances
+     * @description List all balances for addresses that have been subscribed to.
      */
-    get: operations["get-chain-status"];
+    get: operations["list-balances"];
     put?: never;
     post?: never;
     delete?: never;
@@ -104,18 +107,15 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/addresses": {
+  "/chains/{chain}": {
     parameters: {
       query?: never;
       header?: never;
       path?: never;
       cookie?: never;
     };
-    /**
-     * List Addresses
-     * @description Lists all the addresses the user is subscribed to.
-     */
-    get: operations["list-addresses"];
+    /** Get Chain */
+    get: operations["get-chain"];
     put?: never;
     post?: never;
     delete?: never;
@@ -177,46 +177,6 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/balances": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * List Balances
-     * @description List all balances for addresses that have been subscribed to.
-     */
-    get: operations["list-balances"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/chains/{chain}/balances": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * List Chain Balances
-     * @description List all balances for addresses that have been subscribed to on a given chain.
-     */
-    get: operations["list-chain-balances"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
   "/chains/{chain}/addresses/{address}/balances": {
     parameters: {
       query?: never;
@@ -246,6 +206,134 @@ export interface paths {
     };
     /** Get Balance */
     get: operations["get-balance"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/chains/{chain}/addresses/{address}/deposits": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Address Deposits */
+    get: operations["list-address-deposits"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/chains/{chain}/addresses/{address}/movements": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Address Movements */
+    get: operations["list-address-movements"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/chains/{chain}/addresses/{address}/transactions": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List Address Transactions
+     * @description Lists transactions related to the address in descending order by block time.
+     */
+    get: operations["list-address-transactions"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/chains/{chain}/addresses/{address}/withdrawals": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Address Withdrawals */
+    get: operations["list-address-withdrawals"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/chains/{chain}/assets/{asset}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Asset */
+    get: operations["get-asset"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/chains/{chain}/balances": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List Chain Balances
+     * @description List all balances for addresses that have been subscribed to on a given chain.
+     */
+    get: operations["list-chain-balances"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/chains/{chain}/status": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get Chain Status
+     * @description Check the health of chain and it's indexer state.  The JSON content is not API stable. Please use HTTP status (e.g. 200) for machine logic.
+     */
+    get: operations["get-chain-status"];
     put?: never;
     post?: never;
     delete?: never;
@@ -295,18 +383,15 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/chains/{chain}/addresses/{address}/transactions": {
+  "/chains/{chain}/transactions/{hash}/movements/{movement}": {
     parameters: {
       query?: never;
       header?: never;
       path?: never;
       cookie?: never;
     };
-    /**
-     * List Address Transactions
-     * @description Lists transactions related to the address in descending order by block time.
-     */
-    get: operations["list-address-transactions"];
+    /** Get Movement */
+    get: operations["get-movement"];
     put?: never;
     post?: never;
     delete?: never;
@@ -315,15 +400,15 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/chains/{chain}/assets/{asset}": {
+  "/chains/{chain}/transactions/{hash}/movements/{movement}/deposits/{deposit}": {
     parameters: {
       query?: never;
       header?: never;
       path?: never;
       cookie?: never;
     };
-    /** Get Asset */
-    get: operations["get-asset"];
+    /** Get Deposit */
+    get: operations["get-deposit"];
     put?: never;
     post?: never;
     delete?: never;
@@ -332,18 +417,15 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/transactions": {
+  "/chains/{chain}/transactions/{hash}/movements/{movement}/withdrawals/{withdrawal}": {
     parameters: {
       query?: never;
       header?: never;
       path?: never;
       cookie?: never;
     };
-    /**
-     * List Transactions
-     * @description List all transactions, in descending order of the mined block time.
-     */
-    get: operations["list-transactions"];
+    /** Get Withdrawal */
+    get: operations["get-withdrawal"];
     put?: never;
     post?: never;
     delete?: never;
@@ -372,91 +454,6 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/chains/{chain}/transactions/{hash}/movements/{movement}/deposits/{deposit}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get Deposit */
-    get: operations["get-deposit"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/chains/{chain}/addresses/{address}/deposits": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List Address Deposits */
-    get: operations["list-address-deposits"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/withdrawals": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List Withdrawals */
-    get: operations["list-withdrawals"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/chains/{chain}/addresses/{address}/withdrawals": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List Address Withdrawals */
-    get: operations["list-address-withdrawals"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/chains/{chain}/transactions/{hash}/movements/{movement}/withdrawals/{withdrawal}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get Withdrawal */
-    get: operations["get-withdrawal"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
   "/movements": {
     parameters: {
       query?: never;
@@ -474,15 +471,18 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/chains/{chain}/addresses/{address}/movements": {
+  "/transactions": {
     parameters: {
       query?: never;
       header?: never;
       path?: never;
       cookie?: never;
     };
-    /** List Address Movements */
-    get: operations["list-address-movements"];
+    /**
+     * List Transactions
+     * @description List all transactions, in descending order of the mined block time.
+     */
+    get: operations["list-transactions"];
     put?: never;
     post?: never;
     delete?: never;
@@ -491,15 +491,15 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/chains/{chain}/transactions/{hash}/movements/{movement}": {
+  "/withdrawals": {
     parameters: {
       query?: never;
       header?: never;
       path?: never;
       cookie?: never;
     };
-    /** Get Movement */
-    get: operations["get-movement"];
+    /** List Withdrawals */
+    get: operations["list-withdrawals"];
     put?: never;
     post?: never;
     delete?: never;
@@ -546,42 +546,72 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
   schemas: {
-    /** AssetPage */
-    AssetPage: {
-      assets?: components["schemas"]["Asset"][];
+    /** Address */
+    Address: {
+      /** @description `OUTPUT ONLY` */
+      name: components["schemas"]["AddressName"];
+    } & components["schemas"]["AddressData"] &
+      components["schemas"]["Metadata"];
+    /** AddressBalance */
+    AddressBalance: {
+      name: components["schemas"]["AddressBalanceName"];
+    } & components["schemas"]["Metadata"] &
+      components["schemas"]["AddressBalanceData"];
+    /** AddressBalanceData */
+    AddressBalanceData: {
+      address?: string;
+      address_id: string;
+      amount?: components["schemas"]["Amount"];
+      asset_id: string;
+      balance: components["schemas"]["Balance"];
+      contract?: string;
+    };
+    /**
+     * AddressBalanceName
+     * @example chains/ETH/addresses/0xced92fa7f0797cbc851b48140ae218a0b0d41ce0/balances/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48
+     */
+    AddressBalanceName: string;
+    /** AddressBalancesPage */
+    AddressBalancesPage: {
+      balances?: components["schemas"]["AddressBalance"][];
     } & components["schemas"]["Pagination"];
-    /** Asset */
-    Asset: {
-      name?: components["schemas"]["AssetName"];
-    } & components["schemas"]["AssetData"];
     /**
-     * AssetName
-     * @example chains/MATIC/assets/MATIC
+     * AddressData
+     * @example {
+     *       "chain_id": "ETH",
+     *       "id": "0xced92fa7f0797cbc851b48140ae218a0b0d41ce0",
+     *       "subscribe_time": "2023-07-30T011:30:15Z",
+     *       "address": "string"
+     *     }
      */
-    AssetName: string;
-    /** AssetData */
-    AssetData: {
+    AddressData: {
+      /** @description Logically account that the address may be in. */
+      account_id?: string;
+      /** @description Unnormalized version of the address ID. */
+      address?: string;
       chain_id: string;
+      description?: string;
       id: string;
-      decimals: number;
-      price?: components["schemas"]["Price"];
-      symbol?: string;
-      ids?: components["schemas"]["Ids"];
-      names?: components["schemas"]["Names"];
-      prices?: components["schemas"]["Prices"];
-      symbols?: components["schemas"]["Symbols"];
-    };
-    /** Price */
-    Price: {
-      time: components["schemas"]["Timestamp"];
-      usd: components["schemas"]["Amount"];
+      subscribe_time: components["schemas"]["Timestamp"];
+      /** @description The treasury that this address is associated with, e.g. `SGxCSBhhjdJ1LAGBSeAM5i`.  This will be set if the `TREASURY` header is set when creating the address. */
+      treasury_id?: string;
+      /** @description The address variant, e.g. `internal`. */
+      variant?: string;
     };
     /**
-     * Timestamp
-     * @description Seconds since UNIX epoch, encoded as UTC timestamp (ending in Z).
-     * @example 2023-07-30T011:30:15Z
+     * AddressName
+     * @description The name of an address consists of its parent chain name and the normalization of its on-chain representation as `Id`.
+     * @example chains/SOL/addresses/2mp7kgAGSUXMRPVtpJQxQwXpUw7UAhYjh2gjYeCL5zsMeL1VMKidcfeY5J1BptDtoAyb24U58qCGCe8QVui8Yz5x
      */
-    Timestamp: string;
+    AddressName: string;
+    /** AddressPage */
+    AddressPage: {
+      addresses: components["schemas"]["Address"][];
+    } & components["schemas"]["Pagination"];
+    AddressTransactionPage: {
+      address?: components["schemas"]["AddressName"];
+      transactions?: components["schemas"]["Transaction"][];
+    } & components["schemas"]["Pagination"];
     /**
      * Amount
      * @description Asset amount as decimal, encoded as string.
@@ -589,56 +619,74 @@ export interface components {
      */
     Amount: string;
     /**
-     * Ids
-     * @description Identifiers assigned to chains or assets by external systems.
+     * AmountChange
+     * @description Change in amount for an address that contributes to a given movement.
      */
-    Ids: {
-      coingecko?: string;
-      coinmarketcap?: number;
-      /** @description From "Header", "DTI" */
-      dti?: string;
-      /** @description From "UnderlyingAssetExternalIdentifiers", "UnderlyingAssetExternalIdentifierValue" where "UnderlyingAssetExternalIdentifierType" is "ISIN" */
-      isin?: string;
+    AmountChange: {
+      /** @description Address that contributed funds to this movement. */
+      address?: components["schemas"]["AddressName"];
+      address_id: string;
+      amount?: components["schemas"]["Amount"];
+      /** @description The balance of `asset` sent or received by `address`. */
+      balance: components["schemas"]["Balance"];
+      event?: components["schemas"]["Event"];
+      subscribed?: boolean;
     };
-    /** Names */
-    Names: {
-      coingecko?: string;
-      coinmarketcap?: string;
-      /** @description From "Informative", "LongName" */
-      dti?: string;
-    };
-    /** Prices */
-    Prices: {
-      coinmarketcap?: components["schemas"]["Price"];
-      coingecko?: components["schemas"]["Price"];
+    /** Asset */
+    Asset: {
+      name?: components["schemas"]["AssetName"];
+    } & components["schemas"]["AssetData"];
+    /** AssetData */
+    AssetData: {
+      chain_id: string;
+      decimals: number;
+      id: string;
+      ids?: components["schemas"]["Ids"];
+      names?: components["schemas"]["Names"];
+      price?: components["schemas"]["Price"];
+      prices?: components["schemas"]["Prices"];
+      symbol?: string;
+      symbols?: components["schemas"]["Symbols"];
     };
     /**
-     * Symbols
-     * @description Symbols assigned to chains or assets by external systems.
+     * AssetName
+     * @example chains/MATIC/assets/MATIC
      */
-    Symbols: {
-      coingecko?: string;
-      coinmarketcap?: string;
-      /** @description From "Informative", "ShortName" */
-      dti?: string;
-    };
-    /** Pagination */
-    Pagination: {
-      /** @description `OPTIONAL`. If set, there are more pages, which can be requested by repeating the `List` request, setting this value as query parameter `page_token`. */
-      next_page_token?: string;
-    };
-    /** DeprecatedPrice */
-    DeprecatedPrice: {
-      asset_name?: components["schemas"]["AssetName"];
-      price?: number;
-      update_time?: components["schemas"]["Timestamp"];
+    AssetName: string;
+    /** AssetPage */
+    AssetPage: {
+      assets?: components["schemas"]["Asset"][];
+    } & components["schemas"]["Pagination"];
+    /**
+     * Balance
+     * @description Base units of an asset as an integer (not adjusted for decimals), encoded as string.
+     * @example 213213432
+     */
+    Balance: string;
+    /**
+     * Block
+     * @example {
+     *       "chain_id": "ETH",
+     *       "id": "0x5e02e3762b09328a3b90f9b8f1caa38c79385bc704fd936173d36cf11bdd88b9",
+     *       "height": 21115105,
+     *       "time": "2023-07-30T011:30:15Z",
+     *       "chain": "chains/ETH",
+     *       "hash": "0x5e02e3762b09328a3b90f9b8f1caa38c79385bc704fd936173d36cf11bdd88b9"
+     *     }
+     */
+    Block: {
+      /** @description Cordial Systems identifier for the chain. */
+      chain_id: string;
+      hash?: string;
+      height?: number;
+      /** @description The block's hash */
+      id?: string;
+      time?: components["schemas"]["Timestamp"];
     };
     /** Chain */
     Chain: {
       name: components["schemas"]["ChainName"];
     } & components["schemas"]["ChainData"];
-    /** ChainName */
-    ChainName: string;
     /**
      * ChainData
      * @example {
@@ -654,200 +702,83 @@ export interface components {
       id?: string;
       network?: string;
     };
+    /** ChainName */
+    ChainName: string;
+    /** ChainPage */
+    ChainPage: {
+      chains?: components["schemas"]["Chain"][];
+    } & components["schemas"]["Pagination"];
     /**
      * ChainStatus
      * @description Returns metadata about the health of a chain.  Note this type is not API stable.  Please use HTTP status (e.g. 200) for machine logic.
      */
     ChainStatus: {
       chain?: components["schemas"]["ChainName"];
-      ok?: boolean;
-      /** @description Last time this was updated. */
-      update_time?: components["schemas"]["Timestamp"];
-      rpc?: {
-        ok?: boolean;
-        message?: string;
-        /** @description The latest block height, as observable on RPC. */
-        block_height?: number;
-      };
       indexer?: {
-        ok?: boolean;
-        message?: string;
         /** @description If known, this will be set to the latest height that the indexer has processed. */
         block_height?: number;
-      };
-      queue?: {
-        ok?: boolean;
         message?: string;
+        ok?: boolean;
+      };
+      ok?: boolean;
+      queue?: {
+        message?: string;
+        ok?: boolean;
         /** @description The current size of transaction queue to index. */
         size?: number;
       };
-    };
-    /** ChainPage */
-    ChainPage: {
-      chains?: components["schemas"]["Chain"][];
-    } & components["schemas"]["Pagination"];
-    /** AddressPage */
-    AddressPage: {
-      addresses: components["schemas"]["Address"][];
-    } & components["schemas"]["Pagination"];
-    /** Address */
-    Address: {
-      /** @description `OUTPUT ONLY` */
-      name: components["schemas"]["AddressName"];
-    } & components["schemas"]["AddressData"] &
-      components["schemas"]["Metadata"];
-    /**
-     * AddressName
-     * @description The name of an address consists of its parent chain name and the normalization of its on-chain representation as `Id`.
-     * @example chains/SOL/addresses/2mp7kgAGSUXMRPVtpJQxQwXpUw7UAhYjh2gjYeCL5zsMeL1VMKidcfeY5J1BptDtoAyb24U58qCGCe8QVui8Yz5x
-     */
-    AddressName: string;
-    /**
-     * AddressData
-     * @example {
-     *       "chain_id": "ETH",
-     *       "id": "0xced92fa7f0797cbc851b48140ae218a0b0d41ce0",
-     *       "subscribe_time": "2023-07-30T011:30:15Z",
-     *       "address": "string"
-     *     }
-     */
-    AddressData: {
-      chain_id: string;
-      id: string;
-      subscribe_time: components["schemas"]["Timestamp"];
-      /** @description Unnormalized version of the address ID. */
-      address?: string;
-      /** @description The treasury that this address is associated with, e.g. `SGxCSBhhjdJ1LAGBSeAM5i`.  This will be set if the `TREASURY` header is set when creating the address. */
-      treasury_id?: string;
-      /** @description The address variant, e.g. `internal`. */
-      variant?: string;
-      /** @description Logically account that the address may be in. */
-      account_id?: string;
-      description?: string;
-    };
-    /** Metadata */
-    Metadata: {
-      create_time: components["schemas"]["Timestamp"];
+      rpc?: {
+        /** @description The latest block height, as observable on RPC. */
+        block_height?: number;
+        message?: string;
+        ok?: boolean;
+      };
+      /** @description Last time this was updated. */
       update_time?: components["schemas"]["Timestamp"];
     };
-    /** AddressBalancesPage */
-    AddressBalancesPage: {
-      balances?: components["schemas"]["AddressBalance"][];
-    } & components["schemas"]["Pagination"];
-    /** AddressBalance */
-    AddressBalance: {
-      name: components["schemas"]["AddressBalanceName"];
+    /** Deposit */
+    Deposit: {
+      name?: components["schemas"]["DepositName"];
     } & components["schemas"]["Metadata"] &
-      components["schemas"]["AddressBalanceData"];
-    /**
-     * AddressBalanceName
-     * @example chains/ETH/addresses/0xced92fa7f0797cbc851b48140ae218a0b0d41ce0/balances/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48
-     */
-    AddressBalanceName: string;
-    /** AddressBalanceData */
-    AddressBalanceData: {
-      address_id: string;
-      asset_id: string;
+      components["schemas"]["DepositData"];
+    /** DepositData */
+    DepositData: {
+      /** @description Asset amount as decimal, encoded as string.  This is only set if the *decimals* is known for the asset. */
       amount?: components["schemas"]["Amount"];
+      /** @description The unmodified version of contract in `asset`. */
+      asset_id: string;
       balance: components["schemas"]["Balance"];
-      address?: string;
-      contract?: string;
-    };
-    /**
-     * Balance
-     * @description Base units of an asset as an integer (not adjusted for decimals), encoded as string.
-     * @example 213213432
-     */
-    Balance: string;
-    /**
-     * Transaction
-     * @description This is the same model as from the connector API.
-     */
-    Transaction: {
-      name?: components["schemas"]["TransactionName"];
-    } & components["schemas"]["Metadata"] &
-      components["schemas"]["TransactionData"];
-    /**
-     * TransactionName
-     * @description The name of an transactions consists of its (parent) chain name, its on-chain identifier (usually the 'transaction hash').
-     * @example chains/MATIC/transactions/0x4a0f7a74ba1824504ac7f0dd462e2b287226691828d04fee66cff42aaa6756db
-     */
-    TransactionName: string;
-    /** TransactionData */
-    TransactionData: {
       block: components["schemas"]["Block"];
-      /** @description The transaction's hash. */
-      id: string;
-      fees: components["schemas"]["Fee"][];
-      movements: components["schemas"]["MovementCore"][];
       confirmations: number;
-      /** @description If there was an issue with the transaction, this field will be set. The transaction nevertheless occurred, and the credits and debits were applied, typically just fees. */
       error?: string;
-      /** @description `OUTPUT ONLY`. The transaction's hash. */
-      hash?: string;
-      state?: components["schemas"]["TransactionState"];
+      event?: components["schemas"]["Event"];
       /** @description If the `confirmations` is high enough for this transaction to be considered "final" on the chain, this will be true. */
       final?: boolean;
-      /** @description Cordial Systems identifier for the chain. */
-      chain_id: string;
-    };
-    /**
-     * Block
-     * @example {
-     *       "chain_id": "ETH",
-     *       "id": "0x5e02e3762b09328a3b90f9b8f1caa38c79385bc704fd936173d36cf11bdd88b9",
-     *       "height": 21115105,
-     *       "time": "2023-07-30T011:30:15Z",
-     *       "chain": "chains/ETH",
-     *       "hash": "0x5e02e3762b09328a3b90f9b8f1caa38c79385bc704fd936173d36cf11bdd88b9"
-     *     }
-     */
-    Block: {
-      /** @description Cordial Systems identifier for the chain. */
-      chain_id: string;
-      /** @description The block's hash */
-      id?: string;
-      height?: number;
-      time?: components["schemas"]["Timestamp"];
-      hash?: string;
-    };
-    /**
-     * Fee
-     * @description An amount taken for fees.
-     */
-    Fee: {
-      asset_id: string;
-      /** @description If decimals for asset are available, `balance` field scaled by `decimals` to decimal `Amount`. */
-      amount?: components["schemas"]["Amount"];
-      /** @description The balance of `asset` sent or received by `address`. */
-      balance: components["schemas"]["Balance"];
-      /** @description The asset being transferred. */
-      asset?: components["schemas"]["AssetName"];
-      contract?: string;
-    };
-    /** MovementCore */
-    MovementCore: {
-      asset_id: string;
-      /** @description Index `>=1` of movement within parent transaction */
+      /** @description Address(es) that contributed to sending of this asset */
+      from_ids?: string[];
+      /** @description Index `>=1` of deposit within parent movement. */
       id: number;
-      to: components["schemas"]["AmountChange"][];
-      from: components["schemas"]["AmountChange"][];
-      asset?: components["schemas"]["AssetName"];
-      contract?: string;
+      memo?: string;
+      movement_id: number;
+      state?: components["schemas"]["TransactionState"];
+      /** @description The address that received the asset. */
+      to_id: string;
+      transaction_id: string;
     };
     /**
-     * AmountChange
-     * @description Change in amount for an address that contributes to a given movement.
+     * DepositName
+     * @example chains/SOL/transactions/0xd2d6e66eca10af3db7ac50c48b6c8f9863657d1581f78f11e544c4254553f9f6/movements/1/deposits/1
      */
-    AmountChange: {
-      address_id: string;
-      amount?: components["schemas"]["Amount"];
-      /** @description The balance of `asset` sent or received by `address`. */
-      balance: components["schemas"]["Balance"];
-      /** @description Address that contributed funds to this movement. */
-      address?: components["schemas"]["AddressName"];
-      subscribed?: boolean;
-      event?: components["schemas"]["Event"];
+    DepositName: string;
+    /** DepositPage */
+    DepositPage: {
+      deposits?: components["schemas"]["Deposit"][];
+    } & components["schemas"]["Pagination"];
+    /** DeprecatedPrice */
+    DeprecatedPrice: {
+      asset_name?: components["schemas"]["AssetName"];
+      price?: number;
+      update_time?: components["schemas"]["Timestamp"];
     };
     /**
      * Event
@@ -964,112 +895,51 @@ export interface components {
      */
     EventVariant: "native" | "token" | "internal" | "fee";
     /**
-     * TransactionState
-     * @description **mining**: The transaction is not yet confirmed by any miner or validator on the network (in the "mempool").
-     *
-     *     **succeeded** The transaction is validated by at least one validator or miner (in a "block").
-     *
-     *     **failed** The transaction failed or reverted.  The network refused to persist the transaction's changes, but the sender paid fees.
-     * @enum {string}
+     * Fee
+     * @description An amount taken for fees.
      */
-    TransactionState: "mining" | "succeeded" | "failed";
-    AddressTransactionPage: {
-      address?: components["schemas"]["AddressName"];
-      transactions?: components["schemas"]["Transaction"][];
-    } & components["schemas"]["Pagination"];
-    /** TransactionPage */
-    TransactionPage: {
-      transactions?: components["schemas"]["Transaction"][];
-    } & components["schemas"]["Pagination"];
-    /** DepositPage */
-    DepositPage: {
-      deposits?: components["schemas"]["Deposit"][];
-    } & components["schemas"]["Pagination"];
-    /** Deposit */
-    Deposit: {
-      name?: components["schemas"]["DepositName"];
-    } & components["schemas"]["Metadata"] &
-      components["schemas"]["DepositData"];
-    /**
-     * DepositName
-     * @example chains/SOL/transactions/0xd2d6e66eca10af3db7ac50c48b6c8f9863657d1581f78f11e544c4254553f9f6/movements/1/deposits/1
-     */
-    DepositName: string;
-    /** DepositData */
-    DepositData: {
-      block: components["schemas"]["Block"];
-      transaction_id: string;
-      movement_id: number;
-      /** @description Index `>=1` of deposit within parent movement. */
-      id: number;
-      /** @description The unmodified version of contract in `asset`. */
-      asset_id: string;
-      /** @description Asset amount as decimal, encoded as string.  This is only set if the *decimals* is known for the asset. */
+    Fee: {
+      /** @description If decimals for asset are available, `balance` field scaled by `decimals` to decimal `Amount`. */
       amount?: components["schemas"]["Amount"];
+      /** @description The asset being transferred. */
+      asset?: components["schemas"]["AssetName"];
+      asset_id: string;
+      /** @description The balance of `asset` sent or received by `address`. */
       balance: components["schemas"]["Balance"];
-      /** @description Address(es) that contributed to sending of this asset */
-      from_ids?: string[];
-      /** @description The address that received the asset. */
-      to_id: string;
-      confirmations: number;
-      error?: string;
-      state?: components["schemas"]["TransactionState"];
-      /** @description If the `confirmations` is high enough for this transaction to be considered "final" on the chain, this will be true. */
-      final?: boolean;
-      event?: components["schemas"]["Event"];
-      memo?: string;
+      contract?: string;
     };
-    /** WithdrawalPage */
-    WithdrawalPage: {
-      withdrawals?: components["schemas"]["Withdrawal"][];
-    } & components["schemas"]["Pagination"];
-    /** Withdrawal */
-    Withdrawal: {
-      name?: components["schemas"]["WithdrawalName"];
-    } & components["schemas"]["Metadata"] &
-      components["schemas"]["WithdrawalData"];
     /**
-     * WithdrawalName
-     * @example chains/ETH/transactions/0xd2d6e66eca10af3db7ac50c48b6c8f9863657d1581f78f11e544c4254553f9f6/movements/1/withdrawals/1
+     * Ids
+     * @description Identifiers assigned to chains or assets by external systems.
      */
-    WithdrawalName: string;
-    /** WithdrawalData */
-    WithdrawalData: {
-      block: components["schemas"]["Block"];
-      transaction_id: string;
-      movement_id: number;
-      /** @description Index `>=1` of withdrawal within parent movement. */
-      id: number;
-      asset_id: string;
-      /** @description Asset amount as decimal, encoded as string.  This is only set if the *decimals* is known for the asset. */
-      amount?: components["schemas"]["Amount"];
-      balance?: components["schemas"]["Balance"];
-      /** @description The address that sent the asset. */
-      from_id: string;
-      /** @description The address(es) that have received at least some of this asset. */
-      to_ids?: string[];
-      confirmations: number;
-      error?: string;
-      state?: components["schemas"]["TransactionState"];
-      /** @description If the `confirmations` is high enough for this transaction to be considered "final" on the chain, this will be true. */
-      final?: boolean;
-      event?: components["schemas"]["Event"];
-      memo?: string;
+    Ids: {
+      coingecko?: string;
+      coinmarketcap?: number;
+      /** @description From "Header", "DTI" */
+      dti?: string;
+      /** @description From "UnderlyingAssetExternalIdentifiers", "UnderlyingAssetExternalIdentifierValue" where "UnderlyingAssetExternalIdentifierType" is "ISIN" */
+      isin?: string;
     };
-    /** MovementPage */
-    MovementPage: {
-      movements?: components["schemas"]["Movement"][];
-    } & components["schemas"]["Pagination"];
+    /** Metadata */
+    Metadata: {
+      create_time: components["schemas"]["Timestamp"];
+      update_time?: components["schemas"]["Timestamp"];
+    };
     /** Movement */
     Movement: {
       name?: components["schemas"]["MovementName"];
     } & components["schemas"]["Metadata"] &
       components["schemas"]["MovementData"];
-    /**
-     * MovementName
-     * @example chains/SOL/transactions/0xd2d6e66eca10af3db7ac50c48b6c8f9863657d1581f78f11e544c4254553f9f6/movements/1
-     */
-    MovementName: string;
+    /** MovementCore */
+    MovementCore: {
+      asset?: components["schemas"]["AssetName"];
+      asset_id: string;
+      contract?: string;
+      from: components["schemas"]["AmountChange"][];
+      /** @description Index `>=1` of movement within parent transaction */
+      id: number;
+      to: components["schemas"]["AmountChange"][];
+    };
     /**
      * MovementData
      * @example {
@@ -1099,37 +969,258 @@ export interface components {
         confirmations: number;
         error?: string;
       } & {
-        state?: components["schemas"]["TransactionState"];
+        event?: components["schemas"]["Event"];
         /** @description If the `confirmations` is high enough for this transaction to be considered "final" on the chain, this will be true. */
         final?: boolean;
-        event?: components["schemas"]["Event"];
         memo?: string;
+        state?: components["schemas"]["TransactionState"];
       };
+    /**
+     * MovementName
+     * @example chains/SOL/transactions/0xd2d6e66eca10af3db7ac50c48b6c8f9863657d1581f78f11e544c4254553f9f6/movements/1
+     */
+    MovementName: string;
+    /** MovementPage */
+    MovementPage: {
+      movements?: components["schemas"]["Movement"][];
+    } & components["schemas"]["Pagination"];
+    /** Names */
+    Names: {
+      coingecko?: string;
+      coinmarketcap?: string;
+      /** @description From "Informative", "LongName" */
+      dti?: string;
+    };
+    /** Pagination */
+    Pagination: {
+      /** @description `OPTIONAL`. If set, there are more pages, which can be requested by repeating the `List` request, setting this value as query parameter `page_token`. */
+      next_page_token?: string;
+    };
+    /** Price */
+    Price: {
+      time: components["schemas"]["Timestamp"];
+      usd: components["schemas"]["Amount"];
+    };
+    /** Prices */
+    Prices: {
+      coingecko?: components["schemas"]["Price"];
+      coinmarketcap?: components["schemas"]["Price"];
+    };
+    /**
+     * Symbols
+     * @description Symbols assigned to chains or assets by external systems.
+     */
+    Symbols: {
+      coingecko?: string;
+      coinmarketcap?: string;
+      /** @description From "Informative", "ShortName" */
+      dti?: string;
+    };
+    /**
+     * Timestamp
+     * @description Seconds since UNIX epoch, encoded as UTC timestamp (ending in Z).
+     * @example 2023-07-30T011:30:15Z
+     */
+    Timestamp: string;
+    /**
+     * Transaction
+     * @description This is the same model as from the connector API.
+     */
+    Transaction: {
+      name?: components["schemas"]["TransactionName"];
+    } & components["schemas"]["Metadata"] &
+      components["schemas"]["TransactionData"];
+    /** TransactionData */
+    TransactionData: {
+      block: components["schemas"]["Block"];
+      /** @description Cordial Systems identifier for the chain. */
+      chain_id: string;
+      confirmations: number;
+      /** @description If there was an issue with the transaction, this field will be set. The transaction nevertheless occurred, and the credits and debits were applied, typically just fees. */
+      error?: string;
+      fees: components["schemas"]["Fee"][];
+      /** @description If the `confirmations` is high enough for this transaction to be considered "final" on the chain, this will be true. */
+      final?: boolean;
+      /** @description `OUTPUT ONLY`. The transaction's hash. */
+      hash?: string;
+      /** @description The transaction's hash. */
+      id: string;
+      movements: components["schemas"]["MovementCore"][];
+      state?: components["schemas"]["TransactionState"];
+    };
+    /**
+     * TransactionName
+     * @description The name of an transactions consists of its (parent) chain name, its on-chain identifier (usually the 'transaction hash').
+     * @example chains/MATIC/transactions/0x4a0f7a74ba1824504ac7f0dd462e2b287226691828d04fee66cff42aaa6756db
+     */
+    TransactionName: string;
+    /** TransactionPage */
+    TransactionPage: {
+      transactions?: components["schemas"]["Transaction"][];
+    } & components["schemas"]["Pagination"];
+    /**
+     * TransactionState
+     * @description **mining**: The transaction is not yet confirmed by any miner or validator on the network (in the "mempool").
+     *
+     *     **succeeded** The transaction is validated by at least one validator or miner (in a "block").
+     *
+     *     **failed** The transaction failed or reverted.  The network refused to persist the transaction's changes, but the sender paid fees.
+     * @enum {string}
+     */
+    TransactionState: "mining" | "succeeded" | "failed";
+    /** Withdrawal */
+    Withdrawal: {
+      name?: components["schemas"]["WithdrawalName"];
+    } & components["schemas"]["Metadata"] &
+      components["schemas"]["WithdrawalData"];
+    /** WithdrawalData */
+    WithdrawalData: {
+      /** @description Asset amount as decimal, encoded as string.  This is only set if the *decimals* is known for the asset. */
+      amount?: components["schemas"]["Amount"];
+      asset_id: string;
+      balance?: components["schemas"]["Balance"];
+      block: components["schemas"]["Block"];
+      confirmations: number;
+      error?: string;
+      event?: components["schemas"]["Event"];
+      /** @description If the `confirmations` is high enough for this transaction to be considered "final" on the chain, this will be true. */
+      final?: boolean;
+      /** @description The address that sent the asset. */
+      from_id: string;
+      /** @description Index `>=1` of withdrawal within parent movement. */
+      id: number;
+      memo?: string;
+      movement_id: number;
+      state?: components["schemas"]["TransactionState"];
+      /** @description The address(es) that have received at least some of this asset. */
+      to_ids?: string[];
+      transaction_id: string;
+    };
+    /**
+     * WithdrawalName
+     * @example chains/ETH/transactions/0xd2d6e66eca10af3db7ac50c48b6c8f9863657d1581f78f11e544c4254553f9f6/movements/1/withdrawals/1
+     */
+    WithdrawalName: string;
+    /** WithdrawalPage */
+    WithdrawalPage: {
+      withdrawals?: components["schemas"]["Withdrawal"][];
+    } & components["schemas"]["Pagination"];
   };
   responses: never;
   parameters: {
     filter: string;
-    /** @description Pagination token returned from the previous request */
-    page_token: string;
+    order_by: string;
     /** @description Amount of elements to return per page */
     page_size: number;
-    order_by: string;
+    /** @description Pagination token returned from the previous request */
+    page_token: string;
   };
   requestBodies: never;
   headers: never;
   pathItems: never;
 }
+export type Address = components["schemas"]["Address"];
+export type AddressBalance = components["schemas"]["AddressBalance"];
+export type AddressBalanceData = components["schemas"]["AddressBalanceData"];
+export type AddressBalanceName = components["schemas"]["AddressBalanceName"];
+export type AddressBalancesPage = components["schemas"]["AddressBalancesPage"];
+export type AddressData = components["schemas"]["AddressData"];
+export type AddressName = components["schemas"]["AddressName"];
+export type AddressPage = components["schemas"]["AddressPage"];
+export type AddressTransactionPage =
+  components["schemas"]["AddressTransactionPage"];
+export type Amount = components["schemas"]["Amount"];
+export type AmountChange = components["schemas"]["AmountChange"];
+export type Asset = components["schemas"]["Asset"];
+export type AssetData = components["schemas"]["AssetData"];
+export type AssetName = components["schemas"]["AssetName"];
+export type AssetPage = components["schemas"]["AssetPage"];
+export type Balance = components["schemas"]["Balance"];
+export type Block = components["schemas"]["Block"];
+export type Chain = components["schemas"]["Chain"];
+export type ChainData = components["schemas"]["ChainData"];
+export type ChainName = components["schemas"]["ChainName"];
+export type ChainPage = components["schemas"]["ChainPage"];
+export type ChainStatus = components["schemas"]["ChainStatus"];
+export type Deposit = components["schemas"]["Deposit"];
+export type DepositData = components["schemas"]["DepositData"];
+export type DepositName = components["schemas"]["DepositName"];
+export type DepositPage = components["schemas"]["DepositPage"];
+export type DeprecatedPrice = components["schemas"]["DeprecatedPrice"];
+export type Event = components["schemas"]["Event"];
+export type EventVariant = components["schemas"]["EventVariant"];
+export type Fee = components["schemas"]["Fee"];
+export type Ids = components["schemas"]["Ids"];
+export type Metadata = components["schemas"]["Metadata"];
+export type Movement = components["schemas"]["Movement"];
+export type MovementCore = components["schemas"]["MovementCore"];
+export type MovementData = components["schemas"]["MovementData"];
+export type MovementName = components["schemas"]["MovementName"];
+export type MovementPage = components["schemas"]["MovementPage"];
+export type Names = components["schemas"]["Names"];
+export type Pagination = components["schemas"]["Pagination"];
+export type Price = components["schemas"]["Price"];
+export type Prices = components["schemas"]["Prices"];
+export type Symbols = components["schemas"]["Symbols"];
+export type Timestamp = components["schemas"]["Timestamp"];
+export type Transaction = components["schemas"]["Transaction"];
+export type TransactionData = components["schemas"]["TransactionData"];
+export type TransactionName = components["schemas"]["TransactionName"];
+export type TransactionPage = components["schemas"]["TransactionPage"];
+export type TransactionState = components["schemas"]["TransactionState"];
+export type Withdrawal = components["schemas"]["Withdrawal"];
+export type WithdrawalData = components["schemas"]["WithdrawalData"];
+export type WithdrawalName = components["schemas"]["WithdrawalName"];
+export type WithdrawalPage = components["schemas"]["WithdrawalPage"];
+export type ParameterFilter = components["parameters"]["filter"];
+export type ParameterOrderBy = components["parameters"]["order_by"];
+export type ParameterPageSize = components["parameters"]["page_size"];
+export type ParameterPageToken = components["parameters"]["page_token"];
 export type $defs = Record<string, never>;
 export interface operations {
-  "list-assets": {
+  "list-addresses": {
     parameters: {
       query?: {
+        filter?: components["parameters"]["filter"];
+        order_by?: components["parameters"]["order_by"];
         /** @description Amount of elements to return per page */
         page_size?: components["parameters"]["page_size"];
         /** @description Pagination token returned from the previous request */
         page_token?: components["parameters"]["page_token"];
+      };
+      header: {
+        /** @description Requester's identity */
+        Organization: string;
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "*/*"?: never;
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AddressPage"];
+        };
+      };
+    };
+  };
+  "list-assets": {
+    parameters: {
+      query?: {
         filter?: components["parameters"]["filter"];
         order_by?: components["parameters"]["order_by"];
+        /** @description Amount of elements to return per page */
+        page_size?: components["parameters"]["page_size"];
+        /** @description Pagination token returned from the previous request */
+        page_token?: components["parameters"]["page_token"];
       };
       header?: never;
       path?: never;
@@ -1168,13 +1259,18 @@ export interface operations {
       };
     };
   };
-  "get-chain": {
+  "list-balances": {
     parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        chain: string;
+      query?: {
+        filter?: components["parameters"]["filter"];
+        order_by?: components["parameters"]["order_by"];
+        /** @description Amount of elements to return per page */
+        page_size?: components["parameters"]["page_size"];
+        /** @description Pagination token returned from the previous request */
+        page_token?: components["parameters"]["page_token"];
       };
+      header?: never;
+      path?: never;
       cookie?: never;
     };
     requestBody?: never;
@@ -1185,38 +1281,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["Chain"];
-        };
-      };
-    };
-  };
-  "get-chain-status": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        chain: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["ChainStatus"];
-        };
-      };
-      /** @description Service Unavailable */
-      503: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["ChainStatus"];
+          "application/json": components["schemas"]["AddressBalancesPage"];
         };
       };
     };
@@ -1241,28 +1306,16 @@ export interface operations {
       };
     };
   };
-  "list-addresses": {
+  "get-chain": {
     parameters: {
-      query?: {
-        /** @description Amount of elements to return per page */
-        page_size?: components["parameters"]["page_size"];
-        /** @description Pagination token returned from the previous request */
-        page_token?: components["parameters"]["page_token"];
-        filter?: components["parameters"]["filter"];
-        order_by?: components["parameters"]["order_by"];
+      query?: never;
+      header?: never;
+      path: {
+        chain: string;
       };
-      header: {
-        /** @description Requester's identity */
-        Organization: string;
-      };
-      path?: never;
       cookie?: never;
     };
-    requestBody?: {
-      content: {
-        "*/*"?: never;
-      };
-    };
+    requestBody?: never;
     responses: {
       /** @description OK */
       200: {
@@ -1270,7 +1323,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["AddressPage"];
+          "application/json": components["schemas"]["Chain"];
         };
       };
     };
@@ -1280,10 +1333,10 @@ export interface operations {
       query?: {
         filter?: components["parameters"]["filter"];
         order_by?: components["parameters"]["order_by"];
-        /** @description Pagination token returned from the previous request */
-        page_token?: components["parameters"]["page_token"];
         /** @description Amount of elements to return per page */
         page_size?: components["parameters"]["page_size"];
+        /** @description Pagination token returned from the previous request */
+        page_token?: components["parameters"]["page_token"];
       };
       header: {
         /** @description Requester's identity */
@@ -1392,79 +1445,23 @@ export interface operations {
       };
     };
   };
-  "list-balances": {
-    parameters: {
-      query?: {
-        /** @description Pagination token returned from the previous request */
-        page_token?: components["parameters"]["page_token"];
-        /** @description Amount of elements to return per page */
-        page_size?: components["parameters"]["page_size"];
-        filter?: components["parameters"]["filter"];
-        order_by?: components["parameters"]["order_by"];
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["AddressBalancesPage"];
-        };
-      };
-    };
-  };
-  "list-chain-balances": {
-    parameters: {
-      query?: {
-        /** @description Pagination token returned from the previous request */
-        page_token?: components["parameters"]["page_token"];
-        /** @description Amount of elements to return per page */
-        page_size?: components["parameters"]["page_size"];
-        filter?: components["parameters"]["filter"];
-        order_by?: components["parameters"]["order_by"];
-      };
-      header?: never;
-      path: {
-        chain: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["AddressBalancesPage"];
-        };
-      };
-    };
-  };
   "list-address-balances": {
     parameters: {
       query?: {
+        filter?: components["parameters"]["filter"];
+        order_by?: components["parameters"]["order_by"];
         /** @description Amount of elements to return per page */
         page_size?: components["parameters"]["page_size"];
         /** @description Pagination token returned from the previous request */
         page_token?: components["parameters"]["page_token"];
-        filter?: components["parameters"]["filter"];
-        order_by?: components["parameters"]["order_by"];
       };
       header: {
         /** @description Requester's identity */
         Organization: string;
       };
       path: {
-        chain: string;
         address: string;
+        chain: string;
       };
       cookie?: never;
     };
@@ -1486,9 +1483,9 @@ export interface operations {
       query?: never;
       header?: never;
       path: {
-        chain: string;
         address: string;
         asset: string;
+        chain: string;
       };
       cookie?: never;
     };
@@ -1501,6 +1498,209 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["AddressBalance"];
+        };
+      };
+    };
+  };
+  "list-address-deposits": {
+    parameters: {
+      query?: {
+        filter?: components["parameters"]["filter"];
+        order_by?: components["parameters"]["order_by"];
+        /** @description Amount of elements to return per page */
+        page_size?: components["parameters"]["page_size"];
+        /** @description Pagination token returned from the previous request */
+        page_token?: components["parameters"]["page_token"];
+      };
+      header?: never;
+      path: {
+        address: string;
+        chain: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DepositPage"];
+        };
+      };
+    };
+  };
+  "list-address-movements": {
+    parameters: {
+      query?: {
+        filter?: components["parameters"]["filter"];
+        order_by?: components["parameters"]["order_by"];
+        /** @description Amount of elements to return per page */
+        page_size?: components["parameters"]["page_size"];
+        /** @description Pagination token returned from the previous request */
+        page_token?: components["parameters"]["page_token"];
+      };
+      header?: never;
+      path: {
+        address: string;
+        chain: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["MovementPage"];
+        };
+      };
+    };
+  };
+  "list-address-transactions": {
+    parameters: {
+      query?: {
+        filter?: components["parameters"]["filter"];
+        order_by?: components["parameters"]["order_by"];
+        /** @description Amount of elements to return per page */
+        page_size?: components["parameters"]["page_size"];
+        /** @description Pagination token returned from the previous request */
+        page_token?: components["parameters"]["page_token"];
+      };
+      header?: never;
+      path: {
+        address: string;
+        chain: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AddressTransactionPage"];
+        };
+      };
+    };
+  };
+  "list-address-withdrawals": {
+    parameters: {
+      query?: {
+        filter?: components["parameters"]["filter"];
+        order_by?: components["parameters"]["order_by"];
+        /** @description Amount of elements to return per page */
+        page_size?: components["parameters"]["page_size"];
+        /** @description Pagination token returned from the previous request */
+        page_token?: components["parameters"]["page_token"];
+      };
+      header?: never;
+      path: {
+        address: string;
+        chain: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["WithdrawalPage"];
+        };
+      };
+    };
+  };
+  "get-asset": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        asset: string;
+        chain: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Asset"];
+        };
+      };
+    };
+  };
+  "list-chain-balances": {
+    parameters: {
+      query?: {
+        filter?: components["parameters"]["filter"];
+        order_by?: components["parameters"]["order_by"];
+        /** @description Amount of elements to return per page */
+        page_size?: components["parameters"]["page_size"];
+        /** @description Pagination token returned from the previous request */
+        page_token?: components["parameters"]["page_token"];
+      };
+      header?: never;
+      path: {
+        chain: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AddressBalancesPage"];
+        };
+      };
+    };
+  };
+  "get-chain-status": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        chain: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ChainStatus"];
+        };
+      };
+      /** @description Service Unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ChainStatus"];
         };
       };
     };
@@ -1563,43 +1763,14 @@ export interface operations {
       };
     };
   };
-  "list-address-transactions": {
-    parameters: {
-      query?: {
-        /** @description Pagination token returned from the previous request */
-        page_token?: components["parameters"]["page_token"];
-        /** @description Amount of elements to return per page */
-        page_size?: components["parameters"]["page_size"];
-        order_by?: components["parameters"]["order_by"];
-        filter?: components["parameters"]["filter"];
-      };
-      header?: never;
-      path: {
-        chain: string;
-        address: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["AddressTransactionPage"];
-        };
-      };
-    };
-  };
-  "get-asset": {
+  "get-movement": {
     parameters: {
       query?: never;
       header?: never;
       path: {
         chain: string;
-        asset: string;
+        hash: string;
+        movement: string;
       };
       cookie?: never;
     };
@@ -1611,61 +1782,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["Asset"];
-        };
-      };
-    };
-  };
-  "list-transactions": {
-    parameters: {
-      query?: {
-        /** @description Pagination token returned from the previous request */
-        page_token?: components["parameters"]["page_token"];
-        /** @description Amount of elements to return per page */
-        page_size?: components["parameters"]["page_size"];
-        filter?: components["parameters"]["filter"];
-        order_by?: components["parameters"]["order_by"];
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["TransactionPage"];
-        };
-      };
-    };
-  };
-  "list-deposits": {
-    parameters: {
-      query?: {
-        /** @description Amount of elements to return per page */
-        page_size?: components["parameters"]["page_size"];
-        /** @description Pagination token returned from the previous request */
-        page_token?: components["parameters"]["page_token"];
-        order_by?: components["parameters"]["order_by"];
-        filter?: components["parameters"]["filter"];
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["DepositPage"];
+          "application/json": components["schemas"]["Movement"];
         };
       };
     };
@@ -1676,9 +1793,9 @@ export interface operations {
       header?: never;
       path: {
         chain: string;
+        deposit: string;
         hash: string;
         movement: string;
-        deposit: string;
       };
       cookie?: never;
     };
@@ -1691,93 +1808,6 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["Deposit"];
-        };
-      };
-    };
-  };
-  "list-address-deposits": {
-    parameters: {
-      query?: {
-        /** @description Amount of elements to return per page */
-        page_size?: components["parameters"]["page_size"];
-        /** @description Pagination token returned from the previous request */
-        page_token?: components["parameters"]["page_token"];
-        order_by?: components["parameters"]["order_by"];
-        filter?: components["parameters"]["filter"];
-      };
-      header?: never;
-      path: {
-        chain: string;
-        address: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["DepositPage"];
-        };
-      };
-    };
-  };
-  "list-withdrawals": {
-    parameters: {
-      query?: {
-        order_by?: components["parameters"]["order_by"];
-        filter?: components["parameters"]["filter"];
-        /** @description Pagination token returned from the previous request */
-        page_token?: components["parameters"]["page_token"];
-        /** @description Amount of elements to return per page */
-        page_size?: components["parameters"]["page_size"];
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["WithdrawalPage"];
-        };
-      };
-    };
-  };
-  "list-address-withdrawals": {
-    parameters: {
-      query?: {
-        order_by?: components["parameters"]["order_by"];
-        filter?: components["parameters"]["filter"];
-        /** @description Pagination token returned from the previous request */
-        page_token?: components["parameters"]["page_token"];
-        /** @description Amount of elements to return per page */
-        page_size?: components["parameters"]["page_size"];
-      };
-      header?: never;
-      path: {
-        chain: string;
-        address: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["WithdrawalPage"];
         };
       };
     };
@@ -1807,15 +1837,42 @@ export interface operations {
       };
     };
   };
+  "list-deposits": {
+    parameters: {
+      query?: {
+        filter?: components["parameters"]["filter"];
+        order_by?: components["parameters"]["order_by"];
+        /** @description Amount of elements to return per page */
+        page_size?: components["parameters"]["page_size"];
+        /** @description Pagination token returned from the previous request */
+        page_token?: components["parameters"]["page_token"];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["DepositPage"];
+        };
+      };
+    };
+  };
   "list-movements": {
     parameters: {
       query?: {
-        order_by?: components["parameters"]["order_by"];
         filter?: components["parameters"]["filter"];
-        /** @description Pagination token returned from the previous request */
-        page_token?: components["parameters"]["page_token"];
+        order_by?: components["parameters"]["order_by"];
         /** @description Amount of elements to return per page */
         page_size?: components["parameters"]["page_size"];
+        /** @description Pagination token returned from the previous request */
+        page_token?: components["parameters"]["page_token"];
       };
       header?: never;
       path?: never;
@@ -1834,21 +1891,18 @@ export interface operations {
       };
     };
   };
-  "list-address-movements": {
+  "list-transactions": {
     parameters: {
       query?: {
-        order_by?: components["parameters"]["order_by"];
         filter?: components["parameters"]["filter"];
-        /** @description Pagination token returned from the previous request */
-        page_token?: components["parameters"]["page_token"];
+        order_by?: components["parameters"]["order_by"];
         /** @description Amount of elements to return per page */
         page_size?: components["parameters"]["page_size"];
+        /** @description Pagination token returned from the previous request */
+        page_token?: components["parameters"]["page_token"];
       };
       header?: never;
-      path: {
-        chain: string;
-        address: string;
-      };
+      path?: never;
       cookie?: never;
     };
     requestBody?: never;
@@ -1859,20 +1913,23 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["MovementPage"];
+          "application/json": components["schemas"]["TransactionPage"];
         };
       };
     };
   };
-  "get-movement": {
+  "list-withdrawals": {
     parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        chain: string;
-        hash: string;
-        movement: string;
+      query?: {
+        filter?: components["parameters"]["filter"];
+        order_by?: components["parameters"]["order_by"];
+        /** @description Amount of elements to return per page */
+        page_size?: components["parameters"]["page_size"];
+        /** @description Pagination token returned from the previous request */
+        page_token?: components["parameters"]["page_token"];
       };
+      header?: never;
+      path?: never;
       cookie?: never;
     };
     requestBody?: never;
@@ -1883,7 +1940,7 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["Movement"];
+          "application/json": components["schemas"]["WithdrawalPage"];
         };
       };
     };

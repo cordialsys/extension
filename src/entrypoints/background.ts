@@ -10,7 +10,7 @@ import { browser_action, COLOR } from "@/lib/constants";
 import { onClicked } from "@/lib/click";
 import { Config } from "@/lib/config";
 import { Login, /*loginFirstName,*/ showOff } from "@/lib/login";
-import { onMessage } from "@/lib/handler";
+import { onMessage, Port } from "@/lib/handler";
 
 // figure out what state we're in, and ensure the keys
 // - on
@@ -36,6 +36,7 @@ async function init() {
 }
 
 async function background() {
+  browser.runtime.onConnect.addListener(Port.set);
   await init();
   browser_action.onClicked.addListener(onClicked);
   browser.runtime.onMessage.addListener(onMessage);

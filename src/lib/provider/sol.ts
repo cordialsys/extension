@@ -92,6 +92,10 @@ function newAccount(chain: IdentifierString, addr: string): Sol.Account {
   return Sol.Account.new(addr, pubKey, [chain], features);
 }
 
+async function requestConfig(): Promise<Option<Sol.Config>> {
+  return solRequest("cordial:config") as Promise<Option<Sol.Config>>;
+}
+
 export class Solana implements Wallet {
   #accounts: Sol.Account[] = [];
   // Using Set<EventsListeners[E]> instead of arrays
@@ -130,14 +134,14 @@ export class Solana implements Wallet {
     return features;
   }
 
-  // constructor() {
-  //   // console.log("constructor this", this);
-  // }
+  async config(): Promise<Option<Sol.Config>> {
+    return requestConfig();
+  }
 
   async start(this: Solana) {
     console.log("Initializing Cordial Solana Provider");
     try {
-      const config = (await solRequest("cordial:config")) as Option<Sol.Config>;
+      const config = await requestConfig();
       console.log("Initial SVM config", config);
       if (!config) return;
 

@@ -8,22 +8,25 @@ import BigNumber from "bignumber.js";
 import { hex } from "@scure/base";
 import * as z from "zod";
 
-export type AddressName = components["schemas"]["AddressName"];
-export type Call = components["schemas"]["Call"];
-export type CallPage = components["schemas"]["CallPage"];
-export type CallSignature = components["schemas"]["CallSignature"];
-export type CallTransaction = components["schemas"]["CallTransaction"];
-export type Hex = components["schemas"]["Hex"];
-export type Id = components["schemas"]["Id"];
-export type Signature = components["schemas"]["Signature"];
-export type Transaction = components["schemas"]["Transaction"];
-export type Treasury = components["schemas"]["Treasury"];
-export type UnsignedMessage = components["schemas"]["UnsignedMessage"];
-export type UnsignedEvmTransaction =
-  components["schemas"]["UnsignedEvmTransaction"];
-export type UnsignedSvmTransaction =
-  components["schemas"]["UnsignedSvmTransaction"];
-export type TypedData = components["schemas"]["Eip712TypedData"];
+export type {
+  CallPage,
+  CallSignature,
+  CallTransaction,
+  Hex,
+  Treasury,
+  UnsignedMessage,
+  UnsignedEvmTransaction,
+  UnsignedSvmTransaction,
+  Eip712TypedData as TypedData,
+} from "./treasury.d";
+
+type Schemas = components["schemas"];
+// types that we want to extend need this syntax
+export type AddressName = Schemas["AddressName"];
+export type Call = Schemas["Call"];
+export type Id = Schemas["Id"];
+export type Signature = Schemas["Signature"];
+export type Transaction = Schemas["Transaction"];
 
 const Id = {
   new(s: string): Id {

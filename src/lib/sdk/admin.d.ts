@@ -4,117 +4,6 @@
  */
 
 export interface paths {
-  "/users/{user}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get User */
-    get: operations["get-user"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/users": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List Users */
-    get: operations["list-users"];
-    put?: never;
-    /**
-     * Create User
-     * @description Create a Cordial User account with an unknown password.
-     *
-     *     Must be `admin` in some existing Cordial Organization, to create a user for yourself, visit https://treasury.cordial.systems and sign up.
-     */
-    post: operations["create-user"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/treasuries": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List Treasuries */
-    get: operations["list-treasuries"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/treasuries/{treasury}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get Treasury */
-    get: operations["get-treasury"];
-    /** Update Treasury */
-    put: operations["update-treasury"];
-    /** Create Treasury */
-    post: operations["create-treasury"];
-    /** Delete Treasury */
-    delete: operations["delete-treasury"];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/organizations": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List Organizations */
-    get: operations["list-organizations"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/organizations/{organization}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get Organization */
-    get: operations["get-organization"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
   "/api-keys": {
     parameters: {
       query?: never;
@@ -153,15 +42,32 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/treasuries/{treasury}/nodes": {
+  "/organizations": {
     parameters: {
       query?: never;
       header?: never;
       path?: never;
       cookie?: never;
     };
-    /** Get Nodes */
-    get: operations["get-nodes"];
+    /** List Organizations */
+    get: operations["list-organizations"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/organizations/{organization}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Organization */
+    get: operations["get-organization"];
     put?: never;
     post?: never;
     delete?: never;
@@ -209,6 +115,100 @@ export interface paths {
      *     Must be `admin` in the organization, or leaving yourself.
      */
     post: operations["leave-user"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/treasuries": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Treasuries */
+    get: operations["list-treasuries"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/treasuries/{treasury}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Treasury */
+    get: operations["get-treasury"];
+    /** Update Treasury */
+    put: operations["update-treasury"];
+    /** Create Treasury */
+    post: operations["create-treasury"];
+    /** Delete Treasury */
+    delete: operations["delete-treasury"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/treasuries/{treasury}/nodes": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Nodes */
+    get: operations["get-nodes"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/users": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Users */
+    get: operations["list-users"];
+    put?: never;
+    /**
+     * Create User
+     * @description Create a Cordial User account with an unknown password.
+     *
+     *     Must be `admin` in some existing Cordial Organization, to create a user for yourself, visit https://treasury.cordial.systems and sign up.
+     */
+    post: operations["create-user"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/users/{user}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get User */
+    get: operations["get-user"];
+    put?: never;
+    post?: never;
     delete?: never;
     options?: never;
     head?: never;
@@ -303,53 +303,50 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
   schemas: {
-    /** User */
-    User: {
-      name: components["schemas"]["UserName"];
+    /** ApiKey */
+    ApiKey: {
+      name: components["schemas"]["ApiKeyName"];
     } & components["schemas"]["Metadata"] &
-      components["schemas"]["UserData"];
-    /**
-     * UserName
-     * @example users/2d3qy9rqnOgM1cdeQVxQowgU954
-     */
-    UserName: string;
-    /** Metadata */
-    Metadata: {
-      creator: components["schemas"]["UserName"];
-      create_time: components["schemas"]["Timestamp"];
-      update_time?: components["schemas"]["Timestamp"];
+      components["schemas"]["ApiKeyData"];
+    /** ApiKeyCreate */
+    ApiKeyCreate: {
+      description?: string;
+      organization: components["schemas"]["OrganizationName"];
     };
+    /** ApiKeyData */
+    ApiKeyData: {
+      /** @description This is set once only after creation.  The user will need to record it. */
+      api_key?: string;
+      description?: string;
+      node?: components["schemas"]["NodeName"];
+      organization: components["schemas"]["OrganizationName"];
+      /** @description This is set only after creation. */
+      secret?: string;
+    };
+    /** ApiKeyName */
+    ApiKeyName: string;
+    /** ApiKeyPage */
+    ApiKeyPage: {
+      "api-keys"?: components["schemas"]["ApiKeyName"][];
+    } & components["schemas"]["Pagination"];
     /**
-     * Timestamp
-     * @example {YYYY}-{MM}-{DD}T{HH}:{MM}:{SS}Z
+     * Bak
+     * @example {
+     *       "id": "cold",
+     *       "bak": "age1cxukt95cfede6mmppvvx4tnrkcrw9sslkhwtumlw6xzdmzlml58shn2am6"
+     *     }
      */
-    Timestamp: string;
-    /** UserData */
-    UserData: {
-      first_name?: string;
-      last_name?: string;
-      /** @description Concatenation of first and last name */
-      display_name?: string;
-      primary_email?: components["schemas"]["Email"];
-      emails?: components["schemas"]["Email"][];
-      /** @description `OUTPUT ONLY`. Keys are OrganizationName, values are `admin` or `member` */
-      organizations?: {
-        [key: string]: string;
-      };
+    Bak: {
+      /** @description The age public key. */
+      bak: string;
+      /** @description Optional ID for the backup key. */
+      id?: string;
     };
     /**
      * Email
      * @example john@doe.com
      */
     Email: string;
-    /** UserPage */
-    UserPage: {
-      users?: components["schemas"]["User"][];
-    } & components["schemas"]["Pagination"];
-    /** Pagination */
-    Pagination: {
-      next_page_token?: string;
-    };
     /**
      * Error
      * @description API failure response, with HTTP error codes mapped from the gRPC error code as per https://github.com/googleapis/googleapis/blob/master/google/rpc/code.proto with the following adjustments:
@@ -364,8 +361,8 @@ export interface components {
      */
     Error: {
       code?: components["schemas"]["ErrorCode"];
-      status?: components["schemas"]["ErrorStatus"];
       message?: string;
+      status?: components["schemas"]["ErrorStatus"];
     };
     /**
      * ErrorCode
@@ -377,83 +374,77 @@ export interface components {
      * @description Human-readable version of the ErrorCode, informational only.
      */
     ErrorStatus: string;
-    /** TreasuryPage */
-    TreasuryPage: {
-      treasuries?: components["schemas"]["Treasury"][];
-    } & components["schemas"]["Pagination"];
-    /** Treasury */
-    Treasury: {
-      name: components["schemas"]["TreasuryName"];
-    } & components["schemas"]["Metadata"] &
-      components["schemas"]["TreasuryData"];
-    /** TreasuryName */
-    TreasuryName: string;
-    /** TreasuryData */
-    TreasuryData: {
-      description?: string;
-      organization: components["schemas"]["OrganizationName"];
-      api?: components["schemas"]["Url"];
-      initial_version?: string;
-      size?: number;
-      network?: string;
-      software?: string;
-      variant: components["schemas"]["TreasuryVariant"];
-      /** @description For hosted Treasuries, this is the ID of the enclave cluster that the treasury is hosted on. */
-      host_id?: string;
-      /** @description Output only once if the treasury is `hosted` and newly created. */
-      invites?: components["schemas"]["Invite"][];
-      /** @description Optional, set of backup keys used when creating a `hosted` treasury. */
-      baks?: components["schemas"]["Bak"][];
+    /**
+     * Extension
+     * @description Extension configuration
+     */
+    Extension: {
+      config?: components["schemas"]["ExtensionConfig"];
+      revision: string;
     };
-    /**
-     * OrganizationName
-     * @example organizations/2d3s5YCcWatWNxpj80TO4R9TSuC
-     */
-    OrganizationName: string;
-    /**
-     * Url
-     * @description Valid URL
-     */
-    Url: string;
-    /**
-     * TreasuryVariant
-     * @enum {string}
-     */
-    TreasuryVariant: "self-hosted" | "co-hosted" | "hosted";
+    /** ExtensionConfig */
+    ExtensionConfig: {
+      addresses: string[];
+      origins: string[];
+      treasury: components["schemas"]["ExtensionTreasury"];
+    };
+    /** ExtensionTreasury */
+    ExtensionTreasury: {
+      name: string;
+      url: string;
+    };
     /** Invite */
     Invite: {
-      /** @description User ID on the treasury instance. */
-      user?: string;
-      /** @description The user's ID on single sign on. */
-      sso?: string;
       /** @description The secret invite for the user to enroll into the Treasury. */
       code?: string;
+      /** @description The user's ID on single sign on. */
+      sso?: string;
+      /** @description User ID on the treasury instance. */
+      user?: string;
+    };
+    /** Keys */
+    Keys: {
+      engine: {
+        identity: string;
+      };
+      node: {
+        identity: string;
+      };
+      signer: {
+        identity: string;
+        recipient: string;
+      };
+    };
+    /** Metadata */
+    Metadata: {
+      create_time: components["schemas"]["Timestamp"];
+      creator: components["schemas"]["UserName"];
+      update_time?: components["schemas"]["Timestamp"];
+    };
+    /** Node */
+    Node: {
+      name: components["schemas"]["NodeName"];
+    } & components["schemas"]["Metadata"] &
+      components["schemas"]["NodeData"];
+    /** NodeData */
+    NodeData: {
+      baks?: components["schemas"]["Bak"][];
+      connector: boolean;
+      creator: string;
+      description?: string;
+      host: string;
+      keys?: components["schemas"]["Keys"];
+      port?: number;
+      updater?: string;
     };
     /**
-     * Bak
-     * @example {
-     *       "id": "cold",
-     *       "bak": "age1cxukt95cfede6mmppvvx4tnrkcrw9sslkhwtumlw6xzdmzlml58shn2am6"
-     *     }
+     * NodeName
+     * @example treasuries/akiWPZUk9P8CFgsVoS4ce1/nodes/1
      */
-    Bak: {
-      /** @description Optional ID for the backup key. */
-      id?: string;
-      /** @description The age public key. */
-      bak: string;
-    };
-    /** TreasuryCreate */
-    TreasuryCreate: {
-      mainnet?: boolean;
-      description?: string;
-      organization?: components["schemas"]["OrganizationName"];
-      api?: string;
-      initial_version?: string;
-      size?: number;
-    };
-    /** OrganizationPage */
-    OrganizationPage: {
-      organizations?: components["schemas"]["Organization"][];
+    NodeName: string;
+    /** NodePage */
+    NodePage: {
+      nodes?: components["schemas"]["Node"][];
     } & components["schemas"]["Pagination"];
     /** Organization */
     Organization: {
@@ -475,16 +466,29 @@ export interface components {
      */
     OrganizationData: {
       display_name?: string;
-      slug?: string;
       /** @description `OUTPUT ONLY`. Keys are email domains, values signify if users with verified matching email domains may join the organization. */
       domains?: {
         [key: string]: boolean;
       };
+      permissions?: components["schemas"]["Permission"][];
+      slug?: string;
       /** @description `OUTPUT ONLY`. Keys are UserName, values are `admin` or `member`. */
       users?: {
         [key: string]: string;
       };
-      permissions?: components["schemas"]["Permission"][];
+    };
+    /**
+     * OrganizationName
+     * @example organizations/2d3s5YCcWatWNxpj80TO4R9TSuC
+     */
+    OrganizationName: string;
+    /** OrganizationPage */
+    OrganizationPage: {
+      organizations?: components["schemas"]["Organization"][];
+    } & components["schemas"]["Pagination"];
+    /** Pagination */
+    Pagination: {
+      next_page_token?: string;
     };
     /**
      * Permission
@@ -492,70 +496,6 @@ export interface components {
      * @constant
      */
     Permission: "full-access";
-    /** ApiKeyPage */
-    ApiKeyPage: {
-      "api-keys"?: components["schemas"]["ApiKeyName"][];
-    } & components["schemas"]["Pagination"];
-    /** ApiKeyName */
-    ApiKeyName: string;
-    /** ApiKeyCreate */
-    ApiKeyCreate: {
-      description?: string;
-      organization: components["schemas"]["OrganizationName"];
-    };
-    /** ApiKey */
-    ApiKey: {
-      name: components["schemas"]["ApiKeyName"];
-    } & components["schemas"]["Metadata"] &
-      components["schemas"]["ApiKeyData"];
-    /** ApiKeyData */
-    ApiKeyData: {
-      description?: string;
-      organization: components["schemas"]["OrganizationName"];
-      /** @description This is set only after creation. */
-      secret?: string;
-      node?: components["schemas"]["NodeName"];
-      /** @description This is set once only after creation.  The user will need to record it. */
-      api_key?: string;
-    };
-    /**
-     * NodeName
-     * @example treasuries/akiWPZUk9P8CFgsVoS4ce1/nodes/1
-     */
-    NodeName: string;
-    /** NodePage */
-    NodePage: {
-      nodes?: components["schemas"]["Node"][];
-    } & components["schemas"]["Pagination"];
-    /** Node */
-    Node: {
-      name: components["schemas"]["NodeName"];
-    } & components["schemas"]["Metadata"] &
-      components["schemas"]["NodeData"];
-    /** NodeData */
-    NodeData: {
-      host: string;
-      port?: number;
-      baks?: components["schemas"]["Bak"][];
-      description?: string;
-      keys?: components["schemas"]["Keys"];
-      creator: string;
-      updater?: string;
-      connector: boolean;
-    };
-    /** Keys */
-    Keys: {
-      node: {
-        identity: string;
-      };
-      engine: {
-        identity: string;
-      };
-      signer: {
-        identity: string;
-        recipient: string;
-      };
-    };
     /**
      * Role
      * @description User role in an organization.
@@ -567,24 +507,84 @@ export interface components {
      */
     Role: "admin" | "anon" | "member";
     /**
-     * Extension
-     * @description Extension configuration
+     * Timestamp
+     * @example {YYYY}-{MM}-{DD}T{HH}:{MM}:{SS}Z
      */
-    Extension: {
-      revision: string;
-      config?: components["schemas"]["ExtensionConfig"];
+    Timestamp: string;
+    /** Treasury */
+    Treasury: {
+      name: components["schemas"]["TreasuryName"];
+    } & components["schemas"]["Metadata"] &
+      components["schemas"]["TreasuryData"];
+    /** TreasuryCreate */
+    TreasuryCreate: {
+      api?: string;
+      description?: string;
+      initial_version?: string;
+      mainnet?: boolean;
+      organization?: components["schemas"]["OrganizationName"];
+      size?: number;
     };
-    /** ExtensionConfig */
-    ExtensionConfig: {
-      addresses: string[];
-      origins: string[];
-      treasury: components["schemas"]["ExtensionTreasury"];
+    /** TreasuryData */
+    TreasuryData: {
+      api?: components["schemas"]["Url"];
+      /** @description Optional, set of backup keys used when creating a `hosted` treasury. */
+      baks?: components["schemas"]["Bak"][];
+      description?: string;
+      /** @description For hosted Treasuries, this is the ID of the enclave cluster that the treasury is hosted on. */
+      host_id?: string;
+      initial_version?: string;
+      /** @description Output only once if the treasury is `hosted` and newly created. */
+      invites?: components["schemas"]["Invite"][];
+      network?: string;
+      organization: components["schemas"]["OrganizationName"];
+      size?: number;
+      software?: string;
+      variant: components["schemas"]["TreasuryVariant"];
     };
-    /** ExtensionTreasury */
-    ExtensionTreasury: {
-      name: string;
-      url: string;
+    /** TreasuryName */
+    TreasuryName: string;
+    /** TreasuryPage */
+    TreasuryPage: {
+      treasuries?: components["schemas"]["Treasury"][];
+    } & components["schemas"]["Pagination"];
+    /**
+     * TreasuryVariant
+     * @enum {string}
+     */
+    TreasuryVariant: "self-hosted" | "co-hosted" | "hosted";
+    /**
+     * Url
+     * @description Valid URL
+     */
+    Url: string;
+    /** User */
+    User: {
+      name: components["schemas"]["UserName"];
+    } & components["schemas"]["Metadata"] &
+      components["schemas"]["UserData"];
+    /** UserData */
+    UserData: {
+      /** @description Concatenation of first and last name */
+      display_name?: string;
+      emails?: components["schemas"]["Email"][];
+      first_name?: string;
+      last_name?: string;
+      /** @description `OUTPUT ONLY`. Keys are OrganizationName, values are `admin` or `member` */
+      organizations?: {
+        [key: string]: string;
+      };
+      primary_email?: components["schemas"]["Email"];
     };
+    /**
+     * UserName
+     * @example users/2d3qy9rqnOgM1cdeQVxQowgU954
+     */
+    UserName: string;
+    /** UserPage */
+    UserPage: {
+      users?: components["schemas"]["User"][];
+    } & components["schemas"]["Pagination"];
   };
   responses: never;
   parameters: never;
@@ -592,47 +592,48 @@ export interface components {
   headers: never;
   pathItems: never;
 }
+export type ApiKey = components["schemas"]["ApiKey"];
+export type ApiKeyCreate = components["schemas"]["ApiKeyCreate"];
+export type ApiKeyData = components["schemas"]["ApiKeyData"];
+export type ApiKeyName = components["schemas"]["ApiKeyName"];
+export type ApiKeyPage = components["schemas"]["ApiKeyPage"];
+export type Bak = components["schemas"]["Bak"];
+export type Email = components["schemas"]["Email"];
+export type Error = components["schemas"]["Error"];
+export type ErrorCode = components["schemas"]["ErrorCode"];
+export type ErrorStatus = components["schemas"]["ErrorStatus"];
+export type Extension = components["schemas"]["Extension"];
+export type ExtensionConfig = components["schemas"]["ExtensionConfig"];
+export type ExtensionTreasury = components["schemas"]["ExtensionTreasury"];
+export type Invite = components["schemas"]["Invite"];
+export type Keys = components["schemas"]["Keys"];
+export type Metadata = components["schemas"]["Metadata"];
+export type Node = components["schemas"]["Node"];
+export type NodeData = components["schemas"]["NodeData"];
+export type NodeName = components["schemas"]["NodeName"];
+export type NodePage = components["schemas"]["NodePage"];
+export type Organization = components["schemas"]["Organization"];
+export type OrganizationData = components["schemas"]["OrganizationData"];
+export type OrganizationName = components["schemas"]["OrganizationName"];
+export type OrganizationPage = components["schemas"]["OrganizationPage"];
+export type Pagination = components["schemas"]["Pagination"];
+export type Permission = components["schemas"]["Permission"];
+export type Role = components["schemas"]["Role"];
+export type Timestamp = components["schemas"]["Timestamp"];
+export type Treasury = components["schemas"]["Treasury"];
+export type TreasuryCreate = components["schemas"]["TreasuryCreate"];
+export type TreasuryData = components["schemas"]["TreasuryData"];
+export type TreasuryName = components["schemas"]["TreasuryName"];
+export type TreasuryPage = components["schemas"]["TreasuryPage"];
+export type TreasuryVariant = components["schemas"]["TreasuryVariant"];
+export type Url = components["schemas"]["Url"];
+export type User = components["schemas"]["User"];
+export type UserData = components["schemas"]["UserData"];
+export type UserName = components["schemas"]["UserName"];
+export type UserPage = components["schemas"]["UserPage"];
 export type $defs = Record<string, never>;
 export interface operations {
-  "get-user": {
-    parameters: {
-      query?: {
-        /** @description fetch organizations */
-        organizations?: boolean;
-      };
-      header?: never;
-      path: {
-        user: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["User"];
-        };
-      };
-      /** @description Forbidden */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-      /** @description Not Found */
-      404: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  "list-users": {
+  "list-api-keys": {
     parameters: {
       query?: {
         /** @description AIP-160 filter */
@@ -653,19 +654,12 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["UserPage"];
+          "application/json": components["schemas"]["ApiKeyPage"];
         };
-      };
-      /** @description Forbidden */
-      403: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
       };
     };
   };
-  "create-user": {
+  "create-api-key": {
     parameters: {
       query?: never;
       header?: never;
@@ -674,10 +668,108 @@ export interface operations {
     };
     requestBody?: {
       content: {
+        "application/json": components["schemas"]["ApiKeyCreate"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiKey"];
+        };
+      };
+    };
+  };
+  "get-api-key": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        "api-key": string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ApiKey"];
+        };
+      };
+    };
+  };
+  "list-organizations": {
+    parameters: {
+      query?: {
+        /** @description AIP-160 filter */
+        filter?: string;
+      };
+      header?: {
+        /** @description Optional comma separated list of organization IDs. Only resources in these organizations will be returned. */
+        Organization?: string;
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OrganizationPage"];
+        };
+      };
+    };
+  };
+  "get-organization": {
+    parameters: {
+      query?: {
+        /** @description fetch users */
+        users?: boolean;
+      };
+      header?: never;
+      path: {
+        organization: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Organization"];
+        };
+      };
+    };
+  };
+  "join-user": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        organization: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
         "application/json": {
-          email?: string;
-          first_name?: string;
-          last_name?: string;
+          role?: components["schemas"]["Role"];
+          user?: components["schemas"]["UserName"];
         };
       };
     };
@@ -688,10 +780,45 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["User"];
+          "application/json": components["schemas"]["Organization"];
         };
       };
-      /** @description The user was created, but the DB did not update in time. */
+      /** @description The organization was updated, but the DB did not update in time. */
+      504: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  "leave-user": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        organization: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["UserName"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Organization"];
+        };
+      };
+      /** @description The organization was updated, but the DB did not update in time. */
       504: {
         headers: {
           [name: string]: unknown;
@@ -709,10 +836,10 @@ export interface operations {
         filter?: string;
       };
       header?: {
-        /** @description Optional comma separated list of organization IDs. Only resources in these organizations will be returned. */
-        Organization?: string;
         /** @description Bear token */
         Authorization?: string;
+        /** @description Optional comma separated list of organization IDs. Only resources in these organizations will be returned. */
+        Organization?: string;
       };
       path?: never;
       cookie?: never;
@@ -825,129 +952,6 @@ export interface operations {
       };
     };
   };
-  "list-organizations": {
-    parameters: {
-      query?: {
-        /** @description AIP-160 filter */
-        filter?: string;
-      };
-      header?: {
-        /** @description Optional comma separated list of organization IDs. Only resources in these organizations will be returned. */
-        Organization?: string;
-      };
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["OrganizationPage"];
-        };
-      };
-    };
-  };
-  "get-organization": {
-    parameters: {
-      query?: {
-        /** @description fetch users */
-        users?: boolean;
-      };
-      header?: never;
-      path: {
-        organization: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Organization"];
-        };
-      };
-    };
-  };
-  "list-api-keys": {
-    parameters: {
-      query?: {
-        /** @description AIP-160 filter */
-        filter?: string;
-      };
-      header?: {
-        /** @description Optional comma separated list of organization IDs. Only resources in these organizations will be returned. */
-        Organization?: string;
-      };
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["ApiKeyPage"];
-        };
-      };
-    };
-  };
-  "create-api-key": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["ApiKeyCreate"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["ApiKey"];
-        };
-      };
-    };
-  };
-  "get-api-key": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        "api-key": string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["ApiKey"];
-        };
-      };
-    };
-  };
   "get-nodes": {
     parameters: {
       query?: never;
@@ -970,20 +974,52 @@ export interface operations {
       };
     };
   };
-  "join-user": {
+  "list-users": {
+    parameters: {
+      query?: {
+        /** @description AIP-160 filter */
+        filter?: string;
+      };
+      header?: {
+        /** @description Optional comma separated list of organization IDs. Only resources in these organizations will be returned. */
+        Organization?: string;
+      };
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["UserPage"];
+        };
+      };
+      /** @description Forbidden */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  "create-user": {
     parameters: {
       query?: never;
       header?: never;
-      path: {
-        organization: string;
-      };
+      path?: never;
       cookie?: never;
     };
     requestBody?: {
       content: {
         "application/json": {
-          user?: components["schemas"]["UserName"];
-          role?: components["schemas"]["Role"];
+          email?: string;
+          first_name?: string;
+          last_name?: string;
         };
       };
     };
@@ -994,10 +1030,10 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["Organization"];
+          "application/json": components["schemas"]["User"];
         };
       };
-      /** @description The organization was updated, but the DB did not update in time. */
+      /** @description The user was created, but the DB did not update in time. */
       504: {
         headers: {
           [name: string]: unknown;
@@ -1008,38 +1044,41 @@ export interface operations {
       };
     };
   };
-  "leave-user": {
+  "get-user": {
     parameters: {
-      query?: never;
+      query?: {
+        /** @description fetch organizations */
+        organizations?: boolean;
+      };
       header?: never;
       path: {
-        organization: string;
+        user: string;
       };
       cookie?: never;
     };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["UserName"];
-      };
-    };
+    requestBody?: never;
     responses: {
-      /** @description OK */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["Organization"];
+          "application/json": components["schemas"]["User"];
         };
       };
-      /** @description The organization was updated, but the DB did not update in time. */
-      504: {
+      /** @description Forbidden */
+      403: {
         headers: {
           [name: string]: unknown;
         };
-        content: {
-          "application/json": components["schemas"]["Error"];
+        content?: never;
+      };
+      /** @description Not Found */
+      404: {
+        headers: {
+          [name: string]: unknown;
         };
+        content?: never;
       };
     };
   };
@@ -1061,9 +1100,9 @@ export interface operations {
         };
         content: {
           "application/json": {
+            display_name?: string;
             first_name?: string;
             last_name?: string;
-            display_name?: string;
             primary_email?: string;
           };
         };

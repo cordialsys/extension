@@ -20,6 +20,14 @@ export const Nonce = {
 export type Provider = "cordial" | "ETH" | "SOL";
 export type Params = unknown[] | object;
 
+// as opposed to Response<T, E>, which is in response to a request
+export interface Broadcast<T = unknown> {
+  provider: Provider;
+  kind: "cordial:extension:broadcast";
+  method: string;
+  value: T;
+}
+
 // Note that "provider" and the prefix of "method" are somewhat redundant.
 // However... the wallet standard also applies to Ethereum, so it would be
 // possible for some dapps to use the "SOL" provider (which would then have
@@ -52,6 +60,7 @@ export const Request = {
 
 // export interface EthProviderRequest extends ProviderRequest, Eth.Request {}
 
+// as opposed to Broadcast<T>, which is not in response to a request
 export interface Response<T = unknown, E = unknown> {
   header: Header;
   kind: "cordial:extension:response";

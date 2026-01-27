@@ -10,7 +10,7 @@ are thrown when rejecting the promise
 */
 
 import superjson from "superjson";
-import { Nonce, Params, Provider, Request, Response } from "./types";
+import { Broadcast, Nonce, Params, Provider, Request, Response } from "./types";
 
 // Map object keys are compared by reference (object identity), not value
 // Currently, Nonce is the primitive type string so it works.
@@ -88,9 +88,21 @@ function relayResponse(responseJson: string) {
   window.postMessage(response);
 }
 
-export function response(event: MessageEvent<Response>) {
-  const response: Response = event.data;
-  if (response.kind !== "cordial:extension:response") return;
+export function message(event: MessageEvent<Broadcast | Response>) {
+  const data: Broadcast | Response = event.data;
+  switch (data.kind) {
+    case "cordial:extension:broadcast":
+      return broadcast(data);
+    case "cordial:extension:response":
+      return response(data);
+  }
+}
+
+export function broadcast(broadcast: Broadcast) {
+  console.log("received broadcast in app", broadcast);
+}
+
+export function response(response: Response) {
   const header = response.header;
   const id = header.id;
   const provider = header.provider;
@@ -113,4 +125,10 @@ export function response(event: MessageEvent<Response>) {
     console.error(log, result.error);
     reject(result.error);
   }
+}
+
+export function relayBroadcast(broadcastJson: string) {
+  const broadcast: Broadcast = superjson.parse(broadcastJson);
+  console.log("received broadcast:", broadcast);
+  window.postMessage(broadcast);
 }

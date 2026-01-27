@@ -1,6 +1,6 @@
 import { Config } from "./config";
 import { Error, Result } from "./sdk";
-import { Err, None, Ok, Option, Request, Response } from "./types";
+import { Broadcast, Err, None, Ok, Option, Request, Response } from "./types";
 
 import * as evm from "./handler/evm";
 import * as svm from "./handler/svm";
@@ -11,9 +11,70 @@ import superjson from "superjson";
 const MAINNET_ONLY: boolean = !!(import.meta.env.VITE_MAINNET_ONLY ?? false);
 if (MAINNET_ONLY) console.log("mainnet only");
 
+type MessageSender = globalThis.Browser.runtime.MessageSender;
+type Port = globalThis.Browser.runtime.Port;
+
+const PORTS: Port[] = [];
+
+export const Port = {
+  set(port: Port) {
+    // 1. Validate and store port
+    console.log("Setting port");
+    if (!port.sender?.tab?.id) {
+      console.log("No tab id for port", port);
+      return;
+    }
+    const id: number = port.sender.tab.id;
+    const url: Option<string> = port.sender.tab.url;
+    console.log("for tab", id, "with url", url);
+    PORTS[id] = port;
+
+    // 2. Initialize provider if allowed
+    if (!allowed(Config.current(), port.sender.origin)) return;
+
+    Port.send(port, {
+      provider: "ETH",
+      kind: "cordial:extension:broadcast",
+      method: "cordial:config",
+      value: evm.config(),
+    });
+
+    Port.send(port, {
+      provider: "SOL",
+      kind: "cordial:extension:broadcast",
+      method: "cordial:config",
+      value: svm.config(),
+    });
+  },
+
+  encode<T>(message: Broadcast<T>): string {
+    return superjson.stringify(message);
+  },
+
+  broadcast(message: Broadcast) {
+    console.log("Broadcasting", message);
+    const messageJson = Port.encode(message);
+    for (const id in PORTS) {
+      const port = PORTS[id];
+      console.log("...to port", port);
+      console.log("...to tab", id);
+      try {
+        port.postMessage(messageJson);
+      } catch {
+        console.log("Tab", id, "disconnected");
+        delete PORTS[id];
+      }
+    }
+  },
+
+  send<T>(port: Port, message: Broadcast<T>) {
+    port.postMessage(Port.encode(message));
+  },
+};
+
 export function onMessage(
   requestJson: string,
-  sender: globalThis.Browser.runtime.MessageSender,
+  sender: MessageSender,
   respond: (response: string) => void,
 ) {
   const request: Request = superjson.parse(requestJson ?? null);
@@ -33,7 +94,7 @@ export function onMessage(
 
 async function handle(
   request: Request,
-  sender: globalThis.Browser.runtime.MessageSender,
+  sender: MessageSender,
 ): Promise<Response> {
   const config = Config.current();
 
@@ -53,6 +114,11 @@ async function handle(
   };
 }
 
+function allowed(config: Option<Config>, origin: Option<string>): boolean {
+  if (!config || !origin) return false;
+  return config.origins.includes(origin);
+}
+
 async function process(
   request: Request,
   config: Option<Config>,
@@ -64,7 +130,7 @@ async function process(
 
   if (!tab) return Err(Error.permissionDenied("Not a tab"));
 
-  if (!config || !origin || !config.origins.includes(origin)) {
+  if (!allowed(config, origin)) {
     await Config.setBadge(config, tab, false);
     switch (method) {
       case "cordial:config":

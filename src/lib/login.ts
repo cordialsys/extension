@@ -1,10 +1,12 @@
-// TODO: Consider using @noble for this, which wraps WebCrypto
 import { hex } from "@scure/base";
 import {
   cryptoBoxKeyPair,
   cryptoBoxOpenEasy,
 } from "@serenity-kit/noble-sodium";
 import { Temporal } from "temporal-polyfill";
+// TODO: Consider just keeping the login in memory.
+// This would remove any kind of storage requirements,
+// and the login should be retained as long as the browser is open.
 import { get, set } from "idb-keyval";
 import { browser_action, COLOR, GRAY, LOGIN_REFRESH } from "./constants";
 import { short_sleep } from "./util";

@@ -4,6 +4,40 @@
  */
 
 export interface paths {
+  "/chains": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Chains */
+    get: operations["list-chains"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/chains/{chain}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Chain */
+    get: operations["get-chain"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/chains/{chain}/addresses/{address}/assets/{asset}": {
     parameters: {
       query?: never;
@@ -45,7 +79,7 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/chains/{chain}/transactions/{transaction}": {
+  "/chains/{chain}/assets/{asset}/decimals": {
     parameters: {
       query?: never;
       header?: never;
@@ -53,52 +87,12 @@ export interface paths {
       cookie?: never;
     };
     /**
-     * Get Transaction
-     * @description Replaces `/v1/__crosschain/info` in previous API.
+     * Get Decimals
+     * @description Get the precision (or "decimals") for a specific asset on a chain.
      */
-    get: operations["get-transaction"];
+    get: operations["get-decimals"];
     put?: never;
     post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/chains/{chain}/transactions": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Submit Transaction
-     * @description Replaces `/v1/__crosschain/submit` in previous API.
-     */
-    post: operations["create-transaction"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/chains/{chain}/transfers": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Prepare Transfer
-     * @description Fetch chain-specific inputs (e.g. fee estimation, account sequence) to support a Transfer transaction.
-     */
-    post: operations["create-transfer"];
     delete?: never;
     options?: never;
     head?: never;
@@ -114,111 +108,6 @@ export interface paths {
     };
     /** Prepare Batch Transfer */
     get: operations["create-batch-transfer"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/chains/{chain}/stakes": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Prepare Stake */
-    post: operations["prepare-stake"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/chains/{chain}/unstakes": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Prepare Unstake */
-    post: operations["prepare-unstake"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/chains/{chain}/withdraws": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /** Prepare Withdraw */
-    post: operations["prepare-withdraw"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/chains": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List Chains */
-    get: operations["list-chains"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/chains/{chain}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get Chain */
-    get: operations["get-chain"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/chains/{chain}/assets/{asset}/decimals": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Get Decimals
-     * @description Get the precision (or "decimals") for a specific asset on a chain.
-     */
-    get: operations["get-decimals"];
     put?: never;
     post?: never;
     delete?: never;
@@ -284,16 +173,127 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/chains/{chain}/stakes": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Prepare Stake */
+    post: operations["prepare-stake"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/chains/{chain}/transactions": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Submit Transaction
+     * @description Replaces `/v1/__crosschain/submit` in previous API.
+     */
+    post: operations["create-transaction"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/chains/{chain}/transactions/{transaction}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get Transaction
+     * @description Replaces `/v1/__crosschain/info` in previous API.
+     */
+    get: operations["get-transaction"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/chains/{chain}/transfers": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Prepare Transfer
+     * @description Fetch chain-specific inputs (e.g. fee estimation, account sequence) to support a Transfer transaction.
+     */
+    post: operations["create-transfer"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/chains/{chain}/unstakes": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Prepare Unstake */
+    post: operations["prepare-unstake"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/chains/{chain}/withdraws": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /** Prepare Withdraw */
+    post: operations["prepare-withdraw"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
   schemas: {
     /** AddressBalance */
     AddressBalance: {
-      name: components["schemas"]["AddressBalanceName"];
       address: string;
       balance: components["schemas"]["Balance"];
       contract: string;
+      name: components["schemas"]["AddressBalanceName"];
     };
     /**
      * AddressBalanceName
@@ -301,362 +301,78 @@ export interface components {
      */
     AddressBalanceName: string;
     /**
-     * Balance
-     * @description Base units of an asset as an integer (not adjusted for decimals), encoded as string.
-     * @example 34592857439
+     * AddressName
+     * @example chains/ETH/addresses/0x123
      */
-    Balance: string;
-    /**
-     * StakedBalance
-     * @description A balance for an asset that is staked to some validator and/or an account.
-     */
-    StakedBalance: {
-      validator: string;
-      account?: string;
-      balance?: {
-        /** @description Balance that is active, and would be earning yield if applicable. */
-        active?: components["schemas"]["Balance"];
-        /** @description Balance that is still waiting to become active. */
-        activating?: components["schemas"]["Balance"];
-        /** @description Balance that is not longer active and waiting to become inactive. */
-        deactivating?: components["schemas"]["Balance"];
-        /** @description Balance that is not earning any applicable yield and may be withdrawn. */
-        inactive?: components["schemas"]["Balance"];
-      };
-    };
-    /** Transaction */
-    Transaction: {
-      name?: components["schemas"]["TransactionName"];
-    } & components["schemas"]["TransactionData"];
-    /**
-     * TransactionName
-     * @description Transaction ID is the "tx hash" as assigned by the corresponding chain.
-     * @example chains/SOL/transactions/Q1QU5bA9YdxjkZ6YwuzuJffDBc9dBSuuYR8BPa4gu9FzJG9wDA7qCWxGMipVLEvkTCWRunyCNkmGghsJd8p6THf
-     */
-    TransactionName: string;
-    /** TransactionData */
-    TransactionData: {
-      block: components["schemas"]["Block"];
-      /** @description `OPTIONAL`. Common unique identifier for the transaction, usually the "hash". Required if its normalization in the ID mangles. */
-      hash: string;
-      movements: components["schemas"]["MovementData"][];
-      confirmations: number;
-      /** @description If there was an issue with the transaction, this field will be set. The transaction nevertheless occurred, and the credits and debits were applied.  Typically this is just to take fees. */
-      error?: string;
-      chain: string;
-      fees: components["schemas"]["FeeChange"][];
-      stakes?: components["schemas"]["Staking"][];
-      unstakes?: components["schemas"]["Staking"][];
-      state?: components["schemas"]["TransactionState"];
-      /** @description If the `confirmations` is high enough for this transaction to be considered "final" on the chain, this will be true. */
-      final?: boolean;
-      /**
-       * @description Optional ID that is preferred when looking up the transaction using connector API or on explorers.
-       *
-       *     Usually the `hash` is sufficient, but some chains need to use an ID that's only discoverable after the transaction is confirmed on chain.
-       */
-      lookup_id?: string;
-    };
-    /** Block */
-    Block: {
-      hash: string;
-      height: number;
-      time: components["schemas"]["Timestamp"];
-      chain_id?: string;
-    };
-    /**
-     * Timestamp
-     * @description Seconds since UNIX epoch, encoded as RFC3339 UTC timestamp (ending in Z).
-     * @example 2023-07-30T011:30:15Z
-     */
-    Timestamp: string;
-    /** MovementData */
-    MovementData: {
-      from: components["schemas"]["BalanceChange"][];
-      to: components["schemas"]["BalanceChange"][];
-      memo?: string;
-      asset?: components["schemas"]["AssetName"];
-      contract?: string;
-      /** @description The asset identifier, commonly the contract value or chain ID in case of native asset. */
-      asset_id: string;
-      /** @description This is set only when there is an on chain identifier for the asset_id that doesn't already match `asset_id`.  E.g. this would be "0x1::aptos_coin::AptosCoin" for "APTOS". */
-      contract_id: string;
-      /** @description Event that contributed to this movement, if any. */
-      event?: components["schemas"]["Event"];
-    };
-    /**
-     * BalanceChange
-     * @description An address that contributes funds to one or more transfers.
-     */
-    BalanceChange: {
-      /** @description If decimals for asset are available, `balance` field scaled by `decimals` to decimal `Amount`. */
-      amount?: components["schemas"]["Amount"];
-      /** @description The balance of `asset` sent or received by `address`. */
-      balance: components["schemas"]["Balance"];
-      /** @description Address that contributed funds to this transfer. */
-      address?: components["schemas"]["AddressName"];
-      /** @description The blockchain address value affected by the balance change. */
-      address_id: string;
-      /** @description If there is an on-chain event attributing this balance change, then this will link to it. */
-      event?: components["schemas"]["Event"];
-    };
+    AddressName: string;
     /**
      * Amount
      * @description Asset amount as decimal, encoded as string.
      */
     Amount: string;
     /**
-     * AddressName
-     * @example chains/ETH/addresses/0x123
-     */
-    AddressName: string;
-    /** Event */
-    Event: {
-      id: string;
-      variant: components["schemas"]["EventVariant"];
-    };
-    /**
-     * EventVariant
-     * @description **native** - Normal transfer of native asset.
-     *
-     *     **token** - Normal transfer of token asset.
-     *
-     *     **internal** - Internal transfer of native asset.
-     * @enum {string}
-     */
-    EventVariant: "native" | "token" | "internal";
-    /**
      * AssetName
      * @example chains/ETH/assets/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48
      */
     AssetName: string;
     /**
-     * FeeChange
-     * @description A balance change without an associated address.  This reflects fees paid in a transaction.
+     * Balance
+     * @description Base units of an asset as an integer (not adjusted for decimals), encoded as string.
+     * @example 34592857439
      */
-    FeeChange: {
-      asset?: components["schemas"]["AssetName"];
-      contract?: string;
-      /** @description Asset identifier, often the contract field or chain ID for native asset. */
-      asset_id: string;
+    Balance: string;
+    /**
+     * BalanceChange
+     * @description An address that contributes funds to one or more transfers.
+     */
+    BalanceChange: {
+      /** @description Address that contributed funds to this transfer. */
+      address?: components["schemas"]["AddressName"];
+      /** @description The blockchain address value affected by the balance change. */
+      address_id: string;
+      /** @description If decimals for asset are available, `balance` field scaled by `decimals` to decimal `Amount`. */
       amount?: components["schemas"]["Amount"];
+      /** @description The balance of `asset` sent or received by `address`. */
       balance: components["schemas"]["Balance"];
-    };
-    /**
-     * Staking
-     * @description A movement committing, or uncommitting an asset to/from a staked state.
-     */
-    Staking: {
-      balance: components["schemas"]["Balance"];
-      validator?: string;
-      account?: string;
-      address: string;
-    };
-    /**
-     * TransactionState
-     * @description **mining**: The transaction is not yet confirmed by any miner or validator on the network (in the "mempool").
-     *
-     *     **succeeded** The transaction is validated by at least one validator or miner (in a "block").
-     *
-     *     **failed** The transaction failed or reverted.  The network refused to persist the transaction's changes, but the sender paid fees.
-     * @enum {string}
-     */
-    TransactionState: "mining" | "succeeded" | "failed";
-    /** SubmitTransactionRequest */
-    SubmitTransactionRequest: {
-      /** @description Base64 encoding of transaction. */
-      tx_data: components["schemas"]["Base64"];
-      /**
-       * @description Base64 encoded array of signatures for the transactions.
-       *
-       *     Should use `input` instead.
-       */
-      signatures?: components["schemas"]["Base64"][];
-      /** @description This is an embedded JSON that encodes additional metadata for the chain's broadcast RPC. Only used for some chains. */
-      input?: string;
+      /** @description If there is an on-chain event attributing this balance change, then this will link to it. */
+      event?: components["schemas"]["Event"];
     };
     /**
      * Base64
      * @description Base64 encoded string.
      */
     Base64: string;
-    /**
-     * TransferRequest
-     * @description A request to create a new transaction.
-     */
-    TransferRequest: {
-      /** @description Address value. */
-      from: string;
-      from_identity?: string;
-      /** @description Address value. */
-      to: string;
-      balance: components["schemas"]["Balance"];
-      /** @description Contract of the asset.  May be empty string or set to the chain value. */
-      contract: string;
-      public_key: components["schemas"]["Hex"];
-      /** @description Set if the transaction fee will be paid by a separate address. */
-      fee_payer?: components["schemas"]["FeePayerInfo"];
-      /** @description Optional parameters that do not apply for most chains. */
-      extra?: {
-        /** @description Array of hashes of previous transaction attempts made by the from address. */
-        transaction_attempts?: string[];
-        /** @description Memo for the transaction. */
-        memo?: string;
-        /** @description On-chain account if the chain doesn't derive addresses from public keys.  Used by EOS. */
-        from_identity?: string;
-        /** @description On-chain account if the chain doesn't derive addresses from public keys.  Used by EOS. */
-        fee_payer_identity?: string;
-      };
-    };
-    /**
-     * Hex
-     * @description Hex encoded string (no 0x prefix).
-     */
-    Hex: string;
-    /** FeePayerInfo */
-    FeePayerInfo: {
-      /** @description Address of the fee payer. */
-      address: string;
-      public_key: components["schemas"]["Hex"];
-      identity?: string;
-    };
-    /** PrepareTransferResponse */
-    PrepareTransferResponse: {
-      /** @description JSON serialization of chain specific inputs for a new transaction. */
-      input: string;
-      /** @description Deprecated, backwards compatibile field. */
-      raw_tx_input?: string;
-    };
     /** BatchTransferRequest */
     BatchTransferRequest: {
-      senders: components["schemas"]["Sender"][];
-      receivers: components["schemas"]["Receiver"][];
-      fee_payer?: components["schemas"]["FeePayerInfo"];
       /** @description Optional parameters that do not apply for most chains. */
       extra?: {
-        transaction_attempts?: string[];
         memo?: string;
+        transaction_attempts?: string[];
       };
-    };
-    /**
-     * Sender
-     * @description A signing address in a batch transfer request.
-     */
-    Sender: {
-      address: string;
-      /** @description Encoded in hex */
-      public_key: components["schemas"]["Hex"];
-    };
-    /**
-     * Receiver
-     * @description A receiving address in a batch transfer.
-     */
-    Receiver: {
-      address: string;
-      balance: components["schemas"]["Balance"];
-      contract?: string;
-      decimals?: number;
-      memo?: string;
-    };
-    /**
-     * StakingRequest
-     * @description A request to create a new transaction.
-     */
-    StakingRequest: {
-      /** @description Address that owns the staking operation. */
-      from: string;
-      /** @description The validator addresses to involve, if applicable. */
-      validator?: string;
-      balance: components["schemas"]["Balance"];
-      /** @description The account address or identifier to involve, if applicable. */
-      account?: string;
-      provider?: components["schemas"]["Provider"];
       fee_payer?: components["schemas"]["FeePayerInfo"];
-      from_public_key?: components["schemas"]["Hex"];
-      memo?: string;
+      receivers: components["schemas"]["Receiver"][];
+      senders: components["schemas"]["Sender"][];
     };
-    /**
-     * Provider
-     * @description Provider to use for transaction input.  By default, `native` will be used.  Some chains like Ethereum require a 3rd party integration to be involved to support delegated staking.
-     * @enum {string}
-     */
-    Provider: "native" | "kiln" | "figment" | "twinstake";
-    /** ChainList */
-    ChainList: {
-      chains?: components["schemas"]["Chain"][];
-    };
-    /** Chain */
-    Chain: {
-      explorer_urls?: components["schemas"]["ExplorerUrls"];
-      name?: components["schemas"]["ChainName"];
-      description?: string;
+    /** Block */
+    Block: {
       chain_id?: string;
-      /** @description Use `confirmations.final` instead. */
-      confirmations_final?: number;
-      /** @description Description of the network if it's a named testnet. */
-      network?: string;
-      /** @description Cordial System's ID for the chain. */
-      symbol: string;
-      /** @description `DEPRECATED`: use `.native_assets` instead. On chain contract identifier for the native asset, if there is one.  E.g. `0x1::aptos_coin::AptosCoin`. */
-      contract_id?: string;
-      external?: {
-        /** @description DTI identifier. */
-        dti?: string;
-        coin_market_cap?: {
-          /** @description CoinMarketCap identifier for the native asset of chain, if relevant.  Also known as "UCID". */
-          asset_id?: string;
-          /** @description CoinMarketCap identifier for the chain. */
-          chain_id?: string;
-        };
-        coin_gecko?: {
-          /** @description CoinGecko ID for the native asset of chain, if relevant. */
-          asset_id?: string;
-          chain_id?: string;
-        };
-        indexing_co?: {
-          /** @description IndexingCo identifier for the chain. */
-          chain_id?: string;
-        };
-      };
-      /** @description List of native assets on the chain that have contract identifiers. */
-      native_assets: components["schemas"]["NativeAsset"][];
-      support?: {
-        /** @description The chain is deprecated by it''s maintainers and may eventually go away. Legacy chains will be supported, but the support level may be reduced. */
-        legacy?: boolean;
-        features?: string[];
-      };
-      confirmations: {
-        final: number;
-        tracked?: number;
-      };
+      hash: string;
+      height: number;
+      time: components["schemas"]["Timestamp"];
     };
     /**
-     * ExplorerUrls
-     * @example {
-     *       "address": "https://etherscan.io/address/{}",
-     *       "tx": "https://etherscan.io/tx/{}",
-     *       "token": "https://etherscan.io/token/{}"
-     *     }
+     * Block
+     * @description This uses a string for `height` instead of integer to guard from overflow.
      */
-    ExplorerUrls: {
-      /** @description Explorer URL with `{}` substitution marker for the address. */
-      address?: string;
-      /** @description Explorer URL with `{}` substitution marker for the transaction hash. */
-      tx?: string;
-      /** @description Explorer URL with `{}` substitution marker for the token contract. */
-      token?: string;
-    };
-    /** ChainName */
-    ChainName: string;
-    /** NativeAsset */
-    NativeAsset: {
-      /** @description Asset Identifier. */
-      asset_id: string;
-      /** @description On-chain asset identifier. */
-      contract_id: string;
-      decimals: number;
-      /** @description The native asset that this bridged asset corresponds to or settles in (e.g., "chains/ETH/assets/ETH" for OptEth or Eclipse) */
-      bridged_asset?: components["schemas"]["AssetName"];
+    Block_2: {
+      chain_id: string;
+      hash: string;
+      height: string;
+      /**
+       * @description Seconds since UNIX epoch, encoded as RFC3339 UTC timestamp (ending in Z).
+       *     Only output if supported by the chain.
+       */
+      time?: components["schemas"]["Timestamp"];
     };
     /**
      * BlockWithTransactions
@@ -682,25 +398,232 @@ export interface components {
      *     }
      */
     BlockWithTransactions: components["schemas"]["Block_2"] & {
-      /** @description An array of transaction ID's, typically is the same as transaction "hash". */
-      transaction_ids: string[];
-      transaction_count: number;
       /** @description Some chains have "sharded" blocks, which are included in a hierarchy. */
       sub_blocks: components["schemas"]["SubBlockWithTransactions"][];
+      transaction_count: number;
+      /** @description An array of transaction ID's, typically is the same as transaction "hash". */
+      transaction_ids: string[];
     };
     /**
-     * Block
-     * @description This uses a string for `height` instead of integer to guard from overflow.
+     * CallRequest
+     * @description See https://cordialapis.stoplight.io/docs/treasury/3yedjk8bpx858-call-data
+     *     for more info.
      */
-    Block_2: {
-      hash: string;
-      height: string;
-      /**
-       * @description Seconds since UNIX epoch, encoded as RFC3339 UTC timestamp (ending in Z).
-       *     Only output if supported by the chain.
-       */
-      time?: components["schemas"]["Timestamp"];
-      chain_id: string;
+    CallRequest: {
+      /** @description Signing addresses associated with the call.  There must be at least 1. */
+      addresses: string[];
+      /** @description See https://cordialapis.stoplight.io/docs/treasury/jknvarxw4t7mh-call-method */
+      method: string;
+      /** @description Chain specific call request */
+      request: Record<string, unknown>;
+    };
+    /** Chain */
+    Chain: {
+      chain_id?: string;
+      confirmations: {
+        final: number;
+        tracked?: number;
+      };
+      /** @description Use `confirmations.final` instead. */
+      confirmations_final?: number;
+      /** @description `DEPRECATED`: use `.native_assets` instead. On chain contract identifier for the native asset, if there is one.  E.g. `0x1::aptos_coin::AptosCoin`. */
+      contract_id?: string;
+      description?: string;
+      explorer_urls?: components["schemas"]["ExplorerUrls"];
+      external?: {
+        coin_gecko?: {
+          /** @description CoinGecko ID for the native asset of chain, if relevant. */
+          asset_id?: string;
+          chain_id?: string;
+        };
+        coin_market_cap?: {
+          /** @description CoinMarketCap identifier for the native asset of chain, if relevant.  Also known as "UCID". */
+          asset_id?: string;
+          /** @description CoinMarketCap identifier for the chain. */
+          chain_id?: string;
+        };
+        /** @description DTI identifier. */
+        dti?: string;
+        indexing_co?: {
+          /** @description IndexingCo identifier for the chain. */
+          chain_id?: string;
+        };
+      };
+      name?: components["schemas"]["ChainName"];
+      /** @description List of native assets on the chain that have contract identifiers. */
+      native_assets: components["schemas"]["NativeAsset"][];
+      /** @description Description of the network if it's a named testnet. */
+      network?: string;
+      support?: {
+        features?: string[];
+        /** @description The chain is deprecated by it''s maintainers and may eventually go away. Legacy chains will be supported, but the support level may be reduced. */
+        legacy?: boolean;
+      };
+      /** @description Cordial System's ID for the chain. */
+      symbol: string;
+    };
+    /** ChainList */
+    ChainList: {
+      chains?: components["schemas"]["Chain"][];
+    };
+    /** ChainName */
+    ChainName: string;
+    /** Event */
+    Event: {
+      id: string;
+      variant: components["schemas"]["EventVariant"];
+    };
+    /**
+     * EventVariant
+     * @description **native** - Normal transfer of native asset.
+     *
+     *     **token** - Normal transfer of token asset.
+     *
+     *     **internal** - Internal transfer of native asset.
+     * @enum {string}
+     */
+    EventVariant: "native" | "token" | "internal";
+    /**
+     * ExplorerUrls
+     * @example {
+     *       "address": "https://etherscan.io/address/{}",
+     *       "tx": "https://etherscan.io/tx/{}",
+     *       "token": "https://etherscan.io/token/{}"
+     *     }
+     */
+    ExplorerUrls: {
+      /** @description Explorer URL with `{}` substitution marker for the address. */
+      address?: string;
+      /** @description Explorer URL with `{}` substitution marker for the token contract. */
+      token?: string;
+      /** @description Explorer URL with `{}` substitution marker for the transaction hash. */
+      tx?: string;
+    };
+    /**
+     * FeeChange
+     * @description A balance change without an associated address.  This reflects fees paid in a transaction.
+     */
+    FeeChange: {
+      amount?: components["schemas"]["Amount"];
+      asset?: components["schemas"]["AssetName"];
+      /** @description Asset identifier, often the contract field or chain ID for native asset. */
+      asset_id: string;
+      balance: components["schemas"]["Balance"];
+      contract?: string;
+    };
+    /** FeePayerInfo */
+    FeePayerInfo: {
+      /** @description Address of the fee payer. */
+      address: string;
+      identity?: string;
+      public_key: components["schemas"]["Hex"];
+    };
+    /**
+     * Hex
+     * @description Hex encoded string (no 0x prefix).
+     */
+    Hex: string;
+    /** MovementData */
+    MovementData: {
+      asset?: components["schemas"]["AssetName"];
+      /** @description The asset identifier, commonly the contract value or chain ID in case of native asset. */
+      asset_id: string;
+      contract?: string;
+      /** @description This is set only when there is an on chain identifier for the asset_id that doesn't already match `asset_id`.  E.g. this would be "0x1::aptos_coin::AptosCoin" for "APTOS". */
+      contract_id: string;
+      /** @description Event that contributed to this movement, if any. */
+      event?: components["schemas"]["Event"];
+      from: components["schemas"]["BalanceChange"][];
+      memo?: string;
+      to: components["schemas"]["BalanceChange"][];
+    };
+    /** NativeAsset */
+    NativeAsset: {
+      /** @description Asset Identifier. */
+      asset_id: string;
+      /** @description The native asset that this bridged asset corresponds to or settles in (e.g., "chains/ETH/assets/ETH" for OptEth or Eclipse) */
+      bridged_asset?: components["schemas"]["AssetName"];
+      /** @description On-chain asset identifier. */
+      contract_id: string;
+      decimals: number;
+    };
+    /** PrepareTransferResponse */
+    PrepareTransferResponse: {
+      /** @description JSON serialization of chain specific inputs for a new transaction. */
+      input: string;
+      /** @description Deprecated, backwards compatibile field. */
+      raw_tx_input?: string;
+    };
+    /**
+     * Provider
+     * @description Provider to use for transaction input.  By default, `native` will be used.  Some chains like Ethereum require a 3rd party integration to be involved to support delegated staking.
+     * @enum {string}
+     */
+    Provider: "native" | "kiln" | "figment" | "twinstake";
+    /**
+     * Receiver
+     * @description A receiving address in a batch transfer.
+     */
+    Receiver: {
+      address: string;
+      balance: components["schemas"]["Balance"];
+      contract?: string;
+      decimals?: number;
+      memo?: string;
+    };
+    /**
+     * Sender
+     * @description A signing address in a batch transfer request.
+     */
+    Sender: {
+      address: string;
+      /** @description Encoded in hex */
+      public_key: components["schemas"]["Hex"];
+    };
+    /**
+     * StakedBalance
+     * @description A balance for an asset that is staked to some validator and/or an account.
+     */
+    StakedBalance: {
+      account?: string;
+      balance?: {
+        /** @description Balance that is still waiting to become active. */
+        activating?: components["schemas"]["Balance"];
+        /** @description Balance that is active, and would be earning yield if applicable. */
+        active?: components["schemas"]["Balance"];
+        /** @description Balance that is not longer active and waiting to become inactive. */
+        deactivating?: components["schemas"]["Balance"];
+        /** @description Balance that is not earning any applicable yield and may be withdrawn. */
+        inactive?: components["schemas"]["Balance"];
+      };
+      validator: string;
+    };
+    /**
+     * Staking
+     * @description A movement committing, or uncommitting an asset to/from a staked state.
+     */
+    Staking: {
+      account?: string;
+      address: string;
+      balance: components["schemas"]["Balance"];
+      validator?: string;
+    };
+    /**
+     * StakingRequest
+     * @description A request to create a new transaction.
+     */
+    StakingRequest: {
+      /** @description The account address or identifier to involve, if applicable. */
+      account?: string;
+      balance: components["schemas"]["Balance"];
+      fee_payer?: components["schemas"]["FeePayerInfo"];
+      /** @description Address that owns the staking operation. */
+      from: string;
+      from_public_key?: components["schemas"]["Hex"];
+      memo?: string;
+      provider?: components["schemas"]["Provider"];
+      /** @description The validator addresses to involve, if applicable. */
+      validator?: string;
     };
     /**
      * SubBlockWithTransactions
@@ -726,22 +649,99 @@ export interface components {
      *     }
      */
     SubBlockWithTransactions: components["schemas"]["Block_2"] & {
+      transaction_count: number;
       /** @description An array of transaction ID's, typically is the same as transaction "hash". */
       transaction_ids: string[];
-      transaction_count: number;
+    };
+    /** SubmitTransactionRequest */
+    SubmitTransactionRequest: {
+      /** @description This is an embedded JSON that encodes additional metadata for the chain's broadcast RPC. Only used for some chains. */
+      input?: string;
+      /**
+       * @description Base64 encoded array of signatures for the transactions.
+       *
+       *     Should use `input` instead.
+       */
+      signatures?: components["schemas"]["Base64"][];
+      /** @description Base64 encoding of transaction. */
+      tx_data: components["schemas"]["Base64"];
     };
     /**
-     * CallRequest
-     * @description See https://cordialapis.stoplight.io/docs/treasury/3yedjk8bpx858-call-data
-     *     for more info.
+     * Timestamp
+     * @description Seconds since UNIX epoch, encoded as RFC3339 UTC timestamp (ending in Z).
+     * @example 2023-07-30T011:30:15Z
      */
-    CallRequest: {
-      /** @description Chain specific call request */
-      request: Record<string, unknown>;
-      /** @description Signing addresses associated with the call.  There must be at least 1. */
-      addresses: string[];
-      /** @description See https://cordialapis.stoplight.io/docs/treasury/jknvarxw4t7mh-call-method */
-      method: string;
+    Timestamp: string;
+    /** Transaction */
+    Transaction: {
+      name?: components["schemas"]["TransactionName"];
+    } & components["schemas"]["TransactionData"];
+    /** TransactionData */
+    TransactionData: {
+      block: components["schemas"]["Block"];
+      chain: string;
+      confirmations: number;
+      /** @description If there was an issue with the transaction, this field will be set. The transaction nevertheless occurred, and the credits and debits were applied.  Typically this is just to take fees. */
+      error?: string;
+      fees: components["schemas"]["FeeChange"][];
+      /** @description If the `confirmations` is high enough for this transaction to be considered "final" on the chain, this will be true. */
+      final?: boolean;
+      /** @description `OPTIONAL`. Common unique identifier for the transaction, usually the "hash". Required if its normalization in the ID mangles. */
+      hash: string;
+      /**
+       * @description Optional ID that is preferred when looking up the transaction using connector API or on explorers.
+       *
+       *     Usually the `hash` is sufficient, but some chains need to use an ID that's only discoverable after the transaction is confirmed on chain.
+       */
+      lookup_id?: string;
+      movements: components["schemas"]["MovementData"][];
+      stakes?: components["schemas"]["Staking"][];
+      state?: components["schemas"]["TransactionState"];
+      unstakes?: components["schemas"]["Staking"][];
+    };
+    /**
+     * TransactionName
+     * @description Transaction ID is the "tx hash" as assigned by the corresponding chain.
+     * @example chains/SOL/transactions/Q1QU5bA9YdxjkZ6YwuzuJffDBc9dBSuuYR8BPa4gu9FzJG9wDA7qCWxGMipVLEvkTCWRunyCNkmGghsJd8p6THf
+     */
+    TransactionName: string;
+    /**
+     * TransactionState
+     * @description **mining**: The transaction is not yet confirmed by any miner or validator on the network (in the "mempool").
+     *
+     *     **succeeded** The transaction is validated by at least one validator or miner (in a "block").
+     *
+     *     **failed** The transaction failed or reverted.  The network refused to persist the transaction's changes, but the sender paid fees.
+     * @enum {string}
+     */
+    TransactionState: "mining" | "succeeded" | "failed";
+    /**
+     * TransferRequest
+     * @description A request to create a new transaction.
+     */
+    TransferRequest: {
+      balance: components["schemas"]["Balance"];
+      /** @description Contract of the asset.  May be empty string or set to the chain value. */
+      contract: string;
+      /** @description Optional parameters that do not apply for most chains. */
+      extra?: {
+        /** @description On-chain account if the chain doesn't derive addresses from public keys.  Used by EOS. */
+        fee_payer_identity?: string;
+        /** @description On-chain account if the chain doesn't derive addresses from public keys.  Used by EOS. */
+        from_identity?: string;
+        /** @description Memo for the transaction. */
+        memo?: string;
+        /** @description Array of hashes of previous transaction attempts made by the from address. */
+        transaction_attempts?: string[];
+      };
+      /** @description Set if the transaction fee will be paid by a separate address. */
+      fee_payer?: components["schemas"]["FeePayerInfo"];
+      /** @description Address value. */
+      from: string;
+      from_identity?: string;
+      public_key: components["schemas"]["Hex"];
+      /** @description Address value. */
+      to: string;
     };
   };
   responses: never;
@@ -750,262 +750,52 @@ export interface components {
   headers: never;
   pathItems: never;
 }
+export type AddressBalance = components["schemas"]["AddressBalance"];
+export type AddressBalanceName = components["schemas"]["AddressBalanceName"];
+export type AddressName = components["schemas"]["AddressName"];
+export type Amount = components["schemas"]["Amount"];
+export type AssetName = components["schemas"]["AssetName"];
+export type Balance = components["schemas"]["Balance"];
+export type BalanceChange = components["schemas"]["BalanceChange"];
+export type Base64 = components["schemas"]["Base64"];
+export type BatchTransferRequest =
+  components["schemas"]["BatchTransferRequest"];
+export type Block = components["schemas"]["Block"];
+export type Block_2 = components["schemas"]["Block_2"];
+export type BlockWithTransactions =
+  components["schemas"]["BlockWithTransactions"];
+export type CallRequest = components["schemas"]["CallRequest"];
+export type Chain = components["schemas"]["Chain"];
+export type ChainList = components["schemas"]["ChainList"];
+export type ChainName = components["schemas"]["ChainName"];
+export type Event = components["schemas"]["Event"];
+export type EventVariant = components["schemas"]["EventVariant"];
+export type ExplorerUrls = components["schemas"]["ExplorerUrls"];
+export type FeeChange = components["schemas"]["FeeChange"];
+export type FeePayerInfo = components["schemas"]["FeePayerInfo"];
+export type Hex = components["schemas"]["Hex"];
+export type MovementData = components["schemas"]["MovementData"];
+export type NativeAsset = components["schemas"]["NativeAsset"];
+export type PrepareTransferResponse =
+  components["schemas"]["PrepareTransferResponse"];
+export type Provider = components["schemas"]["Provider"];
+export type Receiver = components["schemas"]["Receiver"];
+export type Sender = components["schemas"]["Sender"];
+export type StakedBalance = components["schemas"]["StakedBalance"];
+export type Staking = components["schemas"]["Staking"];
+export type StakingRequest = components["schemas"]["StakingRequest"];
+export type SubBlockWithTransactions =
+  components["schemas"]["SubBlockWithTransactions"];
+export type SubmitTransactionRequest =
+  components["schemas"]["SubmitTransactionRequest"];
+export type Timestamp = components["schemas"]["Timestamp"];
+export type Transaction = components["schemas"]["Transaction"];
+export type TransactionData = components["schemas"]["TransactionData"];
+export type TransactionName = components["schemas"]["TransactionName"];
+export type TransactionState = components["schemas"]["TransactionState"];
+export type TransferRequest = components["schemas"]["TransferRequest"];
 export type $defs = Record<string, never>;
 export interface operations {
-  "get-balance": {
-    parameters: {
-      query?: {
-        /** @description Comma-separated list of asset names */
-        assets?: string;
-      };
-      header?: never;
-      path: {
-        chain: string;
-        address: string;
-        asset: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["AddressBalance"];
-        };
-      };
-    };
-  };
-  "get-staking-balance": {
-    parameters: {
-      query?: {
-        /** @description Validator that balances are staked against, if applicable */
-        validator?: string;
-        /** @description Account that balances are staked in, if applicable */
-        account?: string;
-      };
-      header?: never;
-      path: {
-        chain: string;
-        address: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["StakedBalance"][];
-        };
-      };
-    };
-  };
-  "get-transaction": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        chain: string;
-        transaction: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Transaction"];
-        };
-      };
-    };
-  };
-  "create-transaction": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        chain: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["SubmitTransactionRequest"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": Record<string, unknown>;
-        };
-      };
-    };
-  };
-  "create-transfer": {
-    parameters: {
-      query?: {
-        network?: string;
-      };
-      header?: never;
-      path: {
-        chain: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["TransferRequest"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["PrepareTransferResponse"];
-        };
-      };
-    };
-  };
-  "create-batch-transfer": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        chain: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["BatchTransferRequest"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["PrepareTransferResponse"];
-        };
-      };
-    };
-  };
-  "prepare-stake": {
-    parameters: {
-      query?: {
-        validator?: string;
-        account?: string;
-      };
-      header?: {
-        /** @description API key for staking provider, if used. */
-        "x-service-api-key"?: string;
-      };
-      path: {
-        chain: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["StakingRequest"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["PrepareTransferResponse"];
-        };
-      };
-    };
-  };
-  "prepare-unstake": {
-    parameters: {
-      query?: {
-        validator?: string;
-        account?: string;
-      };
-      header?: {
-        /** @description API key for staking provider, if used. */
-        "x-service-api-key"?: string;
-      };
-      path: {
-        chain: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["StakingRequest"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["PrepareTransferResponse"];
-        };
-      };
-    };
-  };
-  "prepare-withdraw": {
-    parameters: {
-      query?: {
-        validator?: string;
-        account?: string;
-      };
-      header?: {
-        /** @description API key for staking provider, if used. */
-        "x-service-api-key"?: string;
-      };
-      path: {
-        chain: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["StakingRequest"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["PrepareTransferResponse"];
-        };
-      };
-    };
-  };
   "list-chains": {
     parameters: {
       query?: never;
@@ -1048,13 +838,68 @@ export interface operations {
       };
     };
   };
+  "get-balance": {
+    parameters: {
+      query?: {
+        /** @description Comma-separated list of asset names */
+        assets?: string;
+      };
+      header?: never;
+      path: {
+        address: string;
+        asset: string;
+        chain: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AddressBalance"];
+        };
+      };
+    };
+  };
+  "get-staking-balance": {
+    parameters: {
+      query?: {
+        /** @description Account that balances are staked in, if applicable */
+        account?: string;
+        /** @description Validator that balances are staked against, if applicable */
+        validator?: string;
+      };
+      header?: never;
+      path: {
+        address: string;
+        chain: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["StakedBalance"][];
+        };
+      };
+    };
+  };
   "get-decimals": {
     parameters: {
       query?: never;
       header?: never;
       path: {
-        chain: string;
         asset: string;
+        chain: string;
       };
       cookie?: never;
     };
@@ -1067,6 +912,32 @@ export interface operations {
         };
         content: {
           "application/json": number;
+        };
+      };
+    };
+  };
+  "create-batch-transfer": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        chain: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["BatchTransferRequest"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PrepareTransferResponse"];
         };
       };
     };
@@ -1098,8 +969,8 @@ export interface operations {
       query?: never;
       header?: never;
       path: {
-        chain: string;
         block: string;
+        chain: string;
       };
       cookie?: never;
     };
@@ -1138,6 +1009,179 @@ export interface operations {
         };
         content: {
           "application/json": Record<string, unknown>;
+        };
+      };
+    };
+  };
+  "prepare-stake": {
+    parameters: {
+      query?: {
+        account?: string;
+        validator?: string;
+      };
+      header?: {
+        /** @description API key for staking provider, if used. */
+        "x-service-api-key"?: string;
+      };
+      path: {
+        chain: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["StakingRequest"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PrepareTransferResponse"];
+        };
+      };
+    };
+  };
+  "create-transaction": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        chain: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["SubmitTransactionRequest"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": Record<string, unknown>;
+        };
+      };
+    };
+  };
+  "get-transaction": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        chain: string;
+        transaction: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Transaction"];
+        };
+      };
+    };
+  };
+  "create-transfer": {
+    parameters: {
+      query?: {
+        network?: string;
+      };
+      header?: never;
+      path: {
+        chain: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["TransferRequest"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PrepareTransferResponse"];
+        };
+      };
+    };
+  };
+  "prepare-unstake": {
+    parameters: {
+      query?: {
+        account?: string;
+        validator?: string;
+      };
+      header?: {
+        /** @description API key for staking provider, if used. */
+        "x-service-api-key"?: string;
+      };
+      path: {
+        chain: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["StakingRequest"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PrepareTransferResponse"];
+        };
+      };
+    };
+  };
+  "prepare-withdraw": {
+    parameters: {
+      query?: {
+        account?: string;
+        validator?: string;
+      };
+      header?: {
+        /** @description API key for staking provider, if used. */
+        "x-service-api-key"?: string;
+      };
+      path: {
+        chain: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["StakingRequest"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PrepareTransferResponse"];
         };
       };
     };

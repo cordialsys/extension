@@ -23,7 +23,13 @@ test:
     pnpm run test
 
 api-gen project api:
-	pnpm dlx openapi-typescript https://api.stoplight.io/projects/{{ project }}/branches/main/export/reference/{{ api }}.yaml -o src/lib/sdk/{{ api }}.d.ts --empty-objects-unknown
+	pnpm dlx openapi-typescript \
+	    https://api.stoplight.io/projects/{{ project }}/branches/main/export/reference/{{ api }}.yaml \
+	    -o src/lib/sdk/{{ api }}.d.ts \
+		--alphabetize \
+		--empty-objects-unknown \
+		--root-types \
+		--root-types-no-schema-prefix
 
 api:
     just api-gen cHJqOjIzOTcxNQ admin

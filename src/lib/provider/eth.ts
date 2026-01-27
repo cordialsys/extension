@@ -21,11 +21,19 @@ const INFO: Eth.Info = {
   rdns: "systems.cordial.treasury",
 };
 
+async function requestConfig(): Promise<Option<Eth.Config>> {
+  return ethRequest("cordial:config") as Promise<Option<Eth.Config>>;
+}
+
 export class Ethereum extends EventEmitter implements Eth.Provider {
+  async config(): Promise<Option<Eth.Config>> {
+    return requestConfig();
+  }
+
   async start() {
     console.log("Initializing Cordial Ethereum Provider");
     try {
-      const config = (await ethRequest("cordial:config")) as Option<Eth.Config>;
+      const config = await requestConfig();
       console.log("Initial EVM config", config);
       if (!config) return;
 

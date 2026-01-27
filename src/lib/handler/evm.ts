@@ -1,4 +1,5 @@
 import { Config } from "@/lib/config";
+import { Port } from "@/lib/handler";
 import { Error, Result, Sdk } from "@/lib/sdk";
 import { Err, Eth, None, Ok, Option, Some } from "@/lib/types";
 
@@ -17,8 +18,13 @@ function notifyConfig(config: Option<Eth.Config>) {
   const notify = CONFIG !== config;
   CONFIG = config;
   if (notify) {
-    // TODO: Notify providers
     console.log("EVM config changed", config);
+    Port.broadcast({
+      provider: "ETH",
+      kind: "cordial:extension:broadcast",
+      method: "cordial:config",
+      value: config,
+    });
   }
 }
 

@@ -4,6 +4,47 @@
  */
 
 export interface paths {
+  "/access-rules": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get Access Policy
+     * @description Lists all access rules, which comprise the current access policy.
+     */
+    get: operations["get-access-policy"];
+    put?: never;
+    /** Create Access Rule */
+    post: operations["create-access-rule"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/access-rules/{access-rule}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Access Rule */
+    get: operations["get-access-rule"];
+    /** Update Access Rule */
+    put: operations["update-access-rule"];
+    /** Import Access Rule */
+    post: operations["import-access-rule"];
+    /** Delete Access Rule */
+    delete: operations["delete-access-rule"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/accounts": {
     parameters: {
       query?: never;
@@ -37,6 +78,23 @@ export interface paths {
     post: operations["import-account"];
     /** Delete Account */
     delete: operations["delete-account"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/accounts/{account}/addresses": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Account Addresses */
+    get: operations["get-account-addresses"];
+    put?: never;
+    post?: never;
+    delete?: never;
     options?: never;
     head?: never;
     patch?: never;
@@ -76,17 +134,95 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/accounts/{account}/addresses": {
+  "/assets": {
     parameters: {
       query?: never;
       header?: never;
       path?: never;
       cookie?: never;
     };
-    /** List Account Addresses */
-    get: operations["get-account-addresses"];
+    /** List Assets */
+    get: operations["list-assets"];
     put?: never;
     post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/calls": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List Calls
+     * @description List all Calls.
+     */
+    get: operations["list-calls"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/chains": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Chains */
+    get: operations["list-chains"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/chains/{chain}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Chain */
+    get: operations["get-chain"];
+    /** Update Chain */
+    put: operations["update-chain"];
+    /** Import Chain */
+    post: operations["import-chain"];
+    /** Delete Chain */
+    delete: operations["delete-chain"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/chains/{chain}/addresses": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Chain Addresses */
+    get: operations["list-chain-addresses"];
+    put?: never;
+    /**
+     * Generate Address
+     * @description The generated address will have variant `internal`.
+     */
+    post: operations["generate-address"];
     delete?: never;
     options?: never;
     head?: never;
@@ -133,15 +269,15 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/assets": {
+  "/chains/{chain}/assets": {
     parameters: {
       query?: never;
       header?: never;
       path?: never;
       cookie?: never;
     };
-    /** List Assets */
-    get: operations["list-assets"];
+    /** List Chain Assets */
+    get: operations["list-chain-assets"];
     put?: never;
     post?: never;
     delete?: never;
@@ -168,1143 +304,6 @@ export interface paths {
     post: operations["import-asset"];
     /** Delete Asset */
     delete: operations["delete-asset"];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/chains": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List Chains */
-    get: operations["list-chains"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/chains/{chain}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get Chain */
-    get: operations["get-chain"];
-    /** Update Chain */
-    put: operations["update-chain"];
-    /** Import Chain */
-    post: operations["import-chain"];
-    /** Delete Chain */
-    delete: operations["delete-chain"];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/credentials": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List Credentials */
-    get: operations["list-credentials"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/users/{user}/credentials/{credential}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get Credential */
-    get: operations["get-credential"];
-    /** Update Credential */
-    put: operations["update-credential"];
-    /**
-     * Import Credential
-     * @description There are two main cases:
-     *     - User in path and user signing are different, variant is `invite`. This corresponds to an "administrator" of sorts creating an invite credential.
-     *     - User in path and user signing are the same, variant is not `invite`. This corresponds to a user adding themselves another credential.
-     */
-    post: operations["create-credential"];
-    /** Delete Credential */
-    delete: operations["delete-credential"];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/operations": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List Operations */
-    get: operations["list-operations"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/operations/{operation}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get Operation */
-    get: operations["get-operation"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/transfers": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List Transfers */
-    get: operations["list-transfers"];
-    /**
-     * Update Transfer
-     * @description Only to be used by worker processes:
-     *     - the connector to drive state from preparing to signing
-     *     - the signer to drive state from signing to submitting
-     *     - the connector to drive state from submitting through finalizing to succeeded
-     *
-     *     Note that the engine performs the state change - the workers only update the transfer resource with new information.
-     */
-    put: operations["update-transfer"];
-    /** Create Transfer */
-    post: operations["create-transfer"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/stakings": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List Stakings */
-    get: operations["list-stakings"];
-    /**
-     * Update Staking
-     * @description Only to be used by worker processes:
-     *     - the connector to drive state from preparing to signing
-     *     - the signer to drive state from signing to submitting
-     *     - the connector to drive state from submitting through finalizing to succeeded
-     *
-     *     Note that the engine performs the state change - the workers only update the transfer resource with new information.
-     */
-    put: operations["update-staking"];
-    /** Create Staking */
-    post: operations["create-staking"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/transfers/{transfer}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get Transfer */
-    get: operations["get-transfer"];
-    put?: never;
-    /** Create Transfer */
-    post: operations["import-transfer"];
-    /** Delete Transfer */
-    delete: operations["delete-transfer"];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/transfers/{transfer}/retry": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Retry Transfer
-     * @description Retry the transfer.  The current transaction will be marked to failed state and
-     *     a new transaction will be created.  Treasury will ensure that the new transaction
-     *     does not cause a double-send.
-     *
-     *     This is useful to try again with new fee estimation, or perhaps
-     *     the previous transaction is timed out for other reasons.
-     */
-    post: operations["transfer-retry"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/users": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List Users */
-    get: operations["list-users"];
-    put?: never;
-    /**
-     * Generate User
-     * @description Engine picks a random user ID.
-     */
-    post: operations["generate-user"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/users/{user}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Get User
-     * @description Retrieve the information of the user with the matching user ID.
-     */
-    get: operations["get-user"];
-    /**
-     * Update User
-     * @description Update the information of an existing user.
-     */
-    put: operations["update-user"];
-    /** Create User */
-    post: operations["create-user"];
-    /** Delete User */
-    delete: operations["delete-user"];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/chains/{chain}/assets": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List Chain Assets */
-    get: operations["list-chain-assets"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/roles": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List Roles */
-    get: operations["list-roles"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/roles/{role}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get Role */
-    get: operations["get-role"];
-    /** Update Role */
-    put: operations["update-role"];
-    post: operations["create-role"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/users/{user}/credentials": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * List User Credentials
-     * @description Lists all credentials of a given user.
-     */
-    get: operations["list-user-credentials"];
-    put?: never;
-    /**
-     * Register Credential
-     * @description Associates a credential with the user. Engine picks a credential ID.
-     *
-     *     See `Import Credential` for discussion of the two main cases.
-     */
-    post: operations["register-credential"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/chains/{chain}/addresses": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List Chain Addresses */
-    get: operations["list-chain-addresses"];
-    put?: never;
-    /**
-     * Generate Address
-     * @description The generated address will have variant `internal`.
-     */
-    post: operations["generate-address"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/features": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List Features */
-    get: operations["get-features"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/features/{feature}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get Feature */
-    get: operations["get-feature"];
-    /**
-     * Update Feature
-     * @description Update metadata on a feature.  Note to enable or disable a feature, the custom /activate or /disable methods must be used.
-     */
-    put: operations["update-feature"];
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/access-rules": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Get Access Policy
-     * @description Lists all access rules, which comprise the current access policy.
-     */
-    get: operations["get-access-policy"];
-    put?: never;
-    /** Create Access Rule */
-    post: operations["create-access-rule"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/access-rules/{access-rule}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get Access Rule */
-    get: operations["get-access-rule"];
-    /** Update Access Rule */
-    put: operations["update-access-rule"];
-    /** Import Access Rule */
-    post: operations["import-access-rule"];
-    /** Delete Access Rule */
-    delete: operations["delete-access-rule"];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/transfer-rules": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * List Transfer Rules
-     * @description Lists all transfer rules, which comprise the current transfer policy.
-     */
-    get: operations["list-transfer-rules"];
-    put?: never;
-    /** Create Transfer Rule */
-    post: operations["create-transfer-rule"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/transfer-rules/{transfer-rule}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get Transfer Rule */
-    get: operations["get-transfer-rule"];
-    /** Update Transfer Rule */
-    put: operations["update-transfer-rule"];
-    /**
-     * Create Named Transfer Rule
-     * @description Importing is the same as creating but the user specifies the resource ID in the URL.
-     */
-    post: operations["create-named-transfer-rule"];
-    /** Delete Transfer Rule */
-    delete: operations["delete-transfer-rule"];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/types": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List Resource Types */
-    get: operations["list-types"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/types/{type}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get Resource Type */
-    get: operations["get-type"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/treasury": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /**
-     * Get Treasury Singleton
-     * @description For an individual treasury deployment, the `Treasury` resource is a singleton, and can be fetched with this endpoint.
-     */
-    get: operations["get-treasury-singleton"];
-    put?: never;
-    /**
-     * Update Treasury
-     * @description Added in `25.2.2`
-     */
-    post: operations["update-treasury-singleton"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/treasuries": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List Treasuries */
-    get: operations["list-treasuries"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/treasuries/{treasury}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get Treasury */
-    get: operations["get-treasury"];
-    put?: never;
-    /**
-     * Update Treasury
-     * @description Added in `25.2.2`
-     */
-    post: operations["update-treasury"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/keys": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List Keys */
-    get: operations["list-keys"];
-    put?: never;
-    /**
-     * Generate Key
-     * @description Only `user` keys can be generated directly.
-     */
-    post: operations["create-key"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/keys/{key}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get Key */
-    get: operations["get-key"];
-    /** Update Key */
-    put: operations["update-key"];
-    /**
-     * Generate Named Key
-     * @description Only `user` keys can be generated directly.
-     */
-    post: operations["create-named-key"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/signatures": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List Signatures */
-    get: operations["list-signatures"];
-    put?: never;
-    /**
-     * Generate Signature
-     * @description The `key` must be of variant `shared` or `user`.
-     */
-    post: operations["create-signature"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/signatures/{signature}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get Signature */
-    get: operations["get-signature"];
-    /** Update Signature */
-    put: operations["update-signature"];
-    /** Create Named Signature */
-    post: operations["create-named-signature"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/key-requests": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List Key Requests */
-    get: operations["list-key-requests"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/signature-requests": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List Signature Requests */
-    get: operations["list-signature-requests"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/signature-request/{id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get Signature Request */
-    get: operations["get-signature-request-id"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/key-request/{id}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get Key Request */
-    get: operations["get-key-request-id"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/transactions": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List Transactions */
-    get: operations["list-transactions"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/transactions/{transaction}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get Transaction */
-    get: operations["get-transaction"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/transactions/{transaction}/recheck": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Recheck transaction
-     * @description Changes a transaction to be back in `finalizing` state, forcing it to be re-observed on chain.
-     */
-    post: operations["recheck-transaction"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/software-updates": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List Software Updates */
-    get: operations["list-software-updates"];
-    put?: never;
-    /** Create Software Update */
-    post: operations["create-software-updates"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/software-updates/{software-update}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get Software Update */
-    get: operations["get-software-update"];
-    /** Update Software Update */
-    put: operations["put-software-updates-software-update"];
-    post?: never;
-    /** Delete Software Update */
-    delete: operations["delete-software-update"];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/signers/{signer}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get Signer */
-    get: operations["get-signer"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/signers": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List Signers */
-    get: operations["list-signers"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/chains/{chain}/symbols/{symbol}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get Symbol */
-    get: operations["get-symbol"];
-    /** Update Symbol */
-    put: operations["update-symbol"];
-    /** Create Symbol */
-    post: operations["create-symbol"];
-    /** Delete Symbol */
-    delete: operations["delete-symbol"];
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/symbols": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List Symbols */
-    get: operations["list-symbols"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/transfers/{transfer}/transactions": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List Transfer Transactions */
-    get: operations["list-transfer-transactions"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/signers/{signer}/key-responses/{key-request}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get Key Response */
-    get: operations["get-key-response"];
-    put?: never;
-    /**
-     * Propose Key Share
-     * @description Called by the signer after an MPC round of key generation or rotation.
-     */
-    post: operations["propose-key-share"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/signers/{signer}/signature-responses/{signature-request}": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** Get Signature Response */
-    get: operations["get-signature-response"];
-    put?: never;
-    /**
-     * Propose Signature Share
-     * @description Called by the signer after an MPC round of signature generation.
-     */
-    post: operations["propose-signature-share"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/signers/{signer}/key-responses": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List Key Responses */
-    get: operations["list-key-responses"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/signers/{signer}/signature-responses": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    /** List Signature Responses */
-    get: operations["list-signature-responses"];
-    put?: never;
-    post?: never;
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/users/{user}/heartbeat": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Heartbeat User
-     * @description Custom method. Allowed to be called only by the given user.
-     *     Updates `active_time` on the `User` resource.
-     *     Body is empty.
-     */
-    post: operations["heartbeat-user"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/transfer-rules/{transfer-rule}/activate": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Activate Transfer Rule
-     * @description Custom method.
-     *     Sets `state` of `TransferRule` to `active`, if it was `disabled`.
-     *     Body is empty.
-     */
-    post: operations["activate-transfer-rule"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/transfer-rules/{transfer-rule}/disable": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Disable Transfer Rule
-     * @description Custom method.
-     *     Sets `state` of `TransferRule` to `disabled`, if it was `active`.
-     *     Body is empty.
-     */
-    post: operations["disable-transfer-rule"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/features/{feature}/activate": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Activate Feature
-     * @description Custom method.
-     *     Sets `state` of `Feature` to `active`, if it was `disabled`.
-     *     Body is empty.
-     */
-    post: operations["activate-feature"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/features/{feature}/disable": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Disable Feature
-     * @description Custom method.
-     *     Sets `state` of `Feature` to `disabled`, if it was `active`.
-     *     Body is empty.
-     */
-    post: operations["disable-feature"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/transfers/{transfer}/abort": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Abort Transfer
-     * @description Abort the current transaction. It will be marked to be in failed state.
-     *     This does not submit any new transaction to public blockchain.
-     *
-     *     If the transaction is already mined by the public blockchain, there will be no
-     *     effect on that.
-     */
-    post: operations["transfer-abort"];
-    delete?: never;
-    options?: never;
-    head?: never;
-    patch?: never;
-    trace?: never;
-  };
-  "/transfers/{transfer}/cancel": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    get?: never;
-    put?: never;
-    /**
-     * Cancel Transfer
-     * @deprecated
-     * @description Deprecated.  Use "Abort Transfer" instead.
-     */
-    post: operations["transfer-cancel"];
-    delete?: never;
     options?: never;
     head?: never;
     patch?: never;
@@ -1347,18 +346,73 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/stakings/{staking}": {
+  "/chains/{chain}/calls": {
     parameters: {
       query?: never;
       header?: never;
       path?: never;
       cookie?: never;
     };
-    /** Get Staking */
-    get: operations["get-staking"];
+    /** List Calls for Chain */
+    get: operations["list-chain-calls"];
     put?: never;
-    /** Create Staking */
-    post: operations["import-staking"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/chains/{chain}/calls/{call}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Call */
+    get: operations["get-call"];
+    put?: never;
+    /** Create Call */
+    post: operations["create-call"];
+    /** Delete Call */
+    delete: operations["delete-call"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/chains/{chain}/symbols/{symbol}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Symbol */
+    get: operations["get-symbol"];
+    /** Update Symbol */
+    put: operations["update-symbol"];
+    /** Create Symbol */
+    post: operations["create-symbol"];
+    /** Delete Symbol */
+    delete: operations["delete-symbol"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/credentials": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Credentials */
+    get: operations["list-credentials"];
+    put?: never;
+    post?: never;
     delete?: never;
     options?: never;
     head?: never;
@@ -1447,6 +501,88 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/features": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Features */
+    get: operations["get-features"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/features/{feature}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Feature */
+    get: operations["get-feature"];
+    /**
+     * Update Feature
+     * @description Update metadata on a feature.  Note to enable or disable a feature, the custom /activate or /disable methods must be used.
+     */
+    put: operations["update-feature"];
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/features/{feature}/activate": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Activate Feature
+     * @description Custom method.
+     *     Sets `state` of `Feature` to `active`, if it was `disabled`.
+     *     Body is empty.
+     */
+    post: operations["activate-feature"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/features/{feature}/disable": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Disable Feature
+     * @description Custom method.
+     *     Sets `state` of `Feature` to `disabled`, if it was `active`.
+     *     Body is empty.
+     */
+    post: operations["disable-feature"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/healthy": {
     parameters: {
       query?: never;
@@ -1518,21 +654,234 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/signatories/{signatory}": {
+  "/host/hosts": {
     parameters: {
       query?: never;
       header?: never;
       path?: never;
       cookie?: never;
     };
-    /** Get Signatory */
-    get: operations["get-signatory"];
-    /** Update Signatory */
-    put: operations["update-signatory"];
-    /** Create named Signatory */
-    post: operations["create-named-signatory"];
-    /** Delete Signatory */
-    delete: operations["delete-signatory"];
+    /** List Hosts */
+    get: operations["list-hosts"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/key-request/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Key Request */
+    get: operations["get-key-request-id"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/key-requests": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Key Requests */
+    get: operations["list-key-requests"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/keys": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Keys */
+    get: operations["list-keys"];
+    put?: never;
+    /**
+     * Generate Key
+     * @description Only `user` keys can be generated directly.
+     */
+    post: operations["create-key"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/keys/{key}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Key */
+    get: operations["get-key"];
+    /** Update Key */
+    put: operations["update-key"];
+    /**
+     * Generate Named Key
+     * @description Only `user` keys can be generated directly.
+     */
+    post: operations["create-named-key"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/operations": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Operations */
+    get: operations["list-operations"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/operations/{operation}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Operation */
+    get: operations["get-operation"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/propose/chains/{chain}/calls": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Call Proposals */
+    get: operations["list-call-proposals"];
+    put?: never;
+    /** Propose Call */
+    post: operations["propose-call"];
+    /** Delete Call Proposal */
+    delete: operations["delete-call-proposal"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/propose/chains/{chain}/calls/{call}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Call Proposal */
+    get: operations["get-call-proposal"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/propose/chains/{chain}/calls/{call}/request": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Call Proposal Request */
+    get: operations["get-call-proposal-request"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/ref/certificate": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Reference Certificate */
+    get: operations["get-ref-certificate"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/roles": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Roles */
+    get: operations["list-roles"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/roles/{role}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Role */
+    get: operations["get-role"];
+    /** Update Role */
+    put: operations["update-role"];
+    post: operations["create-role"];
+    delete?: never;
     options?: never;
     head?: never;
     patch?: never;
@@ -1555,18 +904,242 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/ref/certificate": {
+  "/signatories/{signatory}": {
     parameters: {
       query?: never;
       header?: never;
       path?: never;
       cookie?: never;
     };
-    /** Reference Certificate */
-    get: operations["get-ref-certificate"];
+    /** Get Signatory */
+    get: operations["get-signatory"];
+    /** Update Signatory */
+    put: operations["update-signatory"];
+    /** Create named Signatory */
+    post: operations["create-named-signatory"];
+    /** Delete Signatory */
+    delete: operations["delete-signatory"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/signature-request/{id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Signature Request */
+    get: operations["get-signature-request-id"];
     put?: never;
     post?: never;
     delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/signature-requests": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Signature Requests */
+    get: operations["list-signature-requests"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/signatures": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Signatures */
+    get: operations["list-signatures"];
+    put?: never;
+    /**
+     * Generate Signature
+     * @description The `key` must be of variant `shared` or `user`.
+     */
+    post: operations["create-signature"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/signatures/{signature}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Signature */
+    get: operations["get-signature"];
+    /** Update Signature */
+    put: operations["update-signature"];
+    /** Create Named Signature */
+    post: operations["create-named-signature"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/signers": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Signers */
+    get: operations["list-signers"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/signers/{signer}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Signer */
+    get: operations["get-signer"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/signers/{signer}/key-responses": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Key Responses */
+    get: operations["list-key-responses"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/signers/{signer}/key-responses/{key-request}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Key Response */
+    get: operations["get-key-response"];
+    put?: never;
+    /**
+     * Propose Key Share
+     * @description Called by the signer after an MPC round of key generation or rotation.
+     */
+    post: operations["propose-key-share"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/signers/{signer}/signature-responses": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Signature Responses */
+    get: operations["list-signature-responses"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/signers/{signer}/signature-responses/{signature-request}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Signature Response */
+    get: operations["get-signature-response"];
+    put?: never;
+    /**
+     * Propose Signature Share
+     * @description Called by the signer after an MPC round of signature generation.
+     */
+    post: operations["propose-signature-share"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/software-updates": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Software Updates */
+    get: operations["list-software-updates"];
+    put?: never;
+    /** Create Software Update */
+    post: operations["create-software-updates"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/software-updates/{software-update}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Software Update */
+    get: operations["get-software-update"];
+    /** Update Software Update */
+    put: operations["put-software-updates-software-update"];
+    post?: never;
+    /** Delete Software Update */
+    delete: operations["delete-software-update"];
     options?: never;
     head?: never;
     patch?: never;
@@ -1660,6 +1233,68 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/stakings": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Stakings */
+    get: operations["list-stakings"];
+    /**
+     * Update Staking
+     * @description Only to be used by worker processes:
+     *     - the connector to drive state from preparing to signing
+     *     - the signer to drive state from signing to submitting
+     *     - the connector to drive state from submitting through finalizing to succeeded
+     *
+     *     Note that the engine performs the state change - the workers only update the transfer resource with new information.
+     */
+    put: operations["update-staking"];
+    /** Create Staking */
+    post: operations["create-staking"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/stakings/{staking}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Staking */
+    get: operations["get-staking"];
+    put?: never;
+    /** Create Staking */
+    post: operations["import-staking"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/symbols": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Symbols */
+    get: operations["list-symbols"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/tags": {
     parameters: {
       query?: never;
@@ -1702,7 +1337,61 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/calls": {
+  "/transactions": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Transactions */
+    get: operations["list-transactions"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/transactions/{transaction}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Transaction */
+    get: operations["get-transaction"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/transactions/{transaction}/recheck": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Recheck transaction
+     * @description Changes a transaction to be back in `finalizing` state, forcing it to be re-observed on chain.
+     */
+    post: operations["recheck-transaction"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/transfer-rules": {
     parameters: {
       query?: never;
       header?: never;
@@ -1710,10 +1399,211 @@ export interface paths {
       cookie?: never;
     };
     /**
-     * List Calls
-     * @description List all Calls.
+     * List Transfer Rules
+     * @description Lists all transfer rules, which comprise the current transfer policy.
      */
-    get: operations["list-calls"];
+    get: operations["list-transfer-rules"];
+    put?: never;
+    /** Create Transfer Rule */
+    post: operations["create-transfer-rule"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/transfer-rules/{transfer-rule}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Transfer Rule */
+    get: operations["get-transfer-rule"];
+    /** Update Transfer Rule */
+    put: operations["update-transfer-rule"];
+    /**
+     * Create Named Transfer Rule
+     * @description Importing is the same as creating but the user specifies the resource ID in the URL.
+     */
+    post: operations["create-named-transfer-rule"];
+    /** Delete Transfer Rule */
+    delete: operations["delete-transfer-rule"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/transfer-rules/{transfer-rule}/activate": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Activate Transfer Rule
+     * @description Custom method.
+     *     Sets `state` of `TransferRule` to `active`, if it was `disabled`.
+     *     Body is empty.
+     */
+    post: operations["activate-transfer-rule"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/transfer-rules/{transfer-rule}/disable": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Disable Transfer Rule
+     * @description Custom method.
+     *     Sets `state` of `TransferRule` to `disabled`, if it was `active`.
+     *     Body is empty.
+     */
+    post: operations["disable-transfer-rule"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/transfers": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Transfers */
+    get: operations["list-transfers"];
+    /**
+     * Update Transfer
+     * @description Only to be used by worker processes:
+     *     - the connector to drive state from preparing to signing
+     *     - the signer to drive state from signing to submitting
+     *     - the connector to drive state from submitting through finalizing to succeeded
+     *
+     *     Note that the engine performs the state change - the workers only update the transfer resource with new information.
+     */
+    put: operations["update-transfer"];
+    /** Create Transfer */
+    post: operations["create-transfer"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/transfers/{transfer}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Transfer */
+    get: operations["get-transfer"];
+    put?: never;
+    /** Create Transfer */
+    post: operations["import-transfer"];
+    /** Delete Transfer */
+    delete: operations["delete-transfer"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/transfers/{transfer}/abort": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Abort Transfer
+     * @description Abort the current transaction. It will be marked to be in failed state.
+     *     This does not submit any new transaction to public blockchain.
+     *
+     *     If the transaction is already mined by the public blockchain, there will be no
+     *     effect on that.
+     */
+    post: operations["transfer-abort"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/transfers/{transfer}/cancel": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Cancel Transfer
+     * @deprecated
+     * @description Deprecated.  Use "Abort Transfer" instead.
+     */
+    post: operations["transfer-cancel"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/transfers/{transfer}/retry": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Retry Transfer
+     * @description Retry the transfer.  The current transaction will be marked to failed state and
+     *     a new transaction will be created.  Treasury will ensure that the new transaction
+     *     does not cause a double-send.
+     *
+     *     This is useful to try again with new fee estimation, or perhaps
+     *     the previous transaction is timed out for other reasons.
+     */
+    post: operations["transfer-retry"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/transfers/{transfer}/transactions": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List Transfer Transactions */
+    get: operations["list-transfer-transactions"];
     put?: never;
     post?: never;
     delete?: never;
@@ -1722,15 +1612,15 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/chains/{chain}/calls": {
+  "/treasuries": {
     parameters: {
       query?: never;
       header?: never;
       path?: never;
       cookie?: never;
     };
-    /** List Calls for Chain */
-    get: operations["list-chain-calls"];
+    /** List Treasuries */
+    get: operations["list-treasuries"];
     put?: never;
     post?: never;
     delete?: never;
@@ -1739,53 +1629,60 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/chains/{chain}/calls/{call}": {
+  "/treasuries/{treasury}": {
     parameters: {
       query?: never;
       header?: never;
       path?: never;
       cookie?: never;
     };
-    /** Get Call */
-    get: operations["get-call"];
+    /** Get Treasury */
+    get: operations["get-treasury"];
     put?: never;
-    /** Create Call */
-    post: operations["create-call"];
-    /** Delete Call */
-    delete: operations["delete-call"];
+    /**
+     * Update Treasury
+     * @description Added in `25.2.2`
+     */
+    post: operations["update-treasury"];
+    delete?: never;
     options?: never;
     head?: never;
     patch?: never;
     trace?: never;
   };
-  "/propose/chains/{chain}/calls": {
+  "/treasury": {
     parameters: {
       query?: never;
       header?: never;
       path?: never;
       cookie?: never;
     };
-    /** List Call Proposals */
-    get: operations["list-call-proposals"];
+    /**
+     * Get Treasury Singleton
+     * @description For an individual treasury deployment, the `Treasury` resource is a singleton, and can be fetched with this endpoint.
+     */
+    get: operations["get-treasury-singleton"];
     put?: never;
-    /** Propose Call */
-    post: operations["propose-call"];
-    /** Delete Call Proposal */
-    delete: operations["delete-call-proposal"];
+    /**
+     * Update Treasury
+     * @description Added in `25.2.2`
+     */
+    post: operations["update-treasury-singleton"];
+    delete?: never;
     options?: never;
     head?: never;
     patch?: never;
     trace?: never;
   };
-  "/propose/chains/{chain}/calls/{call}": {
+  "/types": {
     parameters: {
       query?: never;
       header?: never;
       path?: never;
       cookie?: never;
     };
-    /** Get Call Proposal */
-    get: operations["get-call-proposal"];
+    /** List Resource Types */
+    get: operations["list-types"];
     put?: never;
     post?: never;
     delete?: never;
@@ -1794,15 +1691,15 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/propose/chains/{chain}/calls/{call}/request": {
+  "/types/{type}": {
     parameters: {
       query?: never;
       header?: never;
       path?: never;
       cookie?: never;
     };
-    /** Get Call Proposal Request */
-    get: operations["get-call-proposal-request"];
+    /** Get Resource Type */
+    get: operations["get-type"];
     put?: never;
     post?: never;
     delete?: never;
@@ -1811,17 +1708,120 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
-  "/host/hosts": {
+  "/users": {
     parameters: {
       query?: never;
       header?: never;
       path?: never;
       cookie?: never;
     };
-    /** List Hosts */
-    get: operations["list-hosts"];
+    /** List Users */
+    get: operations["list-users"];
     put?: never;
-    post?: never;
+    /**
+     * Generate User
+     * @description Engine picks a random user ID.
+     */
+    post: operations["generate-user"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/users/{user}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Get User
+     * @description Retrieve the information of the user with the matching user ID.
+     */
+    get: operations["get-user"];
+    /**
+     * Update User
+     * @description Update the information of an existing user.
+     */
+    put: operations["update-user"];
+    /** Create User */
+    post: operations["create-user"];
+    /** Delete User */
+    delete: operations["delete-user"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/users/{user}/credentials": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List User Credentials
+     * @description Lists all credentials of a given user.
+     */
+    get: operations["list-user-credentials"];
+    put?: never;
+    /**
+     * Register Credential
+     * @description Associates a credential with the user. Engine picks a credential ID.
+     *
+     *     See `Import Credential` for discussion of the two main cases.
+     */
+    post: operations["register-credential"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/users/{user}/credentials/{credential}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Get Credential */
+    get: operations["get-credential"];
+    /** Update Credential */
+    put: operations["update-credential"];
+    /**
+     * Import Credential
+     * @description There are two main cases:
+     *     - User in path and user signing are different, variant is `invite`. This corresponds to an "administrator" of sorts creating an invite credential.
+     *     - User in path and user signing are the same, variant is not `invite`. This corresponds to a user adding themselves another credential.
+     */
+    post: operations["create-credential"];
+    /** Delete Credential */
+    delete: operations["delete-credential"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/users/{user}/heartbeat": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Heartbeat User
+     * @description Custom method. Allowed to be called only by the given user.
+     *     Updates `active_time` on the `User` resource.
+     *     Body is empty.
+     */
+    post: operations["heartbeat-user"];
     delete?: never;
     options?: never;
     head?: never;
@@ -1832,1377 +1832,23 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
   schemas: {
-    /** AccountPage */
-    AccountPage: {
-      accounts?: components["schemas"]["Account"][];
-    } & components["schemas"]["Pagination"];
-    /** Account */
-    Account: {
-      /** @description OUTPUT ONLY. */
-      name?: components["schemas"]["AccountName"];
-      variant?: components["schemas"]["AddressVariant"];
-      /** @description OUTPUT ONLY. */
-      state?: components["schemas"]["BasicState"];
-    } & components["schemas"]["Metadata"] &
-      components["schemas"]["AccountData"];
-    /**
-     * AccountName
-     * @example accounts/binance
-     */
-    AccountName: string;
-    /**
-     * AddressVariant
-     * @description Internal means the engine has the key, external means it does not.
-     *     Shared means the engine has the key, but it can also be used in Create Signature.
-     * @enum {string}
-     */
-    AddressVariant: "internal" | "shared" | "external" | "validator";
-    /**
-     * BasicState
-     * @description Active / deleted state for resources that don't have a more specific state machine.
-     * @enum {string}
-     */
-    BasicState: "active" | "deleted";
-    /** Metadata */
-    Metadata: {
-      creator?: components["schemas"]["UserName"];
-      /** @description OUTPUT ONLY. */
-      create_time?: components["schemas"]["Timestamp"];
-      updater?: components["schemas"]["UserName"];
-      update_time?: components["schemas"]["Timestamp"];
-      /** @description OUTPUT ONLY. Increment each time the resource is modified. Plays the same role as ETag (entity tag) in HTTP. */
-      version?: components["schemas"]["ResourceVersion"];
-      /**
-       * @description Labels are indexed, meaning they are fast to query when filtering for them.
-       *
-       *     Labels with a `uid.` prefix will have a unique constraint,
-       *     meaning no two resources of the same type may have the same `uid.<key>=<value>` (added in `25.9.4`).
-       */
-      labels?: components["schemas"]["Labels"];
-      /** @description string values. */
-      notes?: components["schemas"]["Notes"];
-      tags?: components["schemas"]["Tags"];
-      /** @description Added in `25.12.1`.  A searchable description for the resource. */
-      description?: string;
-      proposal?: components["schemas"]["Proposal"];
+    /** AccessQuorumFilter */
+    AccessQuorumFilter: {
+      approvals?: number;
+      approve?: components["schemas"]["ExplicitUserFilter"];
+      /** @description No longer supported after `25.13.1`.  Instead, the initiator or any approvers may cancel. */
+      cancel?: components["schemas"]["UserFilter"];
+      initiate?: components["schemas"]["ExplicitUserFilter"];
     };
-    /**
-     * UserName
-     * @description The resource name for a user.
-     * @example users/admin-2
-     */
-    UserName: string;
-    /**
-     * Timestamp
-     * @description Seconds since UNIX epoch, encoded as UTC timestamp (ending in Z).
-     *
-     *     All resources have a `create_time` timestamp, which is set to the engine block time where the resource
-     *     is created in replicated engine state.
-     * @example 2024-07-30T11:30:15Z
-     */
-    Timestamp: string;
-    /** ResourceVersion */
-    ResourceVersion: number;
-    /**
-     * Labels
-     * @description Similar to "labels" in Kubernetes, stores "identifying data" of a resource. Values are strings, or null (for "tags"). It is recommended to namespace using a domain.
-     *
-     *     Standard labels:
-     *     - `creator`
-     *     - `sso`
-     * @example {
-     *       "sso": "joe@cocker.com",
-     *       "update-time": "2024-01-26T01:22:33Z"
-     *     }
-     */
-    Labels: {
-      [key: string]: string | null;
-    };
-    /**
-     * Notes
-     * @description Similar to "annotations" in Kubernetes, stores "non-identifying data" ofa resource. Values are strings. It is recommended to namespace using a domain.
-     *     Standard labels:
-     *     - `description`
-     *     - `email`
-     *     - `display-name`
-     * @example {
-     *       "description": "My first resource",
-     *       "display-name": "Cat Power"
-     *     }
-     */
-    Notes: {
-      [key: string]: string;
-    };
-    /**
-     * Tags
-     * @description A set of strings.  Tags be referenced in policy rules, like access-rules, transfer-rules, and staking-rules.
-     *
-     *     Added in `25.13.1`.
-     */
-    Tags: string[];
-    /** Proposal */
-    Proposal: {
-      name: string;
-      request?: components["schemas"]["Request"];
-    };
-    /**
-     * Request
-     * @description The main payload of the request is the `body`.
-     *     - for `Create` requests, it contains the desired resource's initial representation (`name` is disregarded if set - the name is determined by the choice of `create` vs `generate` actions, and the passed `parent` or resource `id` values).
-     *     - for `Update` requests, it contains the rows of the resource the client intends to modify
-     *     - for `Get`, `List`, and `Delete` requests, it is empty.
-     * @example {
-     *       "treasury": "0509e4b2-16af-46df-aea3-6d29bfdaff80",
-     *       "api": 1,
-     *       "action": "create",
-     *       "resource": "Role",
-     *       "id": "webauthn-only",
-     *       "vote": "approve",
-     *       "operation": "C60E7A5471594BAC1B26950EA51513C19149C35AC2A4C6E0FC7877860C099E02",
-     *       "body": "{\"credentials\":[\"web-authn\"]}",
-     *       "user": "joe",
-     *       "create_time": 1705941241,
-     *       "nonce": 339613079733,
-     *       "signature": "2a6117f93516b9bb02c6e79ef9ce1ce67151baed1ad76668a5599961a822536ffff6d730f8d447f604d43c5c0ea5b01fe8795975489084d97a8cf91098b2e601"
-     *     }
-     * @example {
-     *       "scheme": "https",
-     *       "authority": "treasury.cordialapis.com",
-     *       "api": 1,
-     *       "action": "generate",
-     *       "resource": "Address",
-     *       "parent": "ETH",
-     *       "user": "moe",
-     *       "create_time": 1705941241,
-     *       "nonce": 339613079733,
-     *       "signature": "8683e4990f7e2abb2039757e5efe3b2ce4389b6ed596c1c457ced2a30ef4669641a71bfd454305ee2b4452e1ea760c669aa7858e0fb5a1e2b0eb5b1467fb9113"
-     *     }
-     * @example {
-     *       "scheme": "https",
-     *       "authority": "treasury.cordialapis.com",
-     *       "api": 1,
-     *       "action": "create",
-     *       "resource": "Address",
-     *       "parent": "ETH",
-     *       "id": "0x2b3e38e966391e8604e39490ac881f5e23c107c4",
-     *       "user": "moe",
-     *       "create_time": 1705941241,
-     *       "nonce": 339613079733,
-     *       "signature": "string"
-     *     }
-     */
-    Request: components["schemas"]["Server"] & {
-      action?: components["schemas"]["Action"];
-    } & components["schemas"]["Partial_Resource_Name"] &
-      components["schemas"]["Reference"] & {
-        query?: components["schemas"]["Query"];
-      } & {
-        body?: components["schemas"]["Body"];
-      } & components["schemas"]["Authentication"] & {
-        sso?: components["schemas"]["SingleSignOn"];
-      };
-    /**
-     * Server
-     * @description API server details.
-     */
-    Server: {
-      /** @description e.g. `""` */
-      treasury?: components["schemas"]["Id"];
-      /** @description API version */
-      api?: components["schemas"]["ApiVersion"];
-    };
-    /**
-     * Id
-     * @description Alphanumeric, underscores, and dashes.
-     * @example _abc-DEF7
-     */
-    Id: string;
-    /** ApiVersion */
-    ApiVersion: number;
-    /**
-     * Action
-     * @description - `create`: Create resource, client may attempt to select resource ID
-     *     - `get`: Specific resource
-     *     - `list`: All resources of a resource type, filtered by parent ID if set
-     *     - `update`: Modify existing resource (`version` is used engine-side to prevent accidental reversion of concurrent modification attempts)
-     *     - `delete`: Delete a resource
-     *
-     *     Custom actions are defined by resource type, currently: `CustomUserAction` (`custom/heartbeat`), `CustomFeatureAction` (`custom/activate` and `custom/disable`), and , `CustomTransferRuleAction` (`custom/activate` and `custom/disable`).
-     *
-     *     `custom/recheck` added in `25.6.3`.
-     * @example create
-     * @enum {string}
-     */
-    Action:
-      | "create"
-      | "get"
-      | "list"
-      | "update"
-      | "delete"
-      | "custom/activate"
-      | "custom/disable"
-      | "custom/abort"
-      | "custom/retry"
-      | "custom/price"
-      | "custom/heartbeat"
-      | "custom/cancel"
-      | "custom/recheck";
-    /**
-     * Partial Resource Name
-     * @description The triple (parent, id, extension) of IDs is a higher-level than the URL path to which they correspond, but lower-level than the resource name or parent to which it corresponds (depending on the Action and whether the resource type is nested or not).
-     */
-    Partial_Resource_Name: {
-      resource: components["schemas"]["ResourceType"];
-      parent?: components["schemas"]["Id"];
-      id?: components["schemas"]["Id"];
-      extension?: components["schemas"]["Id"];
-    };
-    /**
-     * ResourceType
-     * @enum {string}
-     */
-    ResourceType:
-      | "AccessRule"
-      | "Account"
-      | "Address"
-      | "Asset"
-      | "Chain"
-      | "Credential"
-      | "Feature"
-      | "Key"
-      | "Operation"
-      | "Role"
-      | "Signature"
-      | "Transfer"
-      | "TransferRule"
-      | "User"
-      | "Treasury"
-      | "Transaction"
-      | "SoftwareUpdate"
-      | "Signer"
-      | "Symbol"
-      | "KeyResponse"
-      | "SignatureResponse"
-      | "Staking"
-      | "Signatory"
-      | "StakingRule"
-      | "Tag"
-      | "Host"
-      | "Call";
-    /**
-     * Reference
-     * @description Used when approving or challenging an `Operation in the `authorizing` state.
-     * @example {
-     *       "vote": "approve",
-     *       "operation": "C60E7A5471594BAC1B26950EA51513C19149C35AC2A4C6E0FC7877860C099E02"
-     *     }
-     */
-    Reference: {
-      vote?: components["schemas"]["Vote"];
-      /** @description `Id` of the `Operation` being judged */
-      operation?: components["schemas"]["Id"];
-    };
-    /**
-     * Vote
-     * @example approve
-     * @enum {string}
-     */
-    Vote: "approve" | "cancel";
-    /**
-     * Query
-     * @description This is any object with `string` values. Clients should strive to serialize this in sorted key order - but two query objects with the same key-value pairs are considered equal.
-     */
-    Query: {
-      [key: string]: string;
-    };
-    /**
-     * Body
-     * @description Body of an HTTP request. For `create` and `update` actions, this is some resource (e.g. `User`). For `get`, `list` and `delete` it is empty.
-     */
-    Body: string;
-    /**
-     * Authentication
-     * @description The create_time and nonce together contribute to replay protection - the engine will only accept the "same" request within a certain lookback window if the nonces differ.
-     */
-    Authentication: {
-      /**
-       * @description Seconds since the UNIX epoch, likely 10 digits.
-       * @example 1705941241
-       */
-      create_time?: number;
-      /**
-       * @description 12 digit integer, roughly 40 bits of entropy.
-       * @example 339613079733
-       */
-      nonce?: number;
-    } & components["schemas"]["ClientKeyData"] & {
-        signature?: components["schemas"]["Hex"];
-      };
-    /** ClientKeyData */
-    ClientKeyData: {
-      /** @enum {string} */
-      algorithm?: "ecdsa-k256-sha256" | "ecdsa-p256-sha256" | "ed25519";
-      /** @description Public Key (hex) of credential signing the message.  This should always be used except for WebAuthn signing. */
-      public_key?: components["schemas"]["Hex"];
-    } & {
-      /** @description ID of user signing the message - only valid for webauthn algorithm. This is special-cased, because WebAuthn cannot supply the public key before signing. */
-      user?: components["schemas"]["Id"];
-    };
-    /**
-     * Hex
-     * @description Hex-encoded bytes
-     */
-    Hex: string;
-    /**
-     * SingleSignOn
-     * @description A single-sign-on assertion includes a signature from your single-sign-on provider over a temporary credential that can than be used to sign a request to Treasury.
-     *
-     *     Treasury typically requires this for `human` variant users in addition to a primary signature.
-     */
-    SingleSignOn: {
-      /** @description Unix timestamp. */
-      create_time?: number;
-      /** @description random number */
-      nonce?: number;
-      /** @description JWT from SSO provider that has included the public key of the credential used to produce the signature. */
-      id?: string;
-      signature?: components["schemas"]["Hex"];
-    };
-    /**
-     * AccountData
-     * @description An account is a container for addresses. Adding or removing an address should usually be permissioned, as transfer rules may be formulated in terms of accounts, and have cascading effects on addresses.
-     */
-    AccountData: {
-      /**
-       * @description The addresses belonging to this account.
-       *     It's recommended to not use this field, and to query addresses directly with a filter for the account.
-       */
-      addresses?: components["schemas"]["AddressName"][];
-      defaults?: components["schemas"]["DefaultAddresses"];
-      fee_payer?: components["schemas"]["FeePayerPolicy"];
-    };
-    /**
-     * AddressName
-     * @description The name of an address consists of its (parent) chain name, its on-chain representation, and optionally a memo, separated by a `+`. In case the memo is not a valid ID, it will be mangled.
-     * @example chains/SOL/addresses/AAPGdMUVxGJqbY1gg6jMA7hnQdSzDtfcW4DPAVL56L9w
-     * @example chains/ATOM/addresses/cosmos13dd5eahz5xkytny9dqnpre7488hm7ahsnadr3w
-     * @example chains/ETH/addresses/0x2bc0dde194d722fe98ed3912cad464380f2225ac
-     * @example chains/ATOM/addresses/cosmos13dd5eahz5xkytny9dqnpre7488hm7ahsnadr3w+memo
-     */
-    AddressName: string;
-    /**
-     * DefaultAddresses
-     * @description Keys are `AssetChoice`s, values are `AddressName`s. These used to select the destination address for a transfer with only destination account given. A more specific matching asset key overrides any less specific chain key. Also helpful for defining policies.
-     *
-     *     Addresses are only considered valid if they are also in the account.
-     */
-    DefaultAddresses: {
-      [key: string]: components["schemas"]["AddressName"];
-    };
-    /**
-     * FeePayerPolicy
-     * @description Added in `v25.13.1`.
-     *
-     *     Permit or deny address to be used as a fee sponsor for transactions.  Default is to deny.
-     *
-     *     May be set on account level, which will be inherited by all addresses in the account.
-     *
-     *     Any update resulting in an inconsistent setting between an address in an account will be rejected.
-     *
-     *     While resources may be created with an initial fee-payer policy, it may only be updated using the custom fee-payer action.  It will otherwise be immutable.
-     * @enum {string}
-     */
-    FeePayerPolicy: "allow" | "deny";
-    /**
-     * Pagination
-     * @description Standard fields added in response to a `list` or `nested-list` action. The `next_page_token` is set if there is remaining data to be transmitted. This data can be verified by repeating the action, setting query parameter `page_token` to the given (opaque) value.
-     */
-    Pagination: {
-      page_size?: number;
-      total_size?: number;
-      next_page_token?: string;
-    };
-    /**
-     * OperationName
-     * @example operations/C60E7A5471594BAC1B26950EA51513C19149C35AC2A4C6E0FC7877860C099E02
-     */
-    OperationName: string;
-    /**
-     * ExplicitFeePayerPolicy
-     * @description Added in `v25.13.1`.
-     *
-     *     Compared to the FeePayerPolicy, this adds the explicit variant "unset".
-     * @enum {string}
-     */
-    ExplicitFeePayerPolicy: "allow" | "deny" | "unset";
-    /** AddressPage */
-    AddressPage: {
-      addresses?: components["schemas"]["Address"][];
-    } & components["schemas"]["Pagination"];
-    /**
-     * Address
-     * @example {
-     *       "name": "chains/ETH/addresses/0x3ec49e613ae70beb0631d7666f46d4ff2813932e",
-     *       "create_time": "2023-07-30T11:30:15Z",
-     *       "account": "accounts/spoofers",
-     *       "kind": "external",
-     *       "key": null
-     *     }
-     * @example {
-     *       "name": "chains/SOL/addresses/2mp7kgAGSUXMRPVtpJQxQwXpUw7UAhYjh2gjYeCL5zsMeL1VMKidcfeY5J1BptDtoAyb24U58qCGCe8QVui8Yz5x",
-     *       "create_time": "2018-02-30T03:30:15Z",
-     *       "account": "accounts/warm",
-     *       "kind": "managed",
-     *       "key": "keys/1"
-     *     }
-     */
-    Address: {
-      /** @description OUTPUT ONLY. */
-      name?: components["schemas"]["AddressName"];
-      variant?: components["schemas"]["AddressVariant"];
-      /** @description OUTPUT ONLY. */
-      state?: components["schemas"]["BasicState"];
-    } & components["schemas"]["Metadata"] &
-      components["schemas"]["AddressData"];
-    /**
-     * AddressData
-     * @description Addresses come in internal and external variants.
-     */
-    AddressData: {
-      /** @description Use an existing key for the address.  If used, any `algorithm` input will be ignored.  Invalid keys for the chain will be rejected. */
-      key?: components["schemas"]["KeyName"];
-      /** @description Immutable. Optional in create requests. Valid blockchain address. */
-      address?: components["schemas"]["BlockchainAddress"];
-      /** @description OUTPUT_ONLY.  If the address is in an account, the account name will be reflected here. */
-      account?: components["schemas"]["AccountName"];
-      /** @description Immutable.  Optional memo to associate with the address.  Only used for `external` variant. */
-      memo?: string;
-      /**
-       * @description INPUT_ONLY.  If not provided, the default algorithm for the chain will be used.  Unsupported algorithms for the chain will be rejected.  Added in `25.7.3`.
-       *
-       *     DEPRECATED.  Use `type` instead.
-       */
-      algorithm?: components["schemas"]["Algorithm"];
-      /** @description Select a type for the address if the chain different types.  Valid values are defined in the respective chain resource. */
-      type?: string;
-      /** @description Only for validator addresses that are to be externally supplied. Designation for the validator providers, e.g. `asymmetric`. */
-      provider?: string;
-      fee_payer?: components["schemas"]["FeePayerPolicy"];
-    };
-    /**
-     * KeyName
-     * @example key/1
-     * @example key/83737783
-     * @example key/my-key
-     */
-    KeyName: string;
-    /**
-     * BlockchainAddress
-     * @description Valid blockchain address.
-     *
-     *     Within treasury, resources have restricted `Id` values. For many blockchains, this is not a problem, as the "actual" address on the blockchain is a valid `Id`. For some, characters like `.` are used which are not valid in an `Id`. Hence, resources like `Address` and `Asset`, in general, use the normalized `Id` value corresponding to the blockchain address as their resource ID. They also have an optional field `blockchain_address` allowing to record the "real" blockchain address. It is required that this value normalizes to the resource ID of the resource.
-     * @example AAPGdMUVxGJqbY1gg6jMA7hnQdSzDtfcW4DPAVL56L9w
-     * @example 0x2bc0dde194d722fe98ed3912cad464380f2225ac
-     * @example cosmos13dd5eahz5xkytny9dqnpre7488hm7ahsnadr3w
-     */
-    BlockchainAddress: string;
-    /**
-     * Algorithm
-     * @description Signing algorithm. ed255 and taproot are Schnorr-like, k256* and p256 are ECDSA.
-     * @enum {string}
-     */
-    Algorithm:
-      | "ed255"
-      | "k256-keccak"
-      | "k256-sha2"
-      | "p256"
-      | "taproot"
-      | "bls12-381-g2-blake2";
-    /** AssetPage */
-    AssetPage: {
-      assets?: components["schemas"]["Asset"][];
-    } & components["schemas"]["Pagination"];
-    /**
-     * Asset
-     * @example {
-     *       "name": "chains/BTC/assets/BTC",
-     *       "create_time": "2023-07-30T011:30:15Z",
-     *       "symbol": "BTC.BTC",
-     *       "native": true,
-     *       "decimals": 8,
-     *       "description": "Bitcoin"
-     *     }
-     * @example {
-     *       "name": "chains/ETH/assets/ETH",
-     *       "create_time": "2023-07-30T011:30:15Z",
-     *       "symbol": "ETH.ETH",
-     *       "decimals": 18,
-     *       "native": true,
-     *       "description": "Ether"
-     *     }
-     * @example {
-     *       "name": "chains/ETH/assets/stETH",
-     *       "create_time": "2023-07-30T011:30:15Z",
-     *       "symbol": "stETH.ETH",
-     *       "native": true,
-     *       "decimals": 18,
-     *       "contract": "chains/ETH/addresses/0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
-     *       "description": "Lido Staked Ether"
-     *     }
-     * @example {
-     *       "name": "chains/SOL/assets/USDT",
-     *       "create_time": "2023-07-30T011:30:15Z",
-     *       "symbol": "USDT.SOL",
-     *       "native": false,
-     *       "decimals": 6,
-     *       "contract": "chains/SOL/addresses/Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
-     *       "description": "Tether"
-     *     }
-     */
-    Asset: {
-      /** @description OUTPUT ONLY. */
-      name?: components["schemas"]["AssetName"];
-      variant?: components["schemas"]["AssetVariant"];
-      /** @description OUTPUT ONLY. */
-      state?: components["schemas"]["BasicState"];
-    } & components["schemas"]["Metadata"] &
-      components["schemas"]["AssetData"];
-    /**
-     * AssetName
-     * @description Assets further have an immutable variant (`native` or `token`).
-     * @example chains/MATIC/assets/ETH
-     * @example chains/ETH/assets/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48
-     */
-    AssetName: string;
-    /**
-     * AssetVariant
-     * @enum {string}
-     */
-    AssetVariant: "native" | "token";
-    /**
-     * AssetData
-     * @description Assets come in native and token variants (perhaps, in the future, also nft variant).
-     */
-    AssetData: {
-      /** @description OUTPUT_ONLY.  Enforced to be unique for a given chain by engine. */
-      symbol?: components["schemas"]["SymbolName"];
-      decimals?: number;
-      /** @description Immutable. Optional in create requests. Valid blockchain contract address. */
-      contract?: components["schemas"]["BlockchainAddress"];
-      /** @description `OPTIONAL`, `OUTPUT_ONLY`. Notional price data (USD). This nested field can *not* be set in Create or Update, only with the custom `/price` method. */
-      price?: components["schemas"]["Price"];
-    };
-    /**
-     * SymbolName
-     * @example chains/SOL/symbols/BONK
-     */
-    SymbolName: string;
-    /** Price */
-    Price: {
-      amount: components["schemas"]["PositiveDecimal"];
-      valid_time: components["schemas"]["Timestamp"];
-    };
-    /**
-     * PositiveDecimal
-     * @description Positive decimal amount.
-     *
-     *     Transmitted as string to avoid precision truncations.
-     */
-    PositiveDecimal: string;
-    /** ChainPage */
-    ChainPage: {
-      chains?: components["schemas"]["Chain"][];
-    } & components["schemas"]["Pagination"];
-    /**
-     * Chain
-     * @description We tend to use the symbol of the native/gas asst of the chain as symbol of the chain, as one does.
-     * @example {
-     *       "name": "chains/SOL",
-     *       "create_time": "2023-07-30T011:30:15Z",
-     *       "confirmations": 4,
-     *       "symbol": "SOL"
-     *     }
-     * @example {
-     *       "name": "chains/ETH",
-     *       "create_time": "2023-07-30T011:30:15Z",
-     *       "symbol": "ETH",
-     *       "description": "Ethereum"
-     *     }
-     * @example {
-     *       "name": "chains/MATIC",
-     *       "create_time": "2023-07-30T011:30:15Z",
-     *       "symbol": "MATIC",
-     *       "description": "Polygon"
-     *     }
-     * @example {
-     *       "name": "chains/BTC",
-     *       "create_time": "2023-07-30T011:30:15Z",
-     *       "symbol": "BTC"
-     *     }
-     */
-    Chain: {
-      /** @description OUTPUT ONLY. */
-      name?: components["schemas"]["ChainName"];
-      /** @description OUTPUT ONLY. */
-      state?: components["schemas"]["BasicState"];
-      variant: components["schemas"]["ChainVariant"];
-    } & components["schemas"]["Metadata"] &
-      components["schemas"]["ChainData"];
-    /**
-     * ChainName
-     * @example chains/SOL
-     */
-    ChainName: string;
-    /**
-     * ChainVariant
-     * @enum {string}
-     */
-    ChainVariant: "native" | "custom";
-    /** ChainData */
-    ChainData: {
-      symbol?: string;
-      /** @description Number of blocks on top of an included transaction required to consider transaction final. */
-      confirmations?: number;
-      priority?: components["schemas"]["Priority"];
-      fee_limits?: components["schemas"]["FeeLimits"];
-      retry?: components["schemas"]["RetryPolicy"];
-      /** @description This is set only when the chain has multiple types of addresses. */
-      address?: components["schemas"]["ChainAddressConfig"];
-    };
-    /** Priority */
-    Priority:
-      | components["schemas"]["PriorityPreset"]
-      | components["schemas"]["PositiveDecimal"];
-    /**
-     * PriorityPreset
-     * @description Priority Preset defers to Treasury to determine the gas fees to land transactions on chain.
-     *
-     *     **low**: Will be lower than market rate to save on fees.
-     *
-     *     **market**: Pay current market rate.
-     *
-     *     **aggressive**: Pay a premium over market rate to ensure transaction always lands quickly.
-     *
-     *     **very-aggressive**: Pay an even larger premium, meant for very volatile periods.
-     * @enum {string}
-     */
-    PriorityPreset: "low" | "market" | "aggressive" | "very-aggressive";
-    /**
-     * FeeLimits
-     * @description Introduced in `v25.3.1`.
-     *
-     *     A set describing the maximum total amount that could be paid in a transaction.  This does not influence fee estimation in any way, but instead will block any transaction with a fee exceeding the limit.
-     *
-     *     For example, if the fee limit for `ETH` asset is "0.1", then any transaction on that chain spending >0.1 `ETH` for the fee will be rejected.
-     *
-     *     A transaction that tries to spend an asset for fee that does not have a limit will be rejected.
-     *
-     *     The intent is to provide a configureable sanity limit to protect from fee griefing attacks.
-     * @example {
-     *       "SOL": "0.5"
-     *     }
-     * @example {
-     *       "uusdc": "10.0",
-     *       "ueure": "10.0"
-     *     }
-     */
-    FeeLimits: {
-      [key: string]: string;
-    };
-    /**
-     * RetryPolicy
-     * @description `EXPERIMENTAL` Added in `25.7.2`.
-     *
-     *     Defining a retry policy will enable transactions to be automatically retried if they are still in `submitting` or `finalizing` state after a certain time period.
-     * @example {
-     *       "attempts": 2,
-     *       "period": "10d"
-     *     }
-     */
-    RetryPolicy: {
-      /** @description Number of attempts before failing the transaction. */
-      attempts: number;
-      /** @description Period inbetween attempts.  If omitted, it will never retry. */
-      after?: components["schemas"]["Duration"];
-      /** @description Optional list of RPC error response messages.  If set, it will limit attempts to retry if the broadcast RPC error message matches one of these messages. */
-      message?: components["schemas"]["StringFilter"];
-    };
-    /**
-     * Duration
-     * @description Multiple of either weeks, days, hours, minutes or seconds. Compared to Go's time.ParseDuration, this is both a simplification of (only positive, integer values, no mixing of say hours and minutes) and an extension (week support, and day support defined as `1d` = `24h`). In normalized form, the largest base unit should be used (e.g. `1d` instead of `24h`, but can use `36h` for a day and a half).
-     * @example 10d
-     */
-    Duration: string;
-    /**
-     * StringFilter
-     * @example string
-     * @example [
-     *       "string1",
-     *       "string2"
-     *     ]
-     */
-    StringFilter: string | string[];
-    /**
-     * ChainAddressConfig
-     * @example {
-     *       "types": [
-     *         "segwit",
-     *         "taproot",
-     *         "legacy"
-     *       ]
-     *     }
-     * @example {
-     *       "types": [
-     *         "icp",
-     *         "icrc1"
-     *       ]
-     *     }
-     */
-    ChainAddressConfig: {
-      types: string[];
-    };
-    /** CredentialPage */
-    CredentialPage: {
-      credentials?: components["schemas"]["Credential"][];
-    } & components["schemas"]["Pagination"];
-    /** Credential */
-    Credential: {
-      /** @description OUTPUT ONLY. */
-      name?: components["schemas"]["CredentialName"];
-      variant?: components["schemas"]["CredentialVariant"];
-      /** @description OUTPUT ONLY. */
-      state?: components["schemas"]["BasicState"];
-    } & components["schemas"]["Metadata"] &
-      components["schemas"]["CredentialData"];
-    /**
-     * CredentialName
-     * @description Name of a credential.
-     * @example users/joe/credentials/3
-     */
-    CredentialName: string;
-    /**
-     * CredentialVariant
-     * @enum {string}
-     */
-    CredentialVariant:
-      | "session"
-      | "k256"
-      | "web-authn"
-      | "web-authn-uv"
-      | "invite"
-      | "ed255"
-      | "p256";
-    /** CredentialData */
-    CredentialData: {
-      /** @description `IMMUTABLE`. Public key, hex encoded. */
-      public_key?: components["schemas"]["Hex"];
-      /** @description `INPUT_ONLY` This is parsed and verified by the engine. It then sets `raw_id` and `aaguid`. Base64 encoded. */
-      attestation?: components["schemas"]["StdBase64"];
-      /** @description `OUTPUT_ONLY`. This is only provided when the credential is a web-authn kind.  Base64 encoded. */
-      raw_id?: components["schemas"]["StdBase64"];
-      /** @description `OUTPUT_ONLY`. This is only provided when the credential is a web-authn kind.  Base64 encoded. */
-      aaguid?: components["schemas"]["StdBase64"];
-    };
-    /**
-     * StdBase64
-     * @description Standard Base64 encoded bytes.
-     */
-    StdBase64: string;
-    /** OperationPage */
-    OperationPage: {
-      operations?: components["schemas"]["Operation"][];
-    } & components["schemas"]["Pagination"];
-    /**
-     * Operation
-     * @description TODO: Decide whether to include `resource: ResourceVersion`, keeping the data more concise (at the risk of the client not being able to retrieve the correct resource data at the version just after performing the operation), or instead to include the full resource in successful responses.
-     */
-    Operation: {
-      name?: components["schemas"]["OperationName"];
-      state?: components["schemas"]["OperationState"];
-    } & components["schemas"]["Metadata"] &
-      components["schemas"]["OperationData"];
-    /**
-     * OperationState
-     * @description A valid request can either be immediately allowed or denied (and will end up in the `succeeded` or `failed` state)_, or require additional approvals (starts in the `authorizing` state).
-     *
-     *     An initiator has the operation ID, and can poll the operation until it is in one of the two terminal state.
-     *
-     *     An approver or challenger can poll all operations, filtering by `authorizing`, and send their votes.
-     *
-     *     ### Cases
-     *     **authorizing**: User sent a valid `Request` for an operation, but further approvals are required to authorize the operation.
-     *
-     *     **creating-resource**: The operation is authorized, but the engine is waiting for an off-chain worker to name the resource. Only current case is `Generate (internal) Address`, where the address ID is derived from the public key of the keypair that is created by the signer for this address.
-     *
-     *     **succeeded**: Terminal state - the operation completed successfully. The `resource_name` field in the `Operation` can be used to fetch the new resource.
-     *
-     *     **failed**: Terminal state - the operation failed (either challenged, timed out, or creating the resource after authorization failed).
-     * @example authorizing
-     * @enum {string}
-     */
-    OperationState:
-      | "authorizing"
-      | "creating-resource"
-      | "succeeded"
-      | "failed";
-    /**
-     * OperationData
-     * @description In states `authorizing` and `creating-resource`, there is neither a `response` nor an `error` field.
-     *
-     *     In state `succeeded`, there is a `response` field of type `Response`, but no `error` field.
-     *
-     *     In state `failed`, there is an `error` field of type `Error`, but no `response` field.
-     *
-     *     NOTE: For some reason, Stoplight chokes on representing this. The OperationData.yaml seems to be correct, hopefully code generators can handle it. Otherwise we can set the schema to just always have a field `request: Request` and a field `error: Error`, and explain things.
-     */
-    OperationData: {
-      initiator: components["schemas"]["UserName"];
-      approve?: components["schemas"]["UserName"][];
-      cancel?: components["schemas"]["UserName"][];
-    } & {
-      request?: components["schemas"]["Request"];
-    } & {
-      response?: components["schemas"]["Response"];
-      error?: components["schemas"]["Error"];
-      /**
-       * @description `EXPERIMENTAL` An operation may be "compound", meaning multiple resources are modified.
-       *     This will contain the list of responses, for each modified resource.
-       *     It is ordered in order of modification, and always includes `.response`.
-       *
-       *     This is omitted if an operation is not compound.
-       */
-      effects?: components["schemas"]["Response"][];
-    };
-    /**
-     * Response
-     * @description Response of engine to successful operation.
-     */
-    Response: {
-      /** @description `Name` of resource that was operated on. This may not have been determined by the original `Request`. */
-      name?: string;
-      /** @description Resource `version` of resource immediately after the operation completed. For `Create`, this will be `0`. For `Update`, it will be "version seen by initiator plus one". */
-      version?: components["schemas"]["ResourceVersion"];
-    };
-    /**
-     * Error
-     * @description On success, APIs return HTTP 200 OK and their specified return value.
-     *
-     *     On error, an HTTP code in the 400/500 range is returned, the `code` and `message` should be used to determine the source of error. Only `code` is part of the API surface, clients should not use the `message` for error handling (it is intended for developers).
-     *
-     *     Sometimes, further details may be listed in the `details` array.
-     *
-     *     `Unknown` is used if we have no clear explanation (e.g. error reporting in code is not fully built out yet).
-     *
-     *     `Invalid Argument` is typically a programming error.
-     *
-     *     `Unauthenticated` is an authn error, vs. `Permission Denied` which is an authz error.
-     *
-     *     For MPC:
-     *     - `Deadline Exceed` can indicate some node failed to participate in time
-     *     - `Aborted` can indicate some node failed to participate correctly
-     *
-     *     |Code|Name|HTTP Code|HTTP Name|CRUD|Description|
-     *     |----|----|---------|---------|----|-----------|
-     *     |1|Cancelled|400|Bad Request|_not used_||
-     *     |2|Unknown|500|Internal Server Error|`*`|Unknown error|
-     *     |3|Invalid Argument|400|Bad Request|`*`|The client specified an invalid argument|
-     *     |4|Deadline Exceeded|500|Internal Server Error|_not used_|The deadline expired before the operation could complete.|
-     *     |5|Not Found|404|Not Found|`Read`, `Delete`|Some requested entity was not found|
-     *     |6|Already Exists|409|Conflict|`Create`|The entity that a client attempted to create already exists|
-     *     |7|Permission Denied|403|Forbidden|`*`|The caller does not have permission to execute the specified operation|
-     *     |8|Resource Exhausted|429|Too Many Requests|_not used_||
-     *     |9|Failed Precondition|400|Bad Request|_not used_|The operation was rejected because the system is not in a state required for the operation's execution|
-     *     |10|Aborted|409|Conflict|_not used_|The operation was aborted|
-     *     |11|Out of Range|400|Bad Request|`Read`|The operation was attempted past the valid range|
-     *     |12|Unimplemented|501|Not Implemented|`*`|The operation is not implemented or is not supported/enabled in this service|
-     *     |13|Internal|500|Internal Server Error|`*`|This error code is reserved for serious errors|
-     *     |14|Unavailable|503|Service Unavailable|`*`|The service is currently unavailable.  This is most likely a transient condition, which can be corrected by retrying with a backoff|
-     *     |15|Data Loss|500|Internal Server Error|_not used_|Unrecoverable data loss or corruption|
-     *     |16|Unauthenticated|401|Unauthorized|`*`|The request does not have valid authentication credentials for the operation|
-     * @example {
-     *       "code": 2,
-     *       "status": "Unknown",
-     *       "message": "Error in Trip",
-     *       "details": [
-     *         "incorrect secret openings: {2, 3}"
-     *       ]
-     *     }
-     * @example {
-     *       "code": 2,
-     *       "status": "Unknown",
-     *       "message": "Error in Trip",
-     *       "details": [
-     *         "incorrect secret openings: {2, 3}"
-     *       ]
-     *     }
-     */
-    Error: {
-      code: components["schemas"]["ErrorCode"];
-      /** @description Code as a string for debugging convenience. */
-      status: components["schemas"]["ErrorStatus"];
-      message: string;
-      /** @description Details may be set on some requests where additional structured data may help troubleshoot.  For example, this will be set when policy rejects a request. */
-      details?: Record<string, unknown>[];
-    };
-    /** ErrorCode */
-    ErrorCode: number;
-    /**
-     * ErrorStatus
-     * @enum {string}
-     */
-    ErrorStatus:
-      | "Cancelled"
-      | "Unknown"
-      | "Invalid Argument"
-      | "Deadline Exceeded"
-      | "Not Found"
-      | "Already Exists"
-      | "Permission Denied"
-      | "Resource Exhausted"
-      | "Failed Precondition"
-      | "Aborted"
-      | "Out Of Range"
-      | "Unimplemented"
-      | "Internal"
-      | "Unavailable"
-      | "Data Loss"
-      | "Unauthenticated"
-      | "Canceled";
-    /** TransferPage */
-    TransferPage: {
-      transfers?: components["schemas"]["Transfer"][];
-    } & components["schemas"]["Pagination"];
-    /**
-     * Transfer
-     * @description Semantic representation of a transfer of one asset between two addresses.
-     *
-     *     - if `from` is set to an account, then a single address with sufficient balance for the asset is selected as from address (else failure)
-     *     - if `to` is set to an account, then one of the preferred receive addresses for the chain is selected (else failure).
-     *
-     *     Creation of a Transfer resource requires:
-     *     - initiator and approvers are sufficiently authorized
-     *     - the transfer resource passes the routing policy
-     *     - the transfer resource passes the approvals policy
-     *
-     *     Once a transfer resource exists (identified by monotonic ID),
-     *     the engine will produce
-     *     - one (the happy path)
-     *     - zero (if insufficiently funded), or
-     *     - more than one (if retries are necessary)
-     *     Transaction resources, by signing a binary representation of the transfer.
-     */
-    Transfer: {
-      /** @description OUTPUT ONLY. */
-      name: components["schemas"]["TransferName"];
-      /** @description OUTPUT ONLY. */
-      state: components["schemas"]["TransferState"];
-    } & components["schemas"]["Metadata"] &
-      components["schemas"]["TransferData"];
-    /**
-     * TransferName
-     * @example transfers/1
-     */
-    TransferName: string;
-    /**
-     * TransferState
-     * @description - **preparing**: Gathering inputs needed to construct the transaction for the transfer.
-     *     - **queued**: The transaction is waiting on another transaction to complete before continuing.
-     *     - **signing**: Waiting for the signer to sign the binary transaction
-     *     - **submitting**: Waiting for confirmation that the signed transactions was submitted successfully
-     *     - **finalizing**: Waiting for confirmation that the signed transactions was is sufficiently final (requirement depends on the upstream chain, for instance Cosmos is instantly final, whereas Bitcoin usually uses 6 confirmations for finality)
-     *     - **succeeded**: Transaction has enough confirmations to be considered final for the given chain
-     *     - **failed**: This transfer failed, and nothing can be done to make further progress
-     *     - **reverted**:  The transfer landed on chain but reverted due to an error.
-     * @enum {string}
-     */
-    TransferState:
-      | "preparing"
-      | "signing"
-      | "submitting"
-      | "finalizing"
-      | "succeeded"
-      | "failed"
-      | "queued"
-      | "reverted";
-    /**
-     * TransferData
-     * @description Semantic representation of a transfer of one asset between two addresses.
-     *
-     *     - if `from` is set to an account, then a single address with sufficient balance for the asset is selected as from address (else failure)
-     *     - if `to` is set to an account, then one of the preferred receive addresses for the chain is selected (else failure).
-     *
-     *     Creation of a Transfer resource requires:
-     *     - initiator and approvers are sufficiently authorized
-     *     - the transfer resource passes the routing policy
-     *     - the transfer resource passes the approvals policy
-     *
-     *     Once a transfer resource exists (identified by monotonic ID),
-     *     the engine will produce
-     *     - one (the happy path)
-     *     - zero (if insufficiently funded), or
-     *     - more than one (if retries are necessary)
-     *     Transaction resources, by signing a binary representation of the transfer.
-     */
-    TransferData: {
-      /**
-       * @description May input an asset name or symbol name.
-       *     The created resource will always output the asset name, along with the current `symbol`.
-       */
-      asset: components["schemas"]["AssetName"];
-      symbol?: components["schemas"]["SymbolName"];
-      amount?: components["schemas"]["PositiveDecimal"];
-      from:
-        | components["schemas"]["AddressName"]
-        | components["schemas"]["AddressName"][];
-      to:
-        | components["schemas"]["AddressName"]
-        | components["schemas"]["AddressWithAmount"][];
-      priority?: components["schemas"]["Priority"];
-      fee?: components["schemas"]["Fee"];
-      /** @description Set a transaction memo.  Added in `25.6.4`. */
-      memo?: string;
-      /** @description An optional retry policy.  This will override any retry policy defined on the respective `Chain`.  Added in `25.10.1`. */
-      retry?: components["schemas"]["RetryPolicy"];
-      /**
-       * @description OUTPUT ONLY.  The last transaction created for this transfer.  New transactions only get created when retrying the transfer.
-       *     See separate transaction query to see full history.
-       */
-      last_transaction?: components["schemas"]["TransactionName"];
-      error?: components["schemas"]["TransactionError"];
-    };
-    /** AddressWithAmount */
-    AddressWithAmount: {
-      address: components["schemas"]["AddressName"];
-      amount: string;
-    };
-    /** Fee */
-    Fee: {
-      /** @description If set, the transaction fee will be deducted from the transfer amount. */
-      inclusive?: boolean;
-      /** @description Option to set an alternative address to pay for fee. */
-      payer?: components["schemas"]["AddressName"];
-    };
-    /**
-     * TransactionName
-     * @example transactions/123
-     */
-    TransactionName: string;
-    /**
-     * TransactionError
-     * @description An error with an on-going transaction.
-     */
-    TransactionError: {
-      message: string;
-      status: components["schemas"]["TransactionErrorStatus"];
-    };
-    /**
-     * TransactionErrorStatus
-     * @enum {string}
-     */
-    TransactionErrorStatus:
-      | "InvalidArgument"
-      | "FailedPrecondition"
-      | "Unavailable"
-      | "TimedOut"
-      | "InsufficientBalance"
-      | "InsufficientBalanceForGas"
-      | "SigningFailed"
-      | "BroadcastFailed"
-      | "Aborted"
-      | "Reverted"
-      | "Unknown"
-      | "FailedPreparation";
-    /**
-     * TransferCreate
-     * @description Semantic representation of a transfer of one asset between two addresses.
-     *
-     *     - if `from` is set to an account, then a single address with sufficient balance for the asset is selected as from address (else failure)
-     *     - if `to` is set to an account, then one of the preferred receive addresses for the chain is selected (else failure).
-     *
-     *     Creation of a Transfer resource requires:
-     *     - initiator and approvers are sufficiently authorized
-     *     - the transfer resource passes the routing policy
-     *     - the transfer resource passes the approvals policy
-     *
-     *     Once a transfer resource exists (identified by monotonic ID),
-     *     the engine will produce
-     *     - one (the happy path)
-     *     - zero (if insufficiently funded), or
-     *     - more than one (if retries are necessary)
-     *     Transaction resources, by signing a binary representation of the transfer.
-     */
-    TransferCreate: components["schemas"]["Metadata"] &
-      components["schemas"]["TransferCreateData"];
-    /**
-     * TransferCreateData
-     * @description Semantic representation of a transfer of one asset between two addresses.
-     *
-     *     - if `from` is set to an account, then a single address with sufficient balance for the asset is selected as from address (else failure)
-     *     - if `to` is set to an account, then one of the preferred receive addresses for the chain is selected (else failure).
-     *
-     *     Creation of a Transfer resource requires:
-     *     - initiator and approvers are sufficiently authorized
-     *     - the transfer resource passes the routing policy
-     *     - the transfer resource passes the approvals policy
-     *
-     *     Once a transfer resource exists (identified by monotonic ID),
-     *     the engine will produce
-     *     - one (the happy path)
-     *     - zero (if insufficiently funded), or
-     *     - more than one (if retries are necessary)
-     *     Transaction resources, by signing a binary representation of the transfer.
-     */
-    TransferCreateData: {
-      /**
-       * @description May input an asset name or symbol name.
-       *     The created resource will always output the asset name, along with the current `symbol`.
-       */
-      asset: components["schemas"]["AssetOrSymbol"];
-      amount?: components["schemas"]["PositiveDecimal"];
-      from:
-        | components["schemas"]["AddressChoice"]
-        | components["schemas"]["AddressChoice"][];
-      to:
-        | components["schemas"]["AddressChoice"]
-        | components["schemas"]["AddressChoiceWithAmount"][];
-      priority?: components["schemas"]["Priority"];
-      /** @description Set a transaction memo.  Added in `25.6.4`. */
-      memo?: string;
-      fee?: components["schemas"]["FeeCreate"];
-      /** @description An optional retry policy.  This will override any retry policy defined on the respective `Chain`.  Added in `25.10.1`. */
-      retry?: components["schemas"]["RetryPolicy"];
-    };
-    /** AssetOrSymbol */
-    AssetOrSymbol:
-      | components["schemas"]["AssetName"]
-      | components["schemas"]["SymbolName"];
-    /**
-     * AddressChoice
-     * @description This is not used as filter, but as field in TransferData
-     */
-    AddressChoice:
-      | components["schemas"]["AddressName"]
-      | components["schemas"]["AccountName"];
-    /** AddressChoiceWithAmount */
-    AddressChoiceWithAmount: {
-      address: components["schemas"]["AddressChoice"];
-      amount: string;
-    };
-    /** FeeCreate */
-    FeeCreate: {
-      /** @description If set, the transaction fee will be deducted from the transfer amount. */
-      inclusive?: boolean;
-      /** @description Option to set an alternative address to pay for fee. */
-      payer?: components["schemas"]["AddressChoice"];
-    };
-    /** StakingPage */
-    StakingPage: {
-      stakings?: components["schemas"]["Staking"][];
-    } & components["schemas"]["Pagination"];
-    /**
-     * Staking
-     * @description Semantic representation of a delegated staking operation of one native asset controlled by one address.
-     *
-     *     `stake` - move liquid assets into a active stake with some validator or provider.
-     *     `unstake` - move staked assets into an inactive or liquid state.
-     *     `withdraw` - withdraw inactive staked assets into the original liquid state.
-     *
-     *     Creation of a Stake resource requires:
-     *     - initiator and approvers are sufficiently authorized
-     *     - the staking resource passes the routing policy
-     *     - the staking resource passes the approvals policy
-     *
-     *     Once a staking resource exists (identified by monotonic ID),
-     *     the engine will produce a transaction that realizes the desired operation on the target chain.
-     *
-     *     Most chains require a validator.  Some chains, like Ethereum, require a 3rd party "provider" to manage the validator on your behalf.
-     */
-    Staking: {
-      /** @description OUTPUT ONLY. */
-      name?: components["schemas"]["StakingName"];
-      /** @description OUTPUT ONLY. */
-      state?: components["schemas"]["TransferState"];
-      variant: components["schemas"]["StakingVariant"];
-    } & components["schemas"]["Metadata"] &
-      components["schemas"]["StakingData"];
-    /**
-     * StakingName
-     * @example staking/1
-     */
-    StakingName: string;
-    /**
-     * StakingVariant
-     * @description Staking operations.  Not all chains use `withdraw`, as it's done automatically in `unstake` transactions.
-     * @enum {string}
-     */
-    StakingVariant: "stake" | "unstake" | "withdraw";
-    /** StakingData */
-    StakingData: {
-      /**
-       * @description Optional.  The asset to stake.
-       *
-       *     Most chains only support staking one asset, which will be used as the default.
-       */
-      asset: components["schemas"]["AssetName"];
-      symbol?: components["schemas"]["SymbolName"];
-      /** @description The amount is required depending on the chain.  Some chains will use the full address balance instead of a specified amount. */
-      amount?: components["schemas"]["PositiveDecimal"];
-      from: components["schemas"]["AddressName"];
-      /** @description The validator address to stake to.  This is optional depending on the chain or protocol.  It is required on most. */
-      to?: components["schemas"]["AddressName"];
-      priority?: components["schemas"]["Priority"];
-      /**
-       * @description OUTPUT ONLY.  The last transaction created for this transfer.  New transactions only get created when retrying the transfer.
-       *     See separate transaction query to see full history.
-       */
-      last_transaction?: components["schemas"]["TransactionName"];
-      error?: components["schemas"]["TransactionError"];
-    };
-    /** UserPage */
-    UserPage: {
-      users?: components["schemas"]["User"][];
-    } & components["schemas"]["Pagination"];
-    /** User */
-    User: {
-      /** @description `OUTPUT ONLY`, `IMMUTABLE`. */
-      name?: components["schemas"]["UserName"];
-      /** @description `IMMUTABLE` */
-      variant: components["schemas"]["UserVariant"];
-      /** @description OUTPUT ONLY. */
-      state?: components["schemas"]["UserState"];
-    } & components["schemas"]["Metadata"] &
-      components["schemas"]["UserData"];
-    /**
-     * UserVariant
-     * @example human
-     * @enum {string}
-     */
-    UserVariant: "human" | "machine";
-    /**
-     * UserState
-     * @description Added after `25.12.1`.
-     *
-     *     **active**: User has a credential registered.
-     *
-     *     **inactive**: User does not have any credential or invite code.
-     *
-     *     **invited**: User has been invited.  User will be deleted if their invitation expires or is deleted.
-     * @example active
-     * @example invited
-     * @enum {string}
-     */
-    UserState: "active" | "inactive" | "invited";
-    /**
-     * UserData
-     * @description The array of credentials for this user is not duplicated here - instead, perform a nested list of credentials under the user `GET /users/joe/credentials`.
-     */
-    UserData: {
-      roles?: components["schemas"]["RoleName"][];
-      active_time?: components["schemas"]["Timestamp"];
-      /** @description `IMMUTABLE` The SSO subject (OAuth identifier) of the user, as used by identity provider, for use with OpenPubkey credentials. */
-      sso?: components["schemas"]["UserSso"];
-      /**
-       * @description `INPUT_ONLY` The public key of an invite code.
-       *
-       *     The user will need to use this invite in order to register a credential.
-       *
-       *     Upon registering, the user will switch to `active` state.  Otherwise if the invite expires, then this user will be deleted.
-       *
-       *     Providing this field is equivilent to creating a User and then separately creating an `invite` credential.
-       */
-      invite?: components["schemas"]["Hex"];
-    };
-    /**
-     * RoleName
-     * @description The resource name for a role.
-     * @example roles/admin
-     */
-    RoleName: string;
-    /** UserSso */
-    UserSso: {
-      subject: string;
-      issuer: string;
-    };
-    /** RolePage */
-    RolePage: {
-      roles?: components["schemas"]["Role"][];
-    } & components["schemas"]["Pagination"];
-    /** Role */
-    Role: {
-      /** @description OUTPUT ONLY. */
-      name?: components["schemas"]["RoleName"];
-      /** @description OUTPUT ONLY. */
-      state?: components["schemas"]["BasicState"];
-    } & components["schemas"]["Metadata"] &
-      components["schemas"]["RoleData"];
-    /**
-     * RoleData
-     * @description Optionally, a role allows restricting only users with the right variant, and/or only using credentials with the right variant, to authenticate themselves.
-     *
-     *     Empty/missing `credentials` or `users` fields are interpreted as wildcard (no restriction).
-     */
-    RoleData: {
-      credential?: components["schemas"]["CredentialVariantFilter"];
-      user?: components["schemas"]["UserVariantFilter"];
-    };
-    /** CredentialVariantFilter */
-    CredentialVariantFilter:
-      | components["schemas"]["CredentialVariant"]
-      | components["schemas"]["CredentialVariant"][];
-    /** UserVariantFilter */
-    UserVariantFilter:
-      | components["schemas"]["UserVariant"]
-      | components["schemas"]["UserVariant"][];
-    /** FeaturePage */
-    FeaturePage: {
-      features?: components["schemas"]["Feature"][];
-    } & components["schemas"]["Pagination"];
-    /**
-     * Feature
-     * @description Features are enabled/disabled by updating their `state`.
-     */
-    Feature: {
-      name?: components["schemas"]["FeatureName"];
-      state?: components["schemas"]["DisableableState"];
-    } & components["schemas"]["Metadata"] &
-      components["schemas"]["FeatureData"];
-    /**
-     * FeatureName
-     * @example features/new-and-shiny
-     */
-    FeatureName: string;
-    /**
-     * DisableableState
-     * @enum {string}
-     */
-    DisableableState: "active" | "disabled" | "deleted";
-    /** FeatureData */
-    FeatureData: Record<string, unknown>;
-    /** AccessRulePage */
-    AccessRulePage: {
-      "access-rules"?: components["schemas"]["AccessRule"][];
-    } & components["schemas"]["Pagination"];
     /** AccessRule */
     AccessRule: {
       /** @description OUTPUT ONLY. */
       name?: components["schemas"]["AccessRuleName"];
-      variant?: components["schemas"]["RuleVariant"];
       /** @description OUTPUT ONLY. */
       state?: components["schemas"]["BasicState"];
+      variant?: components["schemas"]["RuleVariant"];
     } & components["schemas"]["Metadata"] &
       components["schemas"]["AccessRuleData"];
-    /**
-     * AccessRuleName
-     * @description Single segment variant name, with plural: iam-rules
-     * @example access-rules/micromanage
-     * @example access-rules/freeze-everything
-     */
-    AccessRuleName: string;
-    /**
-     * RuleVariant
-     * @enum {string}
-     */
-    RuleVariant: "allow" | "require" | "deny";
     /**
      * AccessRuleData
      * @description NB: Whether the following rules are allow, require or deny rules is variant metadata, encoded in the rule's name.
@@ -3344,13 +1990,81 @@ export interface components {
      */
     AccessRuleData: components["schemas"]["RequestFilter"] &
       components["schemas"]["AccessQuorumFilter"];
-    /** RequestFilter */
-    RequestFilter: {
-      action: components["schemas"]["ActionFilter"];
-      /** @description A resource must be specified. */
-      resource?: components["schemas"]["ResourceFilter"];
-      data?: components["schemas"]["DataFilter"];
+    /**
+     * AccessRuleName
+     * @description Single segment variant name, with plural: iam-rules
+     * @example access-rules/micromanage
+     * @example access-rules/freeze-everything
+     */
+    AccessRuleName: string;
+    /** AccessRulePage */
+    AccessRulePage: {
+      "access-rules"?: components["schemas"]["AccessRule"][];
+    } & components["schemas"]["Pagination"];
+    /** Account */
+    Account: {
+      /** @description OUTPUT ONLY. */
+      name?: components["schemas"]["AccountName"];
+      /** @description OUTPUT ONLY. */
+      state?: components["schemas"]["BasicState"];
+      variant?: components["schemas"]["AddressVariant"];
+    } & components["schemas"]["Metadata"] &
+      components["schemas"]["AccountData"];
+    /**
+     * AccountData
+     * @description An account is a container for addresses. Adding or removing an address should usually be permissioned, as transfer rules may be formulated in terms of accounts, and have cascading effects on addresses.
+     */
+    AccountData: {
+      /**
+       * @description The addresses belonging to this account.
+       *     It's recommended to not use this field, and to query addresses directly with a filter for the account.
+       */
+      addresses?: components["schemas"]["AddressName"][];
+      defaults?: components["schemas"]["DefaultAddresses"];
+      fee_payer?: components["schemas"]["FeePayerPolicy"];
     };
+    /**
+     * AccountDefaults
+     * @description Use in transfer policy: Binds to the default addresses of a given account.
+     */
+    AccountDefaults: string;
+    /**
+     * AccountName
+     * @example accounts/binance
+     */
+    AccountName: string;
+    /** AccountPage */
+    AccountPage: {
+      accounts?: components["schemas"]["Account"][];
+    } & components["schemas"]["Pagination"];
+    /**
+     * Action
+     * @description - `create`: Create resource, client may attempt to select resource ID
+     *     - `get`: Specific resource
+     *     - `list`: All resources of a resource type, filtered by parent ID if set
+     *     - `update`: Modify existing resource (`version` is used engine-side to prevent accidental reversion of concurrent modification attempts)
+     *     - `delete`: Delete a resource
+     *
+     *     Custom actions are defined by resource type, currently: `CustomUserAction` (`custom/heartbeat`), `CustomFeatureAction` (`custom/activate` and `custom/disable`), and , `CustomTransferRuleAction` (`custom/activate` and `custom/disable`).
+     *
+     *     `custom/recheck` added in `25.6.3`.
+     * @example create
+     * @enum {string}
+     */
+    Action:
+      | "create"
+      | "get"
+      | "list"
+      | "update"
+      | "delete"
+      | "custom/activate"
+      | "custom/disable"
+      | "custom/abort"
+      | "custom/retry"
+      | "custom/price"
+      | "custom/heartbeat"
+      | "custom/cancel"
+      | "custom/recheck";
     /**
      * ActionFilter
      * @example create
@@ -3366,34 +2080,561 @@ export interface components {
     ActionFilter:
       | components["schemas"]["Action"]
       | components["schemas"]["Action"][];
-    /** ResourceFilter */
-    ResourceFilter:
-      | {
-          /** @description Optional resource type(s) to match target resource by. */
-          type?: components["schemas"]["ResourceTypeFilter"];
-          /** @description Optional state(s) to match target resources by. */
-          state?: components["schemas"]["StringFilter"];
-          /** @description Optional variant(s) to match target resources by. */
-          variant?: components["schemas"]["StringFilter"];
-          /** @description Optional name(s) to match target resources by. */
-          name?: components["schemas"]["StringFilter"];
-          /** @description Tags to match target resources by.  Added in `25.13.3`. */
-          tag?: components["schemas"]["StringFilter"];
-        }
-      | components["schemas"]["ResourceType"]
-      | components["schemas"]["ResourceType"][];
     /**
-     * ResourceTypeFilter
-     * @example Transfer
-     * @example [
-     *       "User",
-     *       "Credential",
-     *       "Transfer"
-     *     ]
+     * Address
+     * @example {
+     *       "name": "chains/ETH/addresses/0x3ec49e613ae70beb0631d7666f46d4ff2813932e",
+     *       "create_time": "2023-07-30T11:30:15Z",
+     *       "account": "accounts/spoofers",
+     *       "kind": "external",
+     *       "key": null
+     *     }
+     * @example {
+     *       "name": "chains/SOL/addresses/2mp7kgAGSUXMRPVtpJQxQwXpUw7UAhYjh2gjYeCL5zsMeL1VMKidcfeY5J1BptDtoAyb24U58qCGCe8QVui8Yz5x",
+     *       "create_time": "2018-02-30T03:30:15Z",
+     *       "account": "accounts/warm",
+     *       "kind": "managed",
+     *       "key": "keys/1"
+     *     }
      */
-    ResourceTypeFilter:
-      | components["schemas"]["ResourceType"]
-      | components["schemas"]["ResourceType"][];
+    Address: {
+      /** @description OUTPUT ONLY. */
+      name?: components["schemas"]["AddressName"];
+      /** @description OUTPUT ONLY. */
+      state?: components["schemas"]["BasicState"];
+      variant?: components["schemas"]["AddressVariant"];
+    } & components["schemas"]["Metadata"] &
+      components["schemas"]["AddressData"];
+    /**
+     * AddressChoice
+     * @description This is not used as filter, but as field in TransferData
+     */
+    AddressChoice:
+      | components["schemas"]["AddressName"]
+      | components["schemas"]["AccountName"];
+    /** AddressChoiceWithAmount */
+    AddressChoiceWithAmount: {
+      address: components["schemas"]["AddressChoice"];
+      amount: string;
+    };
+    /**
+     * AddressData
+     * @description Addresses come in internal and external variants.
+     */
+    AddressData: {
+      /** @description OUTPUT_ONLY.  If the address is in an account, the account name will be reflected here. */
+      account?: components["schemas"]["AccountName"];
+      /** @description Immutable. Optional in create requests. Valid blockchain address. */
+      address?: components["schemas"]["BlockchainAddress"];
+      /**
+       * @description INPUT_ONLY.  If not provided, the default algorithm for the chain will be used.  Unsupported algorithms for the chain will be rejected.  Added in `25.7.3`.
+       *
+       *     DEPRECATED.  Use `type` instead.
+       */
+      algorithm?: components["schemas"]["Algorithm"];
+      fee_payer?: components["schemas"]["FeePayerPolicy"];
+      /** @description Use an existing key for the address.  If used, any `algorithm` input will be ignored.  Invalid keys for the chain will be rejected. */
+      key?: components["schemas"]["KeyName"];
+      /** @description Immutable.  Optional memo to associate with the address.  Only used for `external` variant. */
+      memo?: string;
+      /** @description Only for validator addresses that are to be externally supplied. Designation for the validator providers, e.g. `asymmetric`. */
+      provider?: string;
+      /** @description Select a type for the address if the chain different types.  Valid values are defined in the respective chain resource. */
+      type?: string;
+    };
+    /** AddressFilter */
+    AddressFilter:
+      | components["schemas"]["AddressFilterEntry"]
+      | components["schemas"]["AddressFilterEntry"][]
+      | components["schemas"]["AnyAddress"];
+    /** AddressFilterEntry */
+    AddressFilterEntry:
+      | components["schemas"]["AddressName"]
+      | components["schemas"]["AccountName"]
+      | components["schemas"]["AccountDefaults"];
+    /**
+     * AddressName
+     * @description The name of an address consists of its (parent) chain name, its on-chain representation, and optionally a memo, separated by a `+`. In case the memo is not a valid ID, it will be mangled.
+     * @example chains/SOL/addresses/AAPGdMUVxGJqbY1gg6jMA7hnQdSzDtfcW4DPAVL56L9w
+     * @example chains/ATOM/addresses/cosmos13dd5eahz5xkytny9dqnpre7488hm7ahsnadr3w
+     * @example chains/ETH/addresses/0x2bc0dde194d722fe98ed3912cad464380f2225ac
+     * @example chains/ATOM/addresses/cosmos13dd5eahz5xkytny9dqnpre7488hm7ahsnadr3w+memo
+     */
+    AddressName: string;
+    /** AddressPage */
+    AddressPage: {
+      addresses?: components["schemas"]["Address"][];
+    } & components["schemas"]["Pagination"];
+    /**
+     * AddressVariant
+     * @description Internal means the engine has the key, external means it does not.
+     *     Shared means the engine has the key, but it can also be used in Create Signature.
+     * @enum {string}
+     */
+    AddressVariant: "internal" | "shared" | "external" | "validator";
+    /** AddressWithAmount */
+    AddressWithAmount: {
+      address: components["schemas"]["AddressName"];
+      amount: string;
+    };
+    /**
+     * Algorithm
+     * @description Signing algorithm. ed255 and taproot are Schnorr-like, k256* and p256 are ECDSA.
+     * @enum {string}
+     */
+    Algorithm:
+      | "ed255"
+      | "k256-keccak"
+      | "k256-sha2"
+      | "p256"
+      | "taproot"
+      | "bls12-381-g2-blake2";
+    /**
+     * AmountFilter
+     * @description Only one of `at_least`, `more_than` may be set (as lower bound). Only one of `at_most`, `less_than` may be set (as upper bound). Either a lower bound, an upper bound, or a lower and an upper bound must be set. All bounds are in terms of the notional value of the current amount (or including historical amounts) in terms of the `quote` asset.
+     * @example {
+     *       "more_than": "10",
+     *       "at_most": "1000",
+     *       "quote": "chains/USD/assets/USD",
+     *       "within": "12h"
+     *     }
+     */
+    AmountFilter: {
+      at_least?: components["schemas"]["PositiveDecimal"];
+      at_most?: components["schemas"]["PositiveDecimal"];
+      less_than?: components["schemas"]["PositiveDecimal"];
+      more_than?: components["schemas"]["PositiveDecimal"];
+      /** @description Only `chains/USD/assets/USD` currently supported. */
+      quote: components["schemas"]["AssetName"];
+      /** @description Optional lookback window. */
+      within?: components["schemas"]["Duration"];
+    };
+    /**
+     * AnyAddress
+     * @constant
+     */
+    AnyAddress: "any/address";
+    /**
+     * AnyAsset
+     * @constant
+     */
+    AnyAsset: "any/asset";
+    /**
+     * AnyUser
+     * @constant
+     */
+    AnyUser: "any/user";
+    /** ApiVersion */
+    ApiVersion: number;
+    /**
+     * Asset
+     * @example {
+     *       "name": "chains/BTC/assets/BTC",
+     *       "create_time": "2023-07-30T011:30:15Z",
+     *       "symbol": "BTC.BTC",
+     *       "native": true,
+     *       "decimals": 8,
+     *       "description": "Bitcoin"
+     *     }
+     * @example {
+     *       "name": "chains/ETH/assets/ETH",
+     *       "create_time": "2023-07-30T011:30:15Z",
+     *       "symbol": "ETH.ETH",
+     *       "decimals": 18,
+     *       "native": true,
+     *       "description": "Ether"
+     *     }
+     * @example {
+     *       "name": "chains/ETH/assets/stETH",
+     *       "create_time": "2023-07-30T011:30:15Z",
+     *       "symbol": "stETH.ETH",
+     *       "native": true,
+     *       "decimals": 18,
+     *       "contract": "chains/ETH/addresses/0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+     *       "description": "Lido Staked Ether"
+     *     }
+     * @example {
+     *       "name": "chains/SOL/assets/USDT",
+     *       "create_time": "2023-07-30T011:30:15Z",
+     *       "symbol": "USDT.SOL",
+     *       "native": false,
+     *       "decimals": 6,
+     *       "contract": "chains/SOL/addresses/Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
+     *       "description": "Tether"
+     *     }
+     */
+    Asset: {
+      /** @description OUTPUT ONLY. */
+      name?: components["schemas"]["AssetName"];
+      /** @description OUTPUT ONLY. */
+      state?: components["schemas"]["BasicState"];
+      variant?: components["schemas"]["AssetVariant"];
+    } & components["schemas"]["Metadata"] &
+      components["schemas"]["AssetData"];
+    /** AssetAndSymbolAndAmount */
+    AssetAndSymbolAndAmount: {
+      amount: components["schemas"]["PositiveDecimal"];
+      asset: components["schemas"]["AssetName"];
+      /** @description OUTPUT ONLY. The symbol for the asset if there is one. */
+      symbol?: string;
+    };
+    /**
+     * AssetData
+     * @description Assets come in native and token variants (perhaps, in the future, also nft variant).
+     */
+    AssetData: {
+      /** @description Immutable. Optional in create requests. Valid blockchain contract address. */
+      contract?: components["schemas"]["BlockchainAddress"];
+      decimals?: number;
+      /** @description `OPTIONAL`, `OUTPUT_ONLY`. Notional price data (USD). This nested field can *not* be set in Create or Update, only with the custom `/price` method. */
+      price?: components["schemas"]["Price"];
+      /** @description OUTPUT_ONLY.  Enforced to be unique for a given chain by engine. */
+      symbol?: components["schemas"]["SymbolName"];
+    };
+    /** AssetFilter */
+    AssetFilter:
+      | components["schemas"]["AssetFilterEntry"]
+      | components["schemas"]["AssetFilterEntry"][]
+      | components["schemas"]["AnyAsset"];
+    /** AssetFilterEntry */
+    AssetFilterEntry:
+      | components["schemas"]["AssetName"]
+      | components["schemas"]["ChainAssets"];
+    /**
+     * AssetName
+     * @description Assets further have an immutable variant (`native` or `token`).
+     * @example chains/MATIC/assets/ETH
+     * @example chains/ETH/assets/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48
+     */
+    AssetName: string;
+    /** AssetOrSymbol */
+    AssetOrSymbol:
+      | components["schemas"]["AssetName"]
+      | components["schemas"]["SymbolName"];
+    /** AssetPage */
+    AssetPage: {
+      assets?: components["schemas"]["Asset"][];
+    } & components["schemas"]["Pagination"];
+    /**
+     * AssetVariant
+     * @enum {string}
+     */
+    AssetVariant: "native" | "token";
+    /**
+     * Authentication
+     * @description The create_time and nonce together contribute to replay protection - the engine will only accept the "same" request within a certain lookback window if the nonces differ.
+     */
+    Authentication: {
+      /**
+       * @description Seconds since the UNIX epoch, likely 10 digits.
+       * @example 1705941241
+       */
+      create_time?: number;
+      /**
+       * @description 12 digit integer, roughly 40 bits of entropy.
+       * @example 339613079733
+       */
+      nonce?: number;
+    } & components["schemas"]["ClientKeyData"] & {
+        signature?: components["schemas"]["Hex"];
+      };
+    /**
+     * BackupKey
+     * @example {
+     *       "id": "ops",
+     *       "key": "age10eyz8zrje2aqgwkgpvycxzmut3e4mslc40eky9lk0avmmt6wpv3q8nft3h"
+     *     }
+     */
+    BackupKey: {
+      /** @description Optional ID for the backup key. */
+      id?: components["schemas"]["Id"];
+      /** @description Public backup age key. */
+      key?: string;
+    };
+    /**
+     * BasicState
+     * @description Active / deleted state for resources that don't have a more specific state machine.
+     * @enum {string}
+     */
+    BasicState: "active" | "deleted";
+    /**
+     * Block
+     * @example {
+     *       "height": "10",
+     *       "time": "2024-07-30T11:30:15Z"
+     *     }
+     */
+    Block: {
+      /** @description The last 'height' at which engine nodes had consensus. If this number does not increment roughly ever 5s, then there is not yet a consensus, or a node is down. */
+      height: string;
+      time: components["schemas"]["Timestamp"];
+    };
+    /**
+     * BlockchainAddress
+     * @description Valid blockchain address.
+     *
+     *     Within treasury, resources have restricted `Id` values. For many blockchains, this is not a problem, as the "actual" address on the blockchain is a valid `Id`. For some, characters like `.` are used which are not valid in an `Id`. Hence, resources like `Address` and `Asset`, in general, use the normalized `Id` value corresponding to the blockchain address as their resource ID. They also have an optional field `blockchain_address` allowing to record the "real" blockchain address. It is required that this value normalizes to the resource ID of the resource.
+     * @example AAPGdMUVxGJqbY1gg6jMA7hnQdSzDtfcW4DPAVL56L9w
+     * @example 0x2bc0dde194d722fe98ed3912cad464380f2225ac
+     * @example cosmos13dd5eahz5xkytny9dqnpre7488hm7ahsnadr3w
+     */
+    BlockchainAddress: string;
+    /**
+     * Body
+     * @description Body of an HTTP request. For `create` and `update` actions, this is some resource (e.g. `User`). For `get`, `list` and `delete` it is empty.
+     */
+    Body: string;
+    /** Call */
+    Call: {
+      name?: components["schemas"]["CallName"];
+      state?: components["schemas"]["CallState"];
+    } & components["schemas"]["Metadata"] &
+      components["schemas"]["CallData"];
+    /**
+     * CallData
+     * @description The call `method` determines the variants of `request` and `response` that are permissible.
+     *
+     *     | driver | method | request | response |
+     *     | ------ | ------ | ------- |----------|
+     *     | EVM | personal_sign | UnsignedMessage | signature |
+     *     | EVM | eth_signTypedData_v4 | Eip712TypedData | signature |
+     *     | EVM | eth_sendTransaction | UnsignedEvmTransaction | transaction |
+     *     | EVM | eth_signTransaction | UnsignedEvmTransaction | transaction |
+     *     | SVM | solana:signMessage | UnsignedMessage | signature |
+     *     | SVM | solana:signTransaction | UnsignedSvmTransaction | transaction |
+     *     | SVM | solana:signAndSendTransaction | UnsignedSvmTransaction | transaction |
+     *
+     *     The `method` must match the driver of the specified `chain`.
+     *
+     *     To determine the error causing a `failed` state, see the `error` field of the subordinate response resource.
+     */
+    CallData: {
+      address: components["schemas"]["AddressName"];
+      method: components["schemas"]["CallMethod"];
+      request: components["schemas"]["CallRequest"];
+      response?: components["schemas"]["CallResponse"];
+    };
+    /**
+     * CallMethod
+     * @enum {string}
+     */
+    CallMethod:
+      | "eth_sendTransaction"
+      | "eth_signTransaction"
+      | "personal_sign"
+      | "eth_signTypedData_v4"
+      | "solana:signIn"
+      | "solana:signMessage"
+      | "solana:signTransaction"
+      | "solana:signAndSendTransaction";
+    /**
+     * CallName
+     * @description The name of a Call
+     * @example calls/42
+     */
+    CallName: string;
+    /** CallPage */
+    CallPage: {
+      calls?: components["schemas"]["Call"][];
+    } & components["schemas"]["Pagination"];
+    /** CallRequest */
+    CallRequest:
+      | components["schemas"]["UnsignedMessage"]
+      | components["schemas"]["UnsignedEvmTransaction"]
+      | components["schemas"]["UnsignedSvmTransaction"]
+      | components["schemas"]["Eip712TypedData"];
+    /**
+     * CallResponse
+     * @description Names the subordinate `signature` (for signing calls such as `personal_sign` and `solana:signMessage`) or `transaction` (for transactioning calls such as `eth_sendTransaction`, `eth_signTransaction`, `solana:signTransaction`, `solana:signAndSendTransaction`).
+     *
+     *     Exactly one of these fields must be set.
+     */
+    CallResponse:
+      | components["schemas"]["CallSignature"]
+      | components["schemas"]["CallTransaction"];
+    /** CallSignature */
+    CallSignature: {
+      signature?: components["schemas"]["SignatureName"];
+    };
+    /**
+     * CallState
+     * @description In the `active` state, the subordinate resource is being processed, lookup its state for more details.
+     * @enum {string}
+     */
+    CallState: "active" | "succeeded" | "failed";
+    /** CallTransaction */
+    CallTransaction: {
+      transaction?: components["schemas"]["TransactionName"];
+    };
+    /**
+     * Certificate
+     * @description A certificate is a request to a `Signatory` signer.  The certificate should be signed by an authorization key.  The `Signatory` should verify the signature and claims.  Pending verification, it should then sign `message` with the specified key.
+     */
+    Certificate: {
+      /** @description A JSON serialized `CertificateClaims` */
+      claims: string;
+      /** @description The signature by the authorization key. */
+      signature: components["schemas"]["SignatureName"];
+    };
+    /** CertificateClaims */
+    CertificateClaims: {
+      context: components["schemas"]["CertificateClaimsContext"];
+      /** @description Key with which to sign the message. */
+      key: components["schemas"]["KeyName"];
+      /** @description Message requested to be signed */
+      message: components["schemas"]["Hex"];
+    };
+    /** CertificateClaimsContext */
+    CertificateClaimsContext: {
+      approve: components["schemas"]["UserName"][];
+      initiate: components["schemas"]["UserName"];
+      issue_time: components["schemas"]["Timestamp"];
+      /** @description If there is an intent behind the request, it will be copied here. */
+      origin?:
+        | components["schemas"]["Transfer"]
+        | components["schemas"]["Staking"];
+    };
+    /**
+     * Chain
+     * @description We tend to use the symbol of the native/gas asst of the chain as symbol of the chain, as one does.
+     * @example {
+     *       "name": "chains/SOL",
+     *       "create_time": "2023-07-30T011:30:15Z",
+     *       "confirmations": 4,
+     *       "symbol": "SOL"
+     *     }
+     * @example {
+     *       "name": "chains/ETH",
+     *       "create_time": "2023-07-30T011:30:15Z",
+     *       "symbol": "ETH",
+     *       "description": "Ethereum"
+     *     }
+     * @example {
+     *       "name": "chains/MATIC",
+     *       "create_time": "2023-07-30T011:30:15Z",
+     *       "symbol": "MATIC",
+     *       "description": "Polygon"
+     *     }
+     * @example {
+     *       "name": "chains/BTC",
+     *       "create_time": "2023-07-30T011:30:15Z",
+     *       "symbol": "BTC"
+     *     }
+     */
+    Chain: {
+      /** @description OUTPUT ONLY. */
+      name?: components["schemas"]["ChainName"];
+      /** @description OUTPUT ONLY. */
+      state?: components["schemas"]["BasicState"];
+      variant: components["schemas"]["ChainVariant"];
+    } & components["schemas"]["Metadata"] &
+      components["schemas"]["ChainData"];
+    /**
+     * ChainAddressConfig
+     * @example {
+     *       "types": [
+     *         "segwit",
+     *         "taproot",
+     *         "legacy"
+     *       ]
+     *     }
+     * @example {
+     *       "types": [
+     *         "icp",
+     *         "icrc1"
+     *       ]
+     *     }
+     */
+    ChainAddressConfig: {
+      types: string[];
+    };
+    /** ChainAssets */
+    ChainAssets: string;
+    /** ChainData */
+    ChainData: {
+      /** @description This is set only when the chain has multiple types of addresses. */
+      address?: components["schemas"]["ChainAddressConfig"];
+      /** @description Number of blocks on top of an included transaction required to consider transaction final. */
+      confirmations?: number;
+      fee_limits?: components["schemas"]["FeeLimits"];
+      priority?: components["schemas"]["Priority"];
+      retry?: components["schemas"]["RetryPolicy"];
+      symbol?: string;
+    };
+    /**
+     * ChainName
+     * @example chains/SOL
+     */
+    ChainName: string;
+    /** ChainPage */
+    ChainPage: {
+      chains?: components["schemas"]["Chain"][];
+    } & components["schemas"]["Pagination"];
+    /**
+     * ChainVariant
+     * @enum {string}
+     */
+    ChainVariant: "native" | "custom";
+    /** ClientKeyData */
+    ClientKeyData: {
+      /** @enum {string} */
+      algorithm?: "ecdsa-k256-sha256" | "ecdsa-p256-sha256" | "ed25519";
+      /** @description Public Key (hex) of credential signing the message.  This should always be used except for WebAuthn signing. */
+      public_key?: components["schemas"]["Hex"];
+    } & {
+      /** @description ID of user signing the message - only valid for webauthn algorithm. This is special-cased, because WebAuthn cannot supply the public key before signing. */
+      user?: components["schemas"]["Id"];
+    };
+    /** Complaint */
+    Complaint: {
+      message?: string;
+    };
+    /** Credential */
+    Credential: {
+      /** @description OUTPUT ONLY. */
+      name?: components["schemas"]["CredentialName"];
+      /** @description OUTPUT ONLY. */
+      state?: components["schemas"]["BasicState"];
+      variant?: components["schemas"]["CredentialVariant"];
+    } & components["schemas"]["Metadata"] &
+      components["schemas"]["CredentialData"];
+    /** CredentialData */
+    CredentialData: {
+      /** @description `OUTPUT_ONLY`. This is only provided when the credential is a web-authn kind.  Base64 encoded. */
+      aaguid?: components["schemas"]["StdBase64"];
+      /** @description `INPUT_ONLY` This is parsed and verified by the engine. It then sets `raw_id` and `aaguid`. Base64 encoded. */
+      attestation?: components["schemas"]["StdBase64"];
+      /** @description `IMMUTABLE`. Public key, hex encoded. */
+      public_key?: components["schemas"]["Hex"];
+      /** @description `OUTPUT_ONLY`. This is only provided when the credential is a web-authn kind.  Base64 encoded. */
+      raw_id?: components["schemas"]["StdBase64"];
+    };
+    /**
+     * CredentialName
+     * @description Name of a credential.
+     * @example users/joe/credentials/3
+     */
+    CredentialName: string;
+    /** CredentialPage */
+    CredentialPage: {
+      credentials?: components["schemas"]["Credential"][];
+    } & components["schemas"]["Pagination"];
+    /**
+     * CredentialVariant
+     * @enum {string}
+     */
+    CredentialVariant:
+      | "session"
+      | "k256"
+      | "web-authn"
+      | "web-authn-uv"
+      | "invite"
+      | "ed255"
+      | "p256";
+    /** CredentialVariantFilter */
+    CredentialVariantFilter:
+      | components["schemas"]["CredentialVariant"]
+      | components["schemas"]["CredentialVariant"][];
     /**
      * DataFilter
      * @description Data filter matches if it is a sub-object of a resource's Data.
@@ -3408,14 +2649,157 @@ export interface components {
      *     Currently, we may only support primitive types (integer, string, boolean) as values, and top-level keys.
      */
     DataFilter: Record<string, unknown>;
-    /** AccessQuorumFilter */
-    AccessQuorumFilter: {
-      initiate?: components["schemas"]["ExplicitUserFilter"];
-      approve?: components["schemas"]["ExplicitUserFilter"];
-      /** @description No longer supported after `25.13.1`.  Instead, the initiator or any approvers may cancel. */
-      cancel?: components["schemas"]["UserFilter"];
-      approvals?: number;
+    /**
+     * DefaultAddresses
+     * @description Keys are `AssetChoice`s, values are `AddressName`s. These used to select the destination address for a transfer with only destination account given. A more specific matching asset key overrides any less specific chain key. Also helpful for defining policies.
+     *
+     *     Addresses are only considered valid if they are also in the account.
+     */
+    DefaultAddresses: {
+      [key: string]: components["schemas"]["AddressName"];
     };
+    /**
+     * DisableableState
+     * @enum {string}
+     */
+    DisableableState: "active" | "disabled" | "deleted";
+    /**
+     * Duration
+     * @description Multiple of either weeks, days, hours, minutes or seconds. Compared to Go's time.ParseDuration, this is both a simplification of (only positive, integer values, no mixing of say hours and minutes) and an extension (week support, and day support defined as `1d` = `24h`). In normalized form, the largest base unit should be used (e.g. `1d` instead of `24h`, but can use `36h` for a day and a half).
+     * @example 10d
+     */
+    Duration: string;
+    /** Eip712Domain */
+    Eip712Domain: {
+      chainId?: components["schemas"]["EthHex"];
+      name?: string;
+      salt?: components["schemas"]["EthHex"];
+      verifyingContract?: components["schemas"]["BlockchainAddress"];
+      version?: string;
+    };
+    /** Eip712DomainType */
+    Eip712DomainType: {
+      name: string;
+      type: string;
+    };
+    /** Eip712DomainTypes */
+    Eip712DomainTypes: components["schemas"]["Eip712DomainType"][];
+    /** Eip712TypedData */
+    Eip712TypedData: {
+      domain: components["schemas"]["Eip712Domain"];
+      message: Record<string, unknown>;
+      primaryType: string;
+      types: {
+        [key: string]: components["schemas"]["Eip712DomainTypes"];
+      };
+    };
+    /**
+     * Error
+     * @description On success, APIs return HTTP 200 OK and their specified return value.
+     *
+     *     On error, an HTTP code in the 400/500 range is returned, the `code` and `message` should be used to determine the source of error. Only `code` is part of the API surface, clients should not use the `message` for error handling (it is intended for developers).
+     *
+     *     Sometimes, further details may be listed in the `details` array.
+     *
+     *     `Unknown` is used if we have no clear explanation (e.g. error reporting in code is not fully built out yet).
+     *
+     *     `Invalid Argument` is typically a programming error.
+     *
+     *     `Unauthenticated` is an authn error, vs. `Permission Denied` which is an authz error.
+     *
+     *     For MPC:
+     *     - `Deadline Exceed` can indicate some node failed to participate in time
+     *     - `Aborted` can indicate some node failed to participate correctly
+     *
+     *     |Code|Name|HTTP Code|HTTP Name|CRUD|Description|
+     *     |----|----|---------|---------|----|-----------|
+     *     |1|Cancelled|400|Bad Request|_not used_||
+     *     |2|Unknown|500|Internal Server Error|`*`|Unknown error|
+     *     |3|Invalid Argument|400|Bad Request|`*`|The client specified an invalid argument|
+     *     |4|Deadline Exceeded|500|Internal Server Error|_not used_|The deadline expired before the operation could complete.|
+     *     |5|Not Found|404|Not Found|`Read`, `Delete`|Some requested entity was not found|
+     *     |6|Already Exists|409|Conflict|`Create`|The entity that a client attempted to create already exists|
+     *     |7|Permission Denied|403|Forbidden|`*`|The caller does not have permission to execute the specified operation|
+     *     |8|Resource Exhausted|429|Too Many Requests|_not used_||
+     *     |9|Failed Precondition|400|Bad Request|_not used_|The operation was rejected because the system is not in a state required for the operation's execution|
+     *     |10|Aborted|409|Conflict|_not used_|The operation was aborted|
+     *     |11|Out of Range|400|Bad Request|`Read`|The operation was attempted past the valid range|
+     *     |12|Unimplemented|501|Not Implemented|`*`|The operation is not implemented or is not supported/enabled in this service|
+     *     |13|Internal|500|Internal Server Error|`*`|This error code is reserved for serious errors|
+     *     |14|Unavailable|503|Service Unavailable|`*`|The service is currently unavailable.  This is most likely a transient condition, which can be corrected by retrying with a backoff|
+     *     |15|Data Loss|500|Internal Server Error|_not used_|Unrecoverable data loss or corruption|
+     *     |16|Unauthenticated|401|Unauthorized|`*`|The request does not have valid authentication credentials for the operation|
+     * @example {
+     *       "code": 2,
+     *       "status": "Unknown",
+     *       "message": "Error in Trip",
+     *       "details": [
+     *         "incorrect secret openings: {2, 3}"
+     *       ]
+     *     }
+     * @example {
+     *       "code": 2,
+     *       "status": "Unknown",
+     *       "message": "Error in Trip",
+     *       "details": [
+     *         "incorrect secret openings: {2, 3}"
+     *       ]
+     *     }
+     */
+    Error: {
+      code: components["schemas"]["ErrorCode"];
+      /** @description Details may be set on some requests where additional structured data may help troubleshoot.  For example, this will be set when policy rejects a request. */
+      details?: Record<string, unknown>[];
+      message: string;
+      /** @description Code as a string for debugging convenience. */
+      status: components["schemas"]["ErrorStatus"];
+    };
+    /** ErrorCode */
+    ErrorCode: number;
+    /**
+     * ErrorStatus
+     * @enum {string}
+     */
+    ErrorStatus:
+      | "Cancelled"
+      | "Unknown"
+      | "Invalid Argument"
+      | "Deadline Exceeded"
+      | "Not Found"
+      | "Already Exists"
+      | "Permission Denied"
+      | "Resource Exhausted"
+      | "Failed Precondition"
+      | "Aborted"
+      | "Out Of Range"
+      | "Unimplemented"
+      | "Internal"
+      | "Unavailable"
+      | "Data Loss"
+      | "Unauthenticated"
+      | "Canceled";
+    /**
+     * EthHex
+     * @description Ethereum has a few parameters that are "binary data" (possibly numerical, such as the u64 chain ID) but accept multiple input encodings:
+     *     - `<number>` (if it fits in a JavaScript number)
+     *     - `"<number>"` (if it fits in a JavaScript number)
+     *     - `"0x<hex>"`
+     *
+     *     The last one is in some sense the most general and hence canonical encoding.
+     *
+     *     In clients and servers, such values should be handled (compared, stored...) as byte arrays
+     *
+     *     Note that Ethereum is always big-endian.
+     */
+    EthHex: components["schemas"]["NumberOrString"];
+    /**
+     * ExplicitFeePayerPolicy
+     * @description Added in `v25.13.1`.
+     *
+     *     Compared to the FeePayerPolicy, this adds the explicit variant "unset".
+     * @enum {string}
+     */
+    ExplicitFeePayerPolicy: "allow" | "deny" | "unset";
     /**
      * ExplicitUserFilter
      * @example users/admin-2
@@ -3429,33 +2813,1445 @@ export interface components {
       | components["schemas"]["UserFilterEntry"][]
       | components["schemas"]["AnyUser"];
     /**
-     * UserFilterEntry
-     * @example users/admin-2
-     * @example roles/admin
-     * @example any/user
+     * Feature
+     * @description Features are enabled/disabled by updating their `state`.
      */
-    UserFilterEntry:
-      | components["schemas"]["UserName"]
-      | components["schemas"]["RoleName"];
+    Feature: {
+      name?: components["schemas"]["FeatureName"];
+      state?: components["schemas"]["DisableableState"];
+    } & components["schemas"]["Metadata"] &
+      components["schemas"]["FeatureData"];
+    /** FeatureData */
+    FeatureData: Record<string, unknown>;
     /**
-     * AnyUser
-     * @constant
+     * FeatureName
+     * @example features/new-and-shiny
      */
-    AnyUser: "any/user";
+    FeatureName: string;
+    /** FeaturePage */
+    FeaturePage: {
+      features?: components["schemas"]["Feature"][];
+    } & components["schemas"]["Pagination"];
+    /** Fee */
+    Fee: {
+      /** @description If set, the transaction fee will be deducted from the transfer amount. */
+      inclusive?: boolean;
+      /** @description Option to set an alternative address to pay for fee. */
+      payer?: components["schemas"]["AddressName"];
+    };
+    /** FeeCreate */
+    FeeCreate: {
+      /** @description If set, the transaction fee will be deducted from the transfer amount. */
+      inclusive?: boolean;
+      /** @description Option to set an alternative address to pay for fee. */
+      payer?: components["schemas"]["AddressChoice"];
+    };
     /**
-     * UserFilter
-     * @example users/admin-2
+     * FeeLimits
+     * @description Introduced in `v25.3.1`.
+     *
+     *     A set describing the maximum total amount that could be paid in a transaction.  This does not influence fee estimation in any way, but instead will block any transaction with a fee exceeding the limit.
+     *
+     *     For example, if the fee limit for `ETH` asset is "0.1", then any transaction on that chain spending >0.1 `ETH` for the fee will be rejected.
+     *
+     *     A transaction that tries to spend an asset for fee that does not have a limit will be rejected.
+     *
+     *     The intent is to provide a configureable sanity limit to protect from fee griefing attacks.
+     * @example {
+     *       "SOL": "0.5"
+     *     }
+     * @example {
+     *       "uusdc": "10.0",
+     *       "ueure": "10.0"
+     *     }
+     */
+    FeeLimits: {
+      [key: string]: string;
+    };
+    /**
+     * FeePayerPolicy
+     * @description Added in `v25.13.1`.
+     *
+     *     Permit or deny address to be used as a fee sponsor for transactions.  Default is to deny.
+     *
+     *     May be set on account level, which will be inherited by all addresses in the account.
+     *
+     *     Any update resulting in an inconsistent setting between an address in an account will be rejected.
+     *
+     *     While resources may be created with an initial fee-payer policy, it may only be updated using the custom fee-payer action.  It will otherwise be immutable.
+     * @enum {string}
+     */
+    FeePayerPolicy: "allow" | "deny";
+    /**
+     * Hex
+     * @description Hex-encoded bytes
+     */
+    Hex: string;
+    /** Host */
+    Host: {
+      name?: components["schemas"]["HostName"];
+      state?: components["schemas"]["BasicState"];
+    } & components["schemas"]["HostData"] &
+      components["schemas"]["Metadata"];
+    /** HostData */
+    HostData: {
+      block?: components["schemas"]["Block"];
+      software?: components["schemas"]["SoftwareVersion"];
+    };
+    /**
+     * HostName
+     * @example hosts/mMkv1VAXSvsaJF2pEyPyZ3
+     */
+    HostName: string;
+    /** HostPage */
+    HostPage: {
+      hosts?: components["schemas"]["Host"][];
+    } & components["schemas"]["Pagination"];
+    /**
+     * Id
+     * @description Alphanumeric, underscores, and dashes.
+     * @example _abc-DEF7
+     */
+    Id: string;
+    /**
+     * ImageReference
+     * @example us-docker.pkg.dev/cordialsys/containers/treasury:<version>
+     * @example us-docker.pkg.dev/cordialsys/containers/treasury:0.4.2
+     */
+    ImageReference: string;
+    /**
+     * Key
+     * @example {
+     *       "name": "keys/1",
+     *       "create_time": "2023-07-30T011:30:15Z",
+     *       "algorithm": "ed255",
+     *       "format": "raw",
+     *       "encoding": "hex",
+     *       "public_key": "C3AA10EA7E3D1BC235108B2F29B84DDE1BE54E369D3C2B96749AF6080E56F92D"
+     *     }
+     * @example {
+     *       "name": "keys/824472037170",
+     *       "create_time": "2023-07-30T011:30:15Z",
+     *       "algorithm": "k256",
+     *       "format": "uncompressed-point",
+     *       "encoding": "hex",
+     *       "public_key": "04165a68e921fe2dd2848ecef2612f591f805b172d1114c2df11162e2ea0ef39bb36dfb21ccd044bda1dc87768fe9db9be1f88759dcd3b2fb6770d8ffbf1890db7"
+     *     }
+     */
+    Key: {
+      /** @description OUTPUT ONLY. */
+      name?: components["schemas"]["KeyName"];
+      /** @description OUTPUT ONLY. */
+      state?: components["schemas"]["KeyState"];
+      variant?: components["schemas"]["KeyVariant"];
+    } & components["schemas"]["Metadata"] &
+      components["schemas"]["KeyData"];
+    /** KeyData */
+    KeyData: {
+      algorithm?: components["schemas"]["Algorithm"];
+      /** @description `OUTPUT ONLY`. Forms (together with key ID) the basis of a request ID to the signer, if state is `generating` or `rotating`. Must be unique within a given key (e.g. auto-incrementing during attempts to generate or rotate a key). */
+      attempt?: components["schemas"]["NonNegative"];
+      format?: components["schemas"]["KeyFormat"];
+      /** @description Indicate if this key was imported rather than natively generated. */
+      imported?: boolean;
+      /** @description Hex encoding of public key */
+      key?: components["schemas"]["Hex"];
+      /** @description Set when state is `failed`. */
+      message?: string;
+      rotation?: components["schemas"]["NonNegative"];
+      shares?: components["schemas"]["Shares"];
+      signatory?: components["schemas"]["SignatoryName"];
+      threshold?: components["schemas"]["PositiveInteger"];
+    };
+    /**
+     * KeyFormat
+     * @description `raw` (default) format as is the packed (only) encoding for ed255, and 64 bytes (x, y) coordinates for ECDSA.
+     *     `compressed` is the SEC1 ECDSA encoding with leading 0x02/0x03 for the sign of y, then x coordinate
+     *     `uncompressed` is SEC1 ECDSA encoding with leading 0x04, then default format.
+     * @default raw
+     * @enum {string}
+     */
+    KeyFormat: "raw" | "compressed" | "uncompressed";
+    /**
+     * KeyName
+     * @example key/1
+     * @example key/83737783
+     * @example key/my-key
+     */
+    KeyName: string;
+    /** KeyPage */
+    KeyPage: {
+      keys?: components["schemas"]["Key"][];
+    } & components["schemas"]["Pagination"];
+    KeyRequest: unknown;
+    KeyRequestPage: unknown;
+    /** KeyResponse */
+    KeyResponse: {
+      name?: components["schemas"]["KeyResponseName"];
+      state?: components["schemas"]["BasicState"];
+      variant?: components["schemas"]["ShareVariant"];
+    } & components["schemas"]["Metadata"] &
+      components["schemas"]["KeyResponseData"];
+    /**
+     * KeyResponseData
+     * @example {
+     *       "share": "string",
+     *       "key": "string"
+     *     }
+     */
+    KeyResponseData:
+      | components["schemas"]["RawKeyShare"]
+      | components["schemas"]["Complaint"];
+    /**
+     * KeyResponseName
+     * @description The final ID is the extension of the underlying key ID by the attempt.
+     *     That is, if the key ID is non-extended, then the final ID is `<key-id>+<attempt>`.
+     *     If the key ID were already extended, say `<key-id>+<extension-1>,<extension-2>`, then the final ID would be `<key-id>+<extension-1>,<extension-2>,<attempt>`.
+     * @example signers/1/key-responses/my-key+3
+     */
+    KeyResponseName: string;
+    /** KeyResponsePage */
+    KeyResponsePage: {
+      "key-responses"?: components["schemas"]["KeyResponse"][];
+    } & components["schemas"]["Pagination"];
+    /**
+     * KeyState
+     * @enum {string}
+     */
+    KeyState:
+      | "generating"
+      | "generated"
+      | "importing"
+      | "imported"
+      | "paused"
+      | "rotating"
+      | "failed"
+      | "signatory-generating";
+    /**
+     * KeyVariant
+     * @description Keys may be either engine-controlled (for instance, keys underlying `Address` resources), or user-controlled (with the direct key generation API).
+     *
+     *     - **internal** Can only be used by higher level APIs (like creating Transfers or Stakings).
+     *     - **user** Can only be use for raw signing (creating Signatures).
+     *     - **shared** Can be used with any API.
+     *
+     *     `engine` is deprecated in `25.1.1` and aliased to `internal`.
+     * @enum {string}
+     */
+    KeyVariant: "engine" | "shared" | "user" | "internal";
+    /**
+     * Labels
+     * @description Similar to "labels" in Kubernetes, stores "identifying data" of a resource. Values are strings, or null (for "tags"). It is recommended to namespace using a domain.
+     *
+     *     Standard labels:
+     *     - `creator`
+     *     - `sso`
+     * @example {
+     *       "sso": "joe@cocker.com",
+     *       "update-time": "2024-01-26T01:22:33Z"
+     *     }
+     */
+    Labels: {
+      [key: string]: string | null;
+    };
+    /** Metadata */
+    Metadata: {
+      /** @description OUTPUT ONLY. */
+      create_time?: components["schemas"]["Timestamp"];
+      creator?: components["schemas"]["UserName"];
+      /** @description Added in `25.12.1`.  A searchable description for the resource. */
+      description?: string;
+      /**
+       * @description Labels are indexed, meaning they are fast to query when filtering for them.
+       *
+       *     Labels with a `uid.` prefix will have a unique constraint,
+       *     meaning no two resources of the same type may have the same `uid.<key>=<value>` (added in `25.9.4`).
+       */
+      labels?: components["schemas"]["Labels"];
+      /** @description string values. */
+      notes?: components["schemas"]["Notes"];
+      proposal?: components["schemas"]["Proposal"];
+      tags?: components["schemas"]["Tags"];
+      update_time?: components["schemas"]["Timestamp"];
+      updater?: components["schemas"]["UserName"];
+      /** @description OUTPUT ONLY. Increment each time the resource is modified. Plays the same role as ETag (entity tag) in HTTP. */
+      version?: components["schemas"]["ResourceVersion"];
+    };
+    /**
+     * NonNegative
+     * @example 1
+     * @example 3124
+     * @example 0
+     */
+    NonNegative: number;
+    /**
+     * Notes
+     * @description Similar to "annotations" in Kubernetes, stores "non-identifying data" ofa resource. Values are strings. It is recommended to namespace using a domain.
+     *     Standard labels:
+     *     - `description`
+     *     - `email`
+     *     - `display-name`
+     * @example {
+     *       "description": "My first resource",
+     *       "display-name": "Cat Power"
+     *     }
+     */
+    Notes: {
+      [key: string]: string;
+    };
+    /**
+     * NumberOrString
+     * @description ETH chain ID are sometimes sent as numbers, or as strings (sometimes decimal, sometimes hexadecimal with 0x prefix)
+     * @example 1
+     * @example 0x1
+     */
+    NumberOrString: number | string;
+    /**
+     * Operation
+     * @description TODO: Decide whether to include `resource: ResourceVersion`, keeping the data more concise (at the risk of the client not being able to retrieve the correct resource data at the version just after performing the operation), or instead to include the full resource in successful responses.
+     */
+    Operation: {
+      name?: components["schemas"]["OperationName"];
+      state?: components["schemas"]["OperationState"];
+    } & components["schemas"]["Metadata"] &
+      components["schemas"]["OperationData"];
+    /**
+     * OperationData
+     * @description In states `authorizing` and `creating-resource`, there is neither a `response` nor an `error` field.
+     *
+     *     In state `succeeded`, there is a `response` field of type `Response`, but no `error` field.
+     *
+     *     In state `failed`, there is an `error` field of type `Error`, but no `response` field.
+     *
+     *     NOTE: For some reason, Stoplight chokes on representing this. The OperationData.yaml seems to be correct, hopefully code generators can handle it. Otherwise we can set the schema to just always have a field `request: Request` and a field `error: Error`, and explain things.
+     */
+    OperationData: {
+      approve?: components["schemas"]["UserName"][];
+      cancel?: components["schemas"]["UserName"][];
+      initiator: components["schemas"]["UserName"];
+    } & {
+      request?: components["schemas"]["Request"];
+    } & {
+      /**
+       * @description `EXPERIMENTAL` An operation may be "compound", meaning multiple resources are modified.
+       *     This will contain the list of responses, for each modified resource.
+       *     It is ordered in order of modification, and always includes `.response`.
+       *
+       *     This is omitted if an operation is not compound.
+       */
+      effects?: components["schemas"]["Response"][];
+      error?: components["schemas"]["Error"];
+      response?: components["schemas"]["Response"];
+    };
+    /**
+     * OperationName
+     * @example operations/C60E7A5471594BAC1B26950EA51513C19149C35AC2A4C6E0FC7877860C099E02
+     */
+    OperationName: string;
+    /** OperationPage */
+    OperationPage: {
+      operations?: components["schemas"]["Operation"][];
+    } & components["schemas"]["Pagination"];
+    /**
+     * OperationState
+     * @description A valid request can either be immediately allowed or denied (and will end up in the `succeeded` or `failed` state)_, or require additional approvals (starts in the `authorizing` state).
+     *
+     *     An initiator has the operation ID, and can poll the operation until it is in one of the two terminal state.
+     *
+     *     An approver or challenger can poll all operations, filtering by `authorizing`, and send their votes.
+     *
+     *     ### Cases
+     *     **authorizing**: User sent a valid `Request` for an operation, but further approvals are required to authorize the operation.
+     *
+     *     **creating-resource**: The operation is authorized, but the engine is waiting for an off-chain worker to name the resource. Only current case is `Generate (internal) Address`, where the address ID is derived from the public key of the keypair that is created by the signer for this address.
+     *
+     *     **succeeded**: Terminal state - the operation completed successfully. The `resource_name` field in the `Operation` can be used to fetch the new resource.
+     *
+     *     **failed**: Terminal state - the operation failed (either challenged, timed out, or creating the resource after authorization failed).
+     * @example authorizing
+     * @enum {string}
+     */
+    OperationState:
+      | "authorizing"
+      | "creating-resource"
+      | "succeeded"
+      | "failed";
+    /**
+     * Pagination
+     * @description Standard fields added in response to a `list` or `nested-list` action. The `next_page_token` is set if there is remaining data to be transmitted. This data can be verified by repeating the action, setting query parameter `page_token` to the given (opaque) value.
+     */
+    Pagination: {
+      next_page_token?: string;
+      page_size?: number;
+      total_size?: number;
+    };
+    /**
+     * Partial Resource Name
+     * @description The triple (parent, id, extension) of IDs is a higher-level than the URL path to which they correspond, but lower-level than the resource name or parent to which it corresponds (depending on the Action and whether the resource type is nested or not).
+     */
+    Partial_Resource_Name: {
+      extension?: components["schemas"]["Id"];
+      id?: components["schemas"]["Id"];
+      parent?: components["schemas"]["Id"];
+      resource: components["schemas"]["ResourceType"];
+    };
+    /**
+     * PositiveDecimal
+     * @description Positive decimal amount.
+     *
+     *     Transmitted as string to avoid precision truncations.
+     */
+    PositiveDecimal: string;
+    /** PositiveInteger */
+    PositiveInteger: number;
+    /** Price */
+    Price: {
+      amount: components["schemas"]["PositiveDecimal"];
+      valid_time: components["schemas"]["Timestamp"];
+    };
+    /**
+     * Prices
+     * @example {
+     *       "prices": {
+     *         "chains/BTC/assets/BTC": "106200",
+     *         "chains/ETH/assets/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48": "1"
+     *       },
+     *       "valid_time": "2025-11-13T17:12:10Z"
+     *     }
+     */
+    Prices: {
+      prices: {
+        [key: string]: components["schemas"]["PositiveDecimal"];
+      };
+      valid_time: components["schemas"]["Timestamp"];
+    };
+    /** Priority */
+    Priority:
+      | components["schemas"]["PriorityPreset"]
+      | components["schemas"]["PositiveDecimal"];
+    /**
+     * PriorityPreset
+     * @description Priority Preset defers to Treasury to determine the gas fees to land transactions on chain.
+     *
+     *     **low**: Will be lower than market rate to save on fees.
+     *
+     *     **market**: Pay current market rate.
+     *
+     *     **aggressive**: Pay a premium over market rate to ensure transaction always lands quickly.
+     *
+     *     **very-aggressive**: Pay an even larger premium, meant for very volatile periods.
+     * @enum {string}
+     */
+    PriorityPreset: "low" | "market" | "aggressive" | "very-aggressive";
+    /** Proposal */
+    Proposal: {
+      name: string;
+      request?: components["schemas"]["Request"];
+    };
+    /**
+     * Query
+     * @description This is any object with `string` values. Clients should strive to serialize this in sorted key order - but two query objects with the same key-value pairs are considered equal.
+     */
+    Query: {
+      [key: string]: string;
+    };
+    /** QuorumFilter */
+    QuorumFilter: {
+      approvals?: number;
+      approve?: components["schemas"]["UserFilter"];
+      cancel?: components["schemas"]["UserFilter"];
+      initiate?: components["schemas"]["UserFilter"];
+    };
+    /** RawKeyShare */
+    RawKeyShare: {
+      algorithm?: components["schemas"]["Algorithm"];
+      /** @description optional, hex-encoded */
+      key?: components["schemas"]["Hex"];
+      rotation?: components["schemas"]["NonNegative"];
+      /** @description hex-encoded */
+      share?: components["schemas"]["Hex"];
+      threshold?: components["schemas"]["PositiveInteger"];
+    };
+    /** RawSignatureShare */
+    RawSignatureShare: {
+      /** @description hex-encoded */
+      share?: components["schemas"]["Hex"];
+      /** @description optional, hex-encoded */
+      signature?: components["schemas"]["Hex"];
+    };
+    /**
+     * Reference
+     * @description Used when approving or challenging an `Operation in the `authorizing` state.
+     * @example {
+     *       "vote": "approve",
+     *       "operation": "C60E7A5471594BAC1B26950EA51513C19149C35AC2A4C6E0FC7877860C099E02"
+     *     }
+     */
+    Reference: {
+      /** @description `Id` of the `Operation` being judged */
+      operation?: components["schemas"]["Id"];
+      vote?: components["schemas"]["Vote"];
+    };
+    /**
+     * Request
+     * @description The main payload of the request is the `body`.
+     *     - for `Create` requests, it contains the desired resource's initial representation (`name` is disregarded if set - the name is determined by the choice of `create` vs `generate` actions, and the passed `parent` or resource `id` values).
+     *     - for `Update` requests, it contains the rows of the resource the client intends to modify
+     *     - for `Get`, `List`, and `Delete` requests, it is empty.
+     * @example {
+     *       "treasury": "0509e4b2-16af-46df-aea3-6d29bfdaff80",
+     *       "api": 1,
+     *       "action": "create",
+     *       "resource": "Role",
+     *       "id": "webauthn-only",
+     *       "vote": "approve",
+     *       "operation": "C60E7A5471594BAC1B26950EA51513C19149C35AC2A4C6E0FC7877860C099E02",
+     *       "body": "{\"credentials\":[\"web-authn\"]}",
+     *       "user": "joe",
+     *       "create_time": 1705941241,
+     *       "nonce": 339613079733,
+     *       "signature": "2a6117f93516b9bb02c6e79ef9ce1ce67151baed1ad76668a5599961a822536ffff6d730f8d447f604d43c5c0ea5b01fe8795975489084d97a8cf91098b2e601"
+     *     }
+     * @example {
+     *       "scheme": "https",
+     *       "authority": "treasury.cordialapis.com",
+     *       "api": 1,
+     *       "action": "generate",
+     *       "resource": "Address",
+     *       "parent": "ETH",
+     *       "user": "moe",
+     *       "create_time": 1705941241,
+     *       "nonce": 339613079733,
+     *       "signature": "8683e4990f7e2abb2039757e5efe3b2ce4389b6ed596c1c457ced2a30ef4669641a71bfd454305ee2b4452e1ea760c669aa7858e0fb5a1e2b0eb5b1467fb9113"
+     *     }
+     * @example {
+     *       "scheme": "https",
+     *       "authority": "treasury.cordialapis.com",
+     *       "api": 1,
+     *       "action": "create",
+     *       "resource": "Address",
+     *       "parent": "ETH",
+     *       "id": "0x2b3e38e966391e8604e39490ac881f5e23c107c4",
+     *       "user": "moe",
+     *       "create_time": 1705941241,
+     *       "nonce": 339613079733,
+     *       "signature": "string"
+     *     }
+     */
+    Request: components["schemas"]["Server"] & {
+      action?: components["schemas"]["Action"];
+    } & components["schemas"]["Partial_Resource_Name"] &
+      components["schemas"]["Reference"] & {
+        query?: components["schemas"]["Query"];
+      } & {
+        body?: components["schemas"]["Body"];
+      } & components["schemas"]["Authentication"] & {
+        sso?: components["schemas"]["SingleSignOn"];
+      };
+    /** RequestFilter */
+    RequestFilter: {
+      action: components["schemas"]["ActionFilter"];
+      data?: components["schemas"]["DataFilter"];
+      /** @description A resource must be specified. */
+      resource?: components["schemas"]["ResourceFilter"];
+    };
+    /** ResourceFilter */
+    ResourceFilter:
+      | {
+          /** @description Optional name(s) to match target resources by. */
+          name?: components["schemas"]["StringFilter"];
+          /** @description Optional state(s) to match target resources by. */
+          state?: components["schemas"]["StringFilter"];
+          /** @description Tags to match target resources by.  Added in `25.13.3`. */
+          tag?: components["schemas"]["StringFilter"];
+          /** @description Optional resource type(s) to match target resource by. */
+          type?: components["schemas"]["ResourceTypeFilter"];
+          /** @description Optional variant(s) to match target resources by. */
+          variant?: components["schemas"]["StringFilter"];
+        }
+      | components["schemas"]["ResourceType"]
+      | components["schemas"]["ResourceType"][];
+    /**
+     * ResourceType
+     * @enum {string}
+     */
+    ResourceType:
+      | "AccessRule"
+      | "Account"
+      | "Address"
+      | "Asset"
+      | "Chain"
+      | "Credential"
+      | "Feature"
+      | "Key"
+      | "Operation"
+      | "Role"
+      | "Signature"
+      | "Transfer"
+      | "TransferRule"
+      | "User"
+      | "Treasury"
+      | "Transaction"
+      | "SoftwareUpdate"
+      | "Signer"
+      | "Symbol"
+      | "KeyResponse"
+      | "SignatureResponse"
+      | "Staking"
+      | "Signatory"
+      | "StakingRule"
+      | "Tag"
+      | "Host"
+      | "Call";
+    /**
+     * ResourceTypeFilter
+     * @example Transfer
      * @example [
-     *       "users/admin-2",
-     *       "roles/trader"
+     *       "User",
+     *       "Credential",
+     *       "Transfer"
      *     ]
      */
-    UserFilter:
-      | components["schemas"]["UserFilterEntry"]
-      | components["schemas"]["UserFilterEntry"][];
-    /** TransferRulePage */
-    TransferRulePage: {
-      "transfer-rules"?: components["schemas"]["TransferRule"][];
+    ResourceTypeFilter:
+      | components["schemas"]["ResourceType"]
+      | components["schemas"]["ResourceType"][];
+    /** ResourceVersion */
+    ResourceVersion: number;
+    /**
+     * Response
+     * @description Response of engine to successful operation.
+     */
+    Response: {
+      /** @description `Name` of resource that was operated on. This may not have been determined by the original `Request`. */
+      name?: string;
+      /** @description Resource `version` of resource immediately after the operation completed. For `Create`, this will be `0`. For `Update`, it will be "version seen by initiator plus one". */
+      version?: components["schemas"]["ResourceVersion"];
+    };
+    /**
+     * Retention
+     * @description Retention periods for resources that may accumulate over time.  If no duration is set, then affected resources will always be retained.
+     *
+     *     Added in `25.2.2`.
+     * @example {
+     *       "completed_operations": "30m",
+     *       "authorizing_operations": "2d",
+     *       "signatures": "1h"
+     *     }
+     */
+    Retention: {
+      /** @description Duration to retain operations that are in the `authorizing` state. */
+      authorizing_operations?: components["schemas"]["Duration"];
+      /** @description Duration to retain operations that are in the `succeeded` or `failed` state. */
+      completed_operations?: components["schemas"]["Duration"];
+      /** @description Duration to retain `Signature` resources. */
+      signatures?: components["schemas"]["Duration"];
+      /**
+       * @description Duration to retain `Transfer`, `Staking`, and `Transaction` resources.
+       *     `Transfer` and `Staking` resources are pruned once all of their `Transactions` have been pruned.
+       */
+      transactions?: components["schemas"]["Duration"];
+    };
+    /**
+     * RetryPolicy
+     * @description `EXPERIMENTAL` Added in `25.7.2`.
+     *
+     *     Defining a retry policy will enable transactions to be automatically retried if they are still in `submitting` or `finalizing` state after a certain time period.
+     * @example {
+     *       "attempts": 2,
+     *       "period": "10d"
+     *     }
+     */
+    RetryPolicy: {
+      /** @description Period inbetween attempts.  If omitted, it will never retry. */
+      after?: components["schemas"]["Duration"];
+      /** @description Number of attempts before failing the transaction. */
+      attempts: number;
+      /** @description Optional list of RPC error response messages.  If set, it will limit attempts to retry if the broadcast RPC error message matches one of these messages. */
+      message?: components["schemas"]["StringFilter"];
+    };
+    /** Role */
+    Role: {
+      /** @description OUTPUT ONLY. */
+      name?: components["schemas"]["RoleName"];
+      /** @description OUTPUT ONLY. */
+      state?: components["schemas"]["BasicState"];
+    } & components["schemas"]["Metadata"] &
+      components["schemas"]["RoleData"];
+    /**
+     * RoleData
+     * @description Optionally, a role allows restricting only users with the right variant, and/or only using credentials with the right variant, to authenticate themselves.
+     *
+     *     Empty/missing `credentials` or `users` fields are interpreted as wildcard (no restriction).
+     */
+    RoleData: {
+      credential?: components["schemas"]["CredentialVariantFilter"];
+      user?: components["schemas"]["UserVariantFilter"];
+    };
+    /**
+     * RoleName
+     * @description The resource name for a role.
+     * @example roles/admin
+     */
+    RoleName: string;
+    /** RolePage */
+    RolePage: {
+      roles?: components["schemas"]["Role"][];
+    } & components["schemas"]["Pagination"];
+    /**
+     * RuleVariant
+     * @enum {string}
+     */
+    RuleVariant: "allow" | "require" | "deny";
+    /**
+     * Server
+     * @description API server details.
+     */
+    Server: {
+      /** @description API version */
+      api?: components["schemas"]["ApiVersion"];
+      /** @description e.g. `""` */
+      treasury?: components["schemas"]["Id"];
+    };
+    /** Shares */
+    Shares: {
+      [key: string]: components["schemas"]["Hex"];
+    };
+    /**
+     * ShareVariant
+     * @enum {string}
+     */
+    ShareVariant: "generated" | "rotated" | "failed";
+    /** Signatory */
+    Signatory: {
+      name?: components["schemas"]["SignatoryName"];
+      state?: components["schemas"]["SignatoryState"];
+      variant: components["schemas"]["SignatoryVariant"];
+    } & components["schemas"]["Metadata"] &
+      components["schemas"]["SignatoryData"];
+    /** SignatoryData */
+    SignatoryData: {
+      algorithms: components["schemas"]["Algorithm"][];
+      attestation?: components["schemas"]["KeyName"];
+      authorization?: components["schemas"]["KeyName"];
+      signatory?: components["schemas"]["SignatoryName"];
+      /** @description The user bound to make responses on behalf of the signatory. */
+      user?: components["schemas"]["UserName"];
+    };
+    /**
+     * SignatoryName
+     * @example signatories/yubihsm2
+     */
+    SignatoryName: string;
+    /** SignatoryPage */
+    SignatoryPage: {
+      signatories?: components["schemas"]["Signatory"][];
+    } & components["schemas"]["Pagination"];
+    /**
+     * SignatoryState
+     * @enum {string}
+     */
+    SignatoryState: "initializing" | "active";
+    /**
+     * SignatoryVariant
+     * @constant
+     */
+    SignatoryVariant: "yubi-hsm2";
+    /** Signature */
+    Signature: {
+      /** @description OUTPUT ONLY. */
+      name?: components["schemas"]["SignatureName"];
+      /** @description OUTPUT ONLY. */
+      state?: components["schemas"]["SignatureState"];
+    } & components["schemas"]["Metadata"] &
+      components["schemas"]["SignatureData"];
+    /**
+     * SignatureData
+     * @description The keys of the shares dictionary are set by the system to signal the participants for this `attempt` to sign the message. The signer uses signature ID + attempt as inputs to derive a session ID - it is security critical that this session ID is not reused.
+     */
+    SignatureData: {
+      /** @description OUTPUT ONLY. Forms (together with signature ID) the basis of a request ID to the signer, if state is generating. Must be unique within a given key (e.g. auto-incrementing during attempts to generate or rotate a key). */
+      attempt?: components["schemas"]["NonNegative"];
+      /** @description embedded JSON encoding of a `Certificate` value. */
+      certificate?: components["schemas"]["Certificate"];
+      /** @description OUTPUT_ONLY.  This is a deprecated legacy field used internally by engine to request signatures. */
+      digest?: boolean;
+      /** @description Optional message set when signing fails. */
+      failure?: string;
+      format?: components["schemas"]["SignatureFormat"];
+      key?: components["schemas"]["KeyName"];
+      /** @description Hex encoded message */
+      message?: components["schemas"]["StdBase64"];
+      shares?: components["schemas"]["Shares"];
+      /** @description OUTPUT ONLY.  Hex encoded. */
+      signature?: components["schemas"]["Hex"];
+      /** @description OUTPUT_ONLY.  This is a selection of triples to use for MPC protocol.  Deprecated. */
+      triples?: number[];
+    };
+    /**
+     * SignatureFormat
+     * @description Raw (default) format is (r, s) each as 32 byte big-endian integers.
+     *     With recovery adds a byte for a total length of 65 bytes for ECDSA signatures.
+     *     DER uses the DER encoding of the (r, s) pair, for a typical length of 70 bytes.
+     * @enum {string}
+     */
+    SignatureFormat: "raw" | "recovery" | "der";
+    /**
+     * SignatureName
+     * @example signatures/some-signature
+     */
+    SignatureName: string;
+    /** SignaturePage */
+    SignaturePage: {
+      signatures?: components["schemas"]["Signature"][];
+    } & components["schemas"]["Pagination"];
+    SignatureRequest: unknown;
+    SignatureRequestPage: unknown;
+    /** SignatureResponse */
+    SignatureResponse: {
+      name?: components["schemas"]["SignatureResponseName"];
+      state?: components["schemas"]["BasicState"];
+      /** @enum {string} */
+      variant?: "signed" | "failed";
+    } & components["schemas"]["Metadata"] &
+      components["schemas"]["SignatureResponseData"];
+    /** SignatureResponseData */
+    SignatureResponseData:
+      | components["schemas"]["RawSignatureShare"]
+      | components["schemas"]["Complaint"];
+    /**
+     * SignatureResponseName
+     * @example signers/3/signature-responses/321
+     */
+    SignatureResponseName: string;
+    /** SignatureResponsePage */
+    SignatureResponsePage: {
+      "signature-responses"?: components["schemas"]["SignatureResponse"][];
+    } & components["schemas"]["Pagination"];
+    /**
+     * SignatureState
+     * @enum {string}
+     */
+    SignatureState:
+      | "signing"
+      | "signed"
+      | "failed"
+      | "signatory-signing"
+      | "authorizing";
+    /** Signer */
+    Signer: {
+      name?: components["schemas"]["SignerName"];
+      state?: components["schemas"]["SignerState"];
+    } & components["schemas"]["SignerData"] &
+      components["schemas"]["Metadata"];
+    /** SignerData */
+    SignerData: {
+      /** @description Hex encoded. */
+      recipient?: string;
+      socket?: string;
+      /** @description The user that the signer authenticates as. */
+      user?: components["schemas"]["UserName"];
+      /** @description Hex encoded. */
+      verifying_key?: string;
+    };
+    /**
+     * SignerName
+     * @example signers/3
+     */
+    SignerName: string;
+    /** SignerPage */
+    SignerPage: {
+      signers?: components["schemas"]["Signer"][];
+    } & components["schemas"]["Pagination"];
+    /**
+     * SignerState
+     * @description Added in `25.1.1`.
+     * @enum {string}
+     */
+    SignerState: "active" | "inactive";
+    /**
+     * SingleSignOn
+     * @description A single-sign-on assertion includes a signature from your single-sign-on provider over a temporary credential that can than be used to sign a request to Treasury.
+     *
+     *     Treasury typically requires this for `human` variant users in addition to a primary signature.
+     */
+    SingleSignOn: {
+      /** @description Unix timestamp. */
+      create_time?: number;
+      /** @description JWT from SSO provider that has included the public key of the credential used to produce the signature. */
+      id?: string;
+      /** @description random number */
+      nonce?: number;
+      signature?: components["schemas"]["Hex"];
+    };
+    /** SoftwareUpdate */
+    SoftwareUpdate: {
+      name?: components["schemas"]["SoftwareUpdateName"];
+      state?: components["schemas"]["SoftwareUpdateState"];
+    } & components["schemas"]["SoftwareUpdateData"] &
+      components["schemas"]["Metadata"];
+    /** SoftwareUpdateData */
+    SoftwareUpdateData: {
+      /**
+       * @description Schedule the software update to start after a particular time.
+       *     If omitted, the update will start immediately.
+       */
+      after_time?: components["schemas"]["Timestamp"];
+      /** @description Full OCI reference to a signed image to update to. */
+      artifact?: components["schemas"]["ImageReference"];
+    };
+    /** SoftwareUpdateName */
+    SoftwareUpdateName: string;
+    /** SoftwareUpdatePage */
+    SoftwareUpdatePage: {
+      "software-updates"?: components["schemas"]["SoftwareUpdate"][];
+    } & components["schemas"]["Pagination"];
+    /**
+     * SoftwareUpdateState
+     * @description **Active**: The software update is ongoing and no more changes are allowed to be made to the Treasury instances until the update completes.
+     *
+     *     **Scheduled**: The software update is scheduled to occur in the future.
+     *
+     *     **Succeeded**:  The update has completed successfully by local supervisor process.
+     *
+     *     **Failed**: The update has failed and was aborted by local supervisor process.
+     * @enum {string}
+     */
+    SoftwareUpdateState: "active" | "scheduled" | "succeeded" | "failed";
+    /**
+     * SoftwareVersion
+     * @example 24.1.9 (rev 282bb8b6)
+     * @example 24.2.10-pre.42 (rev 8cbb1724)
+     */
+    SoftwareVersion: string;
+    /**
+     * Staking
+     * @description Semantic representation of a delegated staking operation of one native asset controlled by one address.
+     *
+     *     `stake` - move liquid assets into a active stake with some validator or provider.
+     *     `unstake` - move staked assets into an inactive or liquid state.
+     *     `withdraw` - withdraw inactive staked assets into the original liquid state.
+     *
+     *     Creation of a Stake resource requires:
+     *     - initiator and approvers are sufficiently authorized
+     *     - the staking resource passes the routing policy
+     *     - the staking resource passes the approvals policy
+     *
+     *     Once a staking resource exists (identified by monotonic ID),
+     *     the engine will produce a transaction that realizes the desired operation on the target chain.
+     *
+     *     Most chains require a validator.  Some chains, like Ethereum, require a 3rd party "provider" to manage the validator on your behalf.
+     */
+    Staking: {
+      /** @description OUTPUT ONLY. */
+      name?: components["schemas"]["StakingName"];
+      /** @description OUTPUT ONLY. */
+      state?: components["schemas"]["TransferState"];
+      variant: components["schemas"]["StakingVariant"];
+    } & components["schemas"]["Metadata"] &
+      components["schemas"]["StakingData"];
+    /**
+     * StakingCreate
+     * @description Semantic representation of a delegated staking operation of one native asset controlled by one address.
+     *
+     *     `stake` - move liquid assets into a active stake with some validator or provider.
+     *     `unstake` - move staked assets into an inactive or liquid state.
+     *     `withdraw` - withdraw inactive staked assets into the original liquid state.
+     *
+     *     Creation of a Stake resource requires:
+     *     - initiator and approvers are sufficiently authorized
+     *     - the staking resource passes the routing policy
+     *     - the staking resource passes the approvals policy
+     *
+     *     Once a staking resource exists (identified by monotonic ID),
+     *     the engine will produce a transaction that realizes the desired operation on the target chain.
+     *
+     *     Most chains require a validator.  Some chains, like Ethereum, require a 3rd party "provider" to manage the validator on your behalf.
+     */
+    StakingCreate: {
+      /** @description OUTPUT ONLY. */
+      name?: components["schemas"]["StakingName"];
+      /** @description OUTPUT ONLY. */
+      state?: components["schemas"]["TransferState"];
+      variant: components["schemas"]["StakingVariant"];
+    } & components["schemas"]["Metadata"] &
+      components["schemas"]["StakingCreateData"];
+    /** StakingCreateData */
+    StakingCreateData: {
+      amount: components["schemas"]["PositiveDecimal"];
+      /**
+       * @description Optional.  The asset to stake.
+       *
+       *     Most chains only support staking one asset, which will be used as the default.
+       */
+      asset: components["schemas"]["AssetOrSymbol"];
+      from: components["schemas"]["AddressChoice"];
+      priority?: components["schemas"]["Priority"];
+      /** @description The validator address to stake to.  This is optional depending on the chain or protocol.  It is required on most. */
+      to?: components["schemas"]["AddressChoice"];
+    };
+    /** StakingData */
+    StakingData: {
+      /** @description The amount is required depending on the chain.  Some chains will use the full address balance instead of a specified amount. */
+      amount?: components["schemas"]["PositiveDecimal"];
+      /**
+       * @description Optional.  The asset to stake.
+       *
+       *     Most chains only support staking one asset, which will be used as the default.
+       */
+      asset: components["schemas"]["AssetName"];
+      error?: components["schemas"]["TransactionError"];
+      from: components["schemas"]["AddressName"];
+      /**
+       * @description OUTPUT ONLY.  The last transaction created for this transfer.  New transactions only get created when retrying the transfer.
+       *     See separate transaction query to see full history.
+       */
+      last_transaction?: components["schemas"]["TransactionName"];
+      priority?: components["schemas"]["Priority"];
+      symbol?: components["schemas"]["SymbolName"];
+      /** @description The validator address to stake to.  This is optional depending on the chain or protocol.  It is required on most. */
+      to?: components["schemas"]["AddressName"];
+    };
+    /** StakingFilter */
+    StakingFilter: {
+      amount?: components["schemas"]["AmountFilter"];
+      asset: components["schemas"]["AssetFilter"];
+      from: components["schemas"]["AddressFilter"];
+      /** @description Must have at least one staking variant. */
+      staking: components["schemas"]["StakingVariant"][];
+      to: components["schemas"]["AddressFilter"];
+    };
+    /**
+     * StakingName
+     * @example staking/1
+     */
+    StakingName: string;
+    /** StakingPage */
+    StakingPage: {
+      stakings?: components["schemas"]["Staking"][];
+    } & components["schemas"]["Pagination"];
+    /**
+     * StakingRule
+     * @description This is analogou to transfer rules, except the `to` address must be a `validator` address.
+     * @example {
+     *       "name": "transfer-rules/simple-btc-allowlist-account",
+     *       "variant": "allow",
+     *       "asset": "chains/BTC/assets/BTC",
+     *       "from": "accounts/x",
+     *       "to": "accounts/y",
+     *       "version": 1
+     *     }
+     * @example {
+     *       "name": "transfer-rules/simple-btc-allowlist-addresses",
+     *       "variant": "allow",
+     *       "asset": "chains/BTC/assets/BTC",
+     *       "from": "accounts/x",
+     *       "to": [
+     *         "chains/BTC/addresses/bc1pylz76fj9tcscnqk0gzfux87aguh3lxpnq5fyvyu9h99668wtufds479h8t",
+     *         "chains/BTC/addresses/bc1pylz76fj9tcscnqk0gzfux87aguh3lxpnq5fyvyu9h99668wtufds479h8t"
+     *       ],
+     *       "version": 1
+     *     }
+     * @example {
+     *       "name": "transfer-rules/multi-asset",
+     *       "variant": "allow",
+     *       "asset": [
+     *         "chains/BTC/assets/BTC",
+     *         "chains/ETH/assets/ETH",
+     *         "chains/ETH/assets/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+     *       ],
+     *       "from": "accounts/x",
+     *       "to": "accounts/y",
+     *       "version": 1
+     *     }
+     * @example {
+     *       "name": "transfer-rules/deny-btc-out-of-account-x",
+     *       "variant": "deny",
+     *       "asset": [
+     *         "chains/BTC/assets/BTC"
+     *       ],
+     *       "from": "accounts/x",
+     *       "to": "any/address",
+     *       "version": 1
+     *     }
+     * @example {
+     *       "name": "transfer-rules/require-2-approvals-account-x",
+     *       "variant": "require",
+     *       "asset": "any/asset",
+     *       "from": "accounts/x",
+     *       "to": "any/address",
+     *       "approve": [
+     *         "roles/admin",
+     *         "users/joesmith"
+     *       ],
+     *       "approvals": 2,
+     *       "version": 1
+     *     }
+     * @example {
+     *       "name": "transfer-rules/sent-to-default-address",
+     *       "variant": "allow",
+     *       "asset": "chains/BTC/assets/BTC",
+     *       "from": "accounts/x",
+     *       "to": "accounts/coinbase/defaults",
+     *       "version": 1
+     *     }
+     */
+    StakingRule: {
+      /** @description OUTPUT ONLY. */
+      name?: components["schemas"]["StakingRuleName"];
+      /** @description OUTPUT ONLY. */
+      state?: components["schemas"]["DisableableState"];
+      variant?: components["schemas"]["RuleVariant"];
+    } & components["schemas"]["Metadata"] &
+      components["schemas"]["StakingRuleData"];
+    /** StakingRuleData */
+    StakingRuleData: components["schemas"]["StakingFilter"] &
+      components["schemas"]["QuorumFilter"];
+    /**
+     * StakingRuleName
+     * @example staking-rules/freeze-ETH
+     */
+    StakingRuleName: string;
+    /** StakingRulePage */
+    StakingRulePage: {
+      "staking-rules"?: components["schemas"]["StakingRule"][];
+    } & components["schemas"]["Pagination"];
+    /**
+     * StakingVariant
+     * @description Staking operations.  Not all chains use `withdraw`, as it's done automatically in `unstake` transactions.
+     * @enum {string}
+     */
+    StakingVariant: "stake" | "unstake" | "withdraw";
+    /**
+     * StdBase64
+     * @description Standard Base64 encoded bytes.
+     */
+    StdBase64: string;
+    /**
+     * StringFilter
+     * @example string
+     * @example [
+     *       "string1",
+     *       "string2"
+     *     ]
+     */
+    StringFilter: string | string[];
+    /**
+     * Symbol
+     * @description A symbol that can be used to resolve to a specific asset.
+     *
+     *     No two symbols may resolve to the same asset.
+     */
+    Symbol: {
+      name?: components["schemas"]["SymbolName"];
+      state?: components["schemas"]["BasicState"];
+    } & components["schemas"]["SymbolData"] &
+      components["schemas"]["Metadata"];
+    /** SymbolData */
+    SymbolData: {
+      asset?: components["schemas"]["AssetName"];
+    };
+    /**
+     * SymbolName
+     * @example chains/SOL/symbols/BONK
+     */
+    SymbolName: string;
+    /** SymbolPage */
+    SymbolPage: {
+      symbols?: components["schemas"]["Symbol"][];
+    } & components["schemas"]["Pagination"];
+    /** Tag */
+    Tag: {
+      name?: components["schemas"]["TagName"];
+    } & components["schemas"]["TagData"] &
+      components["schemas"]["Metadata"];
+    /** TagData */
+    TagData: {
+      color?: string;
+      resource?: components["schemas"]["ResourceTypeFilter"];
+    };
+    /**
+     * TagName
+     * @example tags/secure
+     */
+    TagName: string;
+    /** TagPage */
+    TagPage: {
+      tags?: components["schemas"]["Tag"][];
+    } & components["schemas"]["Pagination"];
+    /**
+     * Tags
+     * @description A set of strings.  Tags be referenced in policy rules, like access-rules, transfer-rules, and staking-rules.
+     *
+     *     Added in `25.13.1`.
+     */
+    Tags: string[];
+    /**
+     * Timestamp
+     * @description Seconds since UNIX epoch, encoded as UTC timestamp (ending in Z).
+     *
+     *     All resources have a `create_time` timestamp, which is set to the engine block time where the resource
+     *     is created in replicated engine state.
+     * @example 2024-07-30T11:30:15Z
+     */
+    Timestamp: string;
+    /**
+     * Transaction
+     * @description A transaction on an external blockchain. Treasury will create transactions when creating (or retrying) transfers.
+     *
+     *     The connector process in treasury will automatically manage updating transactions and submitting them to external chains.
+     */
+    Transaction: {
+      /** @description OUTPUT ONLY. */
+      name?: components["schemas"]["TransactionName"];
+      /** @description OUTPUT ONLY. */
+      state?: components["schemas"]["TransferState"];
+    } & components["schemas"]["Metadata"] &
+      components["schemas"]["TransactionData"];
+    /**
+     * TransactionData
+     * @description A transaction on an external blockchain.
+     */
+    TransactionData: {
+      /**
+       * @description If this transaction is in the `queued` state,
+       *     then this field will be set to indicate another transaction
+       *     that is being waited on.
+       *
+       *     Usually the transaction needs to get a confirmation in order
+       *     to advance the internal queue, or not use any conflicting resources on the chain.
+       */
+      after?: components["schemas"]["TransactionName"];
+      block?: components["schemas"]["Block"];
+      /** @description Additional input for broadcast/submit RPC, in addition to the transaction `payload`.  Used only for some chains.  Encoded as an embedded JSON. */
+      broadcast?: string;
+      /** @description OUTPUT_ONLY.  Chain that the transaction is for. */
+      chain: components["schemas"]["ChainName"];
+      /** @description Number of confirmations reported on chain */
+      confirmations?: number;
+      error?: components["schemas"]["TransactionError"];
+      /** @description Any fees paid.  This will be updated only after the transaction is accepted on the public chain. */
+      fees?: components["schemas"]["AssetAndSymbolAndAmount"][];
+      /**
+       * @description Transaction hash.
+       *     It is encoded in the canonical way for the chain.
+       *     This value can be used to look up the transaction on external explorers.
+       */
+      hash?: string;
+      /**
+       * @description The chain-specific inputs used for serialization.
+       *     This is a JSON serialized object.
+       *
+       *     Using these inputs, along with the parent transfer,
+       *     you can recreate the serialized data used for signing.
+       *
+       *     This type is not yet stable and differs for each chain.
+       */
+      input?: string;
+      /**
+       * @description Optional ID that is preferred when looking up the transaction using connector API or on explorers.
+       *
+       *     Usually the `hash` is sufficient, but some chains need to use an ID that's only discoverable after the transaction is confirmed on chain.
+       */
+      lookup_id?: string;
+      origin: components["schemas"]["TransactionOrigin"];
+      /**
+       * @description Hex encoded payload of the serialized transaction.
+       *     This was used for input to signing and can be used for broadcasting.
+       */
+      payload?: string;
+      /** @description If the transaction is queued, this reports the position in the queue. */
+      position?: number;
+      /** @description Time when the transaction was signed. */
+      sign_time?: components["schemas"]["Timestamp"];
+      /** @description Hex encoded signature of the serialization transaction. */
+      signatures?: components["schemas"]["Hex"][];
+      skip_broadcast?: boolean;
+    };
+    /**
+     * TransactionError
+     * @description An error with an on-going transaction.
+     */
+    TransactionError: {
+      message: string;
+      status: components["schemas"]["TransactionErrorStatus"];
+    };
+    /**
+     * TransactionErrorStatus
+     * @enum {string}
+     */
+    TransactionErrorStatus:
+      | "InvalidArgument"
+      | "FailedPrecondition"
+      | "Unavailable"
+      | "TimedOut"
+      | "InsufficientBalance"
+      | "InsufficientBalanceForGas"
+      | "SigningFailed"
+      | "BroadcastFailed"
+      | "Aborted"
+      | "Reverted"
+      | "Unknown"
+      | "FailedPreparation";
+    /**
+     * TransactionName
+     * @example transactions/123
+     */
+    TransactionName: string;
+    /** TransactionOrigin */
+    TransactionOrigin:
+      | components["schemas"]["TransferName"]
+      | components["schemas"]["StakingName"];
+    /** TransactionPage */
+    TransactionPage: {
+      transactions?: components["schemas"]["Transaction"][];
+    } & components["schemas"]["Pagination"];
+    /**
+     * Transfer
+     * @description Semantic representation of a transfer of one asset between two addresses.
+     *
+     *     - if `from` is set to an account, then a single address with sufficient balance for the asset is selected as from address (else failure)
+     *     - if `to` is set to an account, then one of the preferred receive addresses for the chain is selected (else failure).
+     *
+     *     Creation of a Transfer resource requires:
+     *     - initiator and approvers are sufficiently authorized
+     *     - the transfer resource passes the routing policy
+     *     - the transfer resource passes the approvals policy
+     *
+     *     Once a transfer resource exists (identified by monotonic ID),
+     *     the engine will produce
+     *     - one (the happy path)
+     *     - zero (if insufficiently funded), or
+     *     - more than one (if retries are necessary)
+     *     Transaction resources, by signing a binary representation of the transfer.
+     */
+    Transfer: {
+      /** @description OUTPUT ONLY. */
+      name: components["schemas"]["TransferName"];
+      /** @description OUTPUT ONLY. */
+      state: components["schemas"]["TransferState"];
+    } & components["schemas"]["Metadata"] &
+      components["schemas"]["TransferData"];
+    /**
+     * TransferCreate
+     * @description Semantic representation of a transfer of one asset between two addresses.
+     *
+     *     - if `from` is set to an account, then a single address with sufficient balance for the asset is selected as from address (else failure)
+     *     - if `to` is set to an account, then one of the preferred receive addresses for the chain is selected (else failure).
+     *
+     *     Creation of a Transfer resource requires:
+     *     - initiator and approvers are sufficiently authorized
+     *     - the transfer resource passes the routing policy
+     *     - the transfer resource passes the approvals policy
+     *
+     *     Once a transfer resource exists (identified by monotonic ID),
+     *     the engine will produce
+     *     - one (the happy path)
+     *     - zero (if insufficiently funded), or
+     *     - more than one (if retries are necessary)
+     *     Transaction resources, by signing a binary representation of the transfer.
+     */
+    TransferCreate: components["schemas"]["Metadata"] &
+      components["schemas"]["TransferCreateData"];
+    /**
+     * TransferCreateData
+     * @description Semantic representation of a transfer of one asset between two addresses.
+     *
+     *     - if `from` is set to an account, then a single address with sufficient balance for the asset is selected as from address (else failure)
+     *     - if `to` is set to an account, then one of the preferred receive addresses for the chain is selected (else failure).
+     *
+     *     Creation of a Transfer resource requires:
+     *     - initiator and approvers are sufficiently authorized
+     *     - the transfer resource passes the routing policy
+     *     - the transfer resource passes the approvals policy
+     *
+     *     Once a transfer resource exists (identified by monotonic ID),
+     *     the engine will produce
+     *     - one (the happy path)
+     *     - zero (if insufficiently funded), or
+     *     - more than one (if retries are necessary)
+     *     Transaction resources, by signing a binary representation of the transfer.
+     */
+    TransferCreateData: {
+      amount?: components["schemas"]["PositiveDecimal"];
+      /**
+       * @description May input an asset name or symbol name.
+       *     The created resource will always output the asset name, along with the current `symbol`.
+       */
+      asset: components["schemas"]["AssetOrSymbol"];
+      fee?: components["schemas"]["FeeCreate"];
+      from:
+        | components["schemas"]["AddressChoice"]
+        | components["schemas"]["AddressChoice"][];
+      /** @description Set a transaction memo.  Added in `25.6.4`. */
+      memo?: string;
+      priority?: components["schemas"]["Priority"];
+      /** @description An optional retry policy.  This will override any retry policy defined on the respective `Chain`.  Added in `25.10.1`. */
+      retry?: components["schemas"]["RetryPolicy"];
+      to:
+        | components["schemas"]["AddressChoice"]
+        | components["schemas"]["AddressChoiceWithAmount"][];
+    };
+    /**
+     * TransferData
+     * @description Semantic representation of a transfer of one asset between two addresses.
+     *
+     *     - if `from` is set to an account, then a single address with sufficient balance for the asset is selected as from address (else failure)
+     *     - if `to` is set to an account, then one of the preferred receive addresses for the chain is selected (else failure).
+     *
+     *     Creation of a Transfer resource requires:
+     *     - initiator and approvers are sufficiently authorized
+     *     - the transfer resource passes the routing policy
+     *     - the transfer resource passes the approvals policy
+     *
+     *     Once a transfer resource exists (identified by monotonic ID),
+     *     the engine will produce
+     *     - one (the happy path)
+     *     - zero (if insufficiently funded), or
+     *     - more than one (if retries are necessary)
+     *     Transaction resources, by signing a binary representation of the transfer.
+     */
+    TransferData: {
+      amount?: components["schemas"]["PositiveDecimal"];
+      /**
+       * @description May input an asset name or symbol name.
+       *     The created resource will always output the asset name, along with the current `symbol`.
+       */
+      asset: components["schemas"]["AssetName"];
+      error?: components["schemas"]["TransactionError"];
+      fee?: components["schemas"]["Fee"];
+      from:
+        | components["schemas"]["AddressName"]
+        | components["schemas"]["AddressName"][];
+      /**
+       * @description OUTPUT ONLY.  The last transaction created for this transfer.  New transactions only get created when retrying the transfer.
+       *     See separate transaction query to see full history.
+       */
+      last_transaction?: components["schemas"]["TransactionName"];
+      /** @description Set a transaction memo.  Added in `25.6.4`. */
+      memo?: string;
+      priority?: components["schemas"]["Priority"];
+      /** @description An optional retry policy.  This will override any retry policy defined on the respective `Chain`.  Added in `25.10.1`. */
+      retry?: components["schemas"]["RetryPolicy"];
+      symbol?: components["schemas"]["SymbolName"];
+      to:
+        | components["schemas"]["AddressName"]
+        | components["schemas"]["AddressWithAmount"][];
+    };
+    /** TransferFilter */
+    TransferFilter: {
+      amount?: components["schemas"]["AmountFilter"];
+      asset: components["schemas"]["AssetFilter"];
+      from: components["schemas"]["AddressFilter"];
+      to: components["schemas"]["AddressFilter"];
+    };
+    /**
+     * TransferName
+     * @example transfers/1
+     */
+    TransferName: string;
+    /** TransferPage */
+    TransferPage: {
+      transfers?: components["schemas"]["Transfer"][];
     } & components["schemas"]["Pagination"];
     /**
      * TransferRule
@@ -3573,93 +4369,100 @@ export interface components {
     TransferRule: {
       /** @description OUTPUT ONLY. */
       name?: components["schemas"]["TransferRuleName"];
-      variant?: components["schemas"]["RuleVariant"];
       /** @description OUTPUT ONLY. */
       state?: components["schemas"]["DisableableState"];
+      variant?: components["schemas"]["RuleVariant"];
     } & components["schemas"]["Metadata"] &
       components["schemas"]["TransferRuleData"];
+    /** TransferRuleData */
+    TransferRuleData: components["schemas"]["TransferFilter"] &
+      components["schemas"]["QuorumFilter"];
     /**
      * TransferRuleName
      * @example transfer-rules/freeze-ETH
      * @example transferRules/block-binance
      */
     TransferRuleName: string;
-    /** TransferRuleData */
-    TransferRuleData: components["schemas"]["TransferFilter"] &
-      components["schemas"]["QuorumFilter"];
-    /** TransferFilter */
-    TransferFilter: {
-      asset: components["schemas"]["AssetFilter"];
-      amount?: components["schemas"]["AmountFilter"];
-      from: components["schemas"]["AddressFilter"];
-      to: components["schemas"]["AddressFilter"];
-    };
-    /** AssetFilter */
-    AssetFilter:
-      | components["schemas"]["AssetFilterEntry"]
-      | components["schemas"]["AssetFilterEntry"][]
-      | components["schemas"]["AnyAsset"];
-    /** AssetFilterEntry */
-    AssetFilterEntry:
-      | components["schemas"]["AssetName"]
-      | components["schemas"]["ChainAssets"];
-    /** ChainAssets */
-    ChainAssets: string;
+    /** TransferRulePage */
+    TransferRulePage: {
+      "transfer-rules"?: components["schemas"]["TransferRule"][];
+    } & components["schemas"]["Pagination"];
     /**
-     * AnyAsset
-     * @constant
+     * TransferState
+     * @description - **preparing**: Gathering inputs needed to construct the transaction for the transfer.
+     *     - **queued**: The transaction is waiting on another transaction to complete before continuing.
+     *     - **signing**: Waiting for the signer to sign the binary transaction
+     *     - **submitting**: Waiting for confirmation that the signed transactions was submitted successfully
+     *     - **finalizing**: Waiting for confirmation that the signed transactions was is sufficiently final (requirement depends on the upstream chain, for instance Cosmos is instantly final, whereas Bitcoin usually uses 6 confirmations for finality)
+     *     - **succeeded**: Transaction has enough confirmations to be considered final for the given chain
+     *     - **failed**: This transfer failed, and nothing can be done to make further progress
+     *     - **reverted**:  The transfer landed on chain but reverted due to an error.
+     * @enum {string}
      */
-    AnyAsset: "any/asset";
+    TransferState:
+      | "preparing"
+      | "signing"
+      | "submitting"
+      | "finalizing"
+      | "succeeded"
+      | "failed"
+      | "queued"
+      | "reverted";
     /**
-     * AmountFilter
-     * @description Only one of `at_least`, `more_than` may be set (as lower bound). Only one of `at_most`, `less_than` may be set (as upper bound). Either a lower bound, an upper bound, or a lower and an upper bound must be set. All bounds are in terms of the notional value of the current amount (or including historical amounts) in terms of the `quote` asset.
+     * Treasury
+     * @description Information about the treasury install.
+     */
+    Treasury: {
+      name?: components["schemas"]["TreasuryName"];
+      state?: components["schemas"]["BasicState"];
+    } & components["schemas"]["TreasuryData"] &
+      components["schemas"]["Metadata"];
+    /**
+     * TreasuryData
+     * @description Information about the treasury instance.
      * @example {
-     *       "more_than": "10",
-     *       "at_most": "1000",
-     *       "quote": "chains/USD/assets/USD",
-     *       "within": "12h"
+     *       "block": {
+     *         "height": "10",
+     *         "time": "2024-07-30T11:30:15Z"
+     *       },
+     *       "network": "mainnet",
+     *       "software": "24.2.10-pre.44 (rev d59575b9)",
+     *       "retention": {
+     *         "completed_operations": "30m",
+     *         "authorizing_operations": "2d",
+     *         "signatures": "1h"
+     *       }
      *     }
      */
-    AmountFilter: {
-      at_least?: components["schemas"]["PositiveDecimal"];
-      more_than?: components["schemas"]["PositiveDecimal"];
-      at_most?: components["schemas"]["PositiveDecimal"];
-      less_than?: components["schemas"]["PositiveDecimal"];
-      /** @description Only `chains/USD/assets/USD` currently supported. */
-      quote: components["schemas"]["AssetName"];
-      /** @description Optional lookback window. */
-      within?: components["schemas"]["Duration"];
+    TreasuryData: {
+      block?: components["schemas"]["Block"];
+      keys?: {
+        /** @description Not currently implemented. */
+        bak?: components["schemas"]["BackupKey"][];
+        /** @description Signing Json Web Keys, used to validate OpenPubkey credential signatures (the "keys" array in a JWKS). */
+        sso?: Record<string, unknown>[];
+      };
+      /**
+       * @description Blockchain network selector.  By adding this as `network`
+       *     header or query-param to API endpoints, you will get matched with
+       *     mainnet or not-mainnet networks.
+       */
+      network?: string;
+      retention?: components["schemas"]["Retention"];
+      /** @description Software version that Treasury instance is currently running. */
+      software?: components["schemas"]["SoftwareVersion"];
+      /** @description This is currently unused in production environments. */
+      sso_created_user_initial_roles?: string[];
     };
-    /** AddressFilter */
-    AddressFilter:
-      | components["schemas"]["AddressFilterEntry"]
-      | components["schemas"]["AddressFilterEntry"][]
-      | components["schemas"]["AnyAddress"];
-    /** AddressFilterEntry */
-    AddressFilterEntry:
-      | components["schemas"]["AddressName"]
-      | components["schemas"]["AccountName"]
-      | components["schemas"]["AccountDefaults"];
     /**
-     * AccountDefaults
-     * @description Use in transfer policy: Binds to the default addresses of a given account.
+     * TreasuryName
+     * @example treasuries/1
+     * @example treasuries/install_x
      */
-    AccountDefaults: string;
-    /**
-     * AnyAddress
-     * @constant
-     */
-    AnyAddress: "any/address";
-    /** QuorumFilter */
-    QuorumFilter: {
-      initiate?: components["schemas"]["UserFilter"];
-      approve?: components["schemas"]["UserFilter"];
-      cancel?: components["schemas"]["UserFilter"];
-      approvals?: number;
-    };
-    /** TypePage */
-    TypePage: {
-      types?: components["schemas"]["Type"][];
+    TreasuryName: string;
+    /** TreasuryPage */
+    TreasuryPage: {
+      treasuries?: components["schemas"]["Treasury"][];
     } & components["schemas"]["Pagination"];
     /** Type */
     Type: {
@@ -3667,11 +4470,6 @@ export interface components {
       state?: components["schemas"]["BasicState"];
     } & components["schemas"]["Metadata"] &
       components["schemas"]["TypeData"];
-    /**
-     * TypeName
-     * @example types/Transfer
-     */
-    TypeName: string;
     /**
      * TypeData
      * @description Information allowing a client to programmatically generate itself.
@@ -3696,914 +4494,130 @@ export interface components {
     TypeData: {
       /** @description Optional - if set, the type is nested under the type referenced by name. */
       nested?: components["schemas"]["TypeName"];
-      singular?: components["schemas"]["Id"];
       /** @description ID to be used when constructing path segments. */
       plural?: components["schemas"]["Id"];
+      singular?: components["schemas"]["Id"];
       /** @description All valid variants of the resource - if it has variants. */
       variants?: string[];
     };
     /**
-     * Treasury
-     * @description Information about the treasury install.
+     * TypeName
+     * @example types/Transfer
      */
-    Treasury: {
-      name?: components["schemas"]["TreasuryName"];
-      state?: components["schemas"]["BasicState"];
-    } & components["schemas"]["TreasuryData"] &
-      components["schemas"]["Metadata"];
-    /**
-     * TreasuryName
-     * @example treasuries/1
-     * @example treasuries/install_x
-     */
-    TreasuryName: string;
-    /**
-     * TreasuryData
-     * @description Information about the treasury instance.
-     * @example {
-     *       "block": {
-     *         "height": "10",
-     *         "time": "2024-07-30T11:30:15Z"
-     *       },
-     *       "network": "mainnet",
-     *       "software": "24.2.10-pre.44 (rev d59575b9)",
-     *       "retention": {
-     *         "completed_operations": "30m",
-     *         "authorizing_operations": "2d",
-     *         "signatures": "1h"
-     *       }
-     *     }
-     */
-    TreasuryData: {
-      block?: components["schemas"]["Block"];
-      /**
-       * @description Blockchain network selector.  By adding this as `network`
-       *     header or query-param to API endpoints, you will get matched with
-       *     mainnet or not-mainnet networks.
-       */
-      network?: string;
-      /** @description Software version that Treasury instance is currently running. */
-      software?: components["schemas"]["SoftwareVersion"];
-      retention?: components["schemas"]["Retention"];
-      keys?: {
-        /** @description Signing Json Web Keys, used to validate OpenPubkey credential signatures (the "keys" array in a JWKS). */
-        sso?: Record<string, unknown>[];
-        /** @description Not currently implemented. */
-        bak?: components["schemas"]["BackupKey"][];
-      };
-      /** @description This is currently unused in production environments. */
-      sso_created_user_initial_roles?: string[];
-    };
-    /**
-     * Block
-     * @example {
-     *       "height": "10",
-     *       "time": "2024-07-30T11:30:15Z"
-     *     }
-     */
-    Block: {
-      /** @description The last 'height' at which engine nodes had consensus. If this number does not increment roughly ever 5s, then there is not yet a consensus, or a node is down. */
-      height: string;
-      time: components["schemas"]["Timestamp"];
-    };
-    /**
-     * SoftwareVersion
-     * @example 24.1.9 (rev 282bb8b6)
-     * @example 24.2.10-pre.42 (rev 8cbb1724)
-     */
-    SoftwareVersion: string;
-    /**
-     * Retention
-     * @description Retention periods for resources that may accumulate over time.  If no duration is set, then affected resources will always be retained.
-     *
-     *     Added in `25.2.2`.
-     * @example {
-     *       "completed_operations": "30m",
-     *       "authorizing_operations": "2d",
-     *       "signatures": "1h"
-     *     }
-     */
-    Retention: {
-      /** @description Duration to retain operations that are in the `succeeded` or `failed` state. */
-      completed_operations?: components["schemas"]["Duration"];
-      /** @description Duration to retain operations that are in the `authorizing` state. */
-      authorizing_operations?: components["schemas"]["Duration"];
-      /**
-       * @description Duration to retain `Transfer`, `Staking`, and `Transaction` resources.
-       *     `Transfer` and `Staking` resources are pruned once all of their `Transactions` have been pruned.
-       */
-      transactions?: components["schemas"]["Duration"];
-      /** @description Duration to retain `Signature` resources. */
-      signatures?: components["schemas"]["Duration"];
-    };
-    /**
-     * BackupKey
-     * @example {
-     *       "id": "ops",
-     *       "key": "age10eyz8zrje2aqgwkgpvycxzmut3e4mslc40eky9lk0avmmt6wpv3q8nft3h"
-     *     }
-     */
-    BackupKey: {
-      /** @description Optional ID for the backup key. */
-      id?: components["schemas"]["Id"];
-      /** @description Public backup age key. */
-      key?: string;
-    };
-    /** TreasuryPage */
-    TreasuryPage: {
-      treasuries?: components["schemas"]["Treasury"][];
+    TypeName: string;
+    /** TypePage */
+    TypePage: {
+      types?: components["schemas"]["Type"][];
     } & components["schemas"]["Pagination"];
-    /** KeyPage */
-    KeyPage: {
-      keys?: components["schemas"]["Key"][];
-    } & components["schemas"]["Pagination"];
-    /**
-     * Key
-     * @example {
-     *       "name": "keys/1",
-     *       "create_time": "2023-07-30T011:30:15Z",
-     *       "algorithm": "ed255",
-     *       "format": "raw",
-     *       "encoding": "hex",
-     *       "public_key": "C3AA10EA7E3D1BC235108B2F29B84DDE1BE54E369D3C2B96749AF6080E56F92D"
-     *     }
-     * @example {
-     *       "name": "keys/824472037170",
-     *       "create_time": "2023-07-30T011:30:15Z",
-     *       "algorithm": "k256",
-     *       "format": "uncompressed-point",
-     *       "encoding": "hex",
-     *       "public_key": "04165a68e921fe2dd2848ecef2612f591f805b172d1114c2df11162e2ea0ef39bb36dfb21ccd044bda1dc87768fe9db9be1f88759dcd3b2fb6770d8ffbf1890db7"
-     *     }
-     */
-    Key: {
-      /** @description OUTPUT ONLY. */
-      name?: components["schemas"]["KeyName"];
-      variant?: components["schemas"]["KeyVariant"];
-      /** @description OUTPUT ONLY. */
-      state?: components["schemas"]["KeyState"];
-    } & components["schemas"]["Metadata"] &
-      components["schemas"]["KeyData"];
-    /**
-     * KeyVariant
-     * @description Keys may be either engine-controlled (for instance, keys underlying `Address` resources), or user-controlled (with the direct key generation API).
-     *
-     *     - **internal** Can only be used by higher level APIs (like creating Transfers or Stakings).
-     *     - **user** Can only be use for raw signing (creating Signatures).
-     *     - **shared** Can be used with any API.
-     *
-     *     `engine` is deprecated in `25.1.1` and aliased to `internal`.
-     * @enum {string}
-     */
-    KeyVariant: "engine" | "shared" | "user" | "internal";
-    /**
-     * KeyState
-     * @enum {string}
-     */
-    KeyState:
-      | "generating"
-      | "generated"
-      | "importing"
-      | "imported"
-      | "paused"
-      | "rotating"
-      | "failed"
-      | "signatory-generating";
-    /** KeyData */
-    KeyData: {
-      algorithm?: components["schemas"]["Algorithm"];
-      threshold?: components["schemas"]["PositiveInteger"];
-      format?: components["schemas"]["KeyFormat"];
-      /** @description Hex encoding of public key */
-      key?: components["schemas"]["Hex"];
-      shares?: components["schemas"]["Shares"];
-      /** @description `OUTPUT ONLY`. Forms (together with key ID) the basis of a request ID to the signer, if state is `generating` or `rotating`. Must be unique within a given key (e.g. auto-incrementing during attempts to generate or rotate a key). */
-      attempt?: components["schemas"]["NonNegative"];
-      rotation?: components["schemas"]["NonNegative"];
-      /** @description Indicate if this key was imported rather than natively generated. */
-      imported?: boolean;
-      /** @description Set when state is `failed`. */
-      message?: string;
-      signatory?: components["schemas"]["SignatoryName"];
-    };
-    /** PositiveInteger */
-    PositiveInteger: number;
-    /**
-     * KeyFormat
-     * @description `raw` (default) format as is the packed (only) encoding for ed255, and 64 bytes (x, y) coordinates for ECDSA.
-     *     `compressed` is the SEC1 ECDSA encoding with leading 0x02/0x03 for the sign of y, then x coordinate
-     *     `uncompressed` is SEC1 ECDSA encoding with leading 0x04, then default format.
-     * @default raw
-     * @enum {string}
-     */
-    KeyFormat: "raw" | "compressed" | "uncompressed";
-    /** Shares */
-    Shares: {
-      [key: string]: components["schemas"]["Hex"];
-    };
-    /**
-     * NonNegative
-     * @example 1
-     * @example 3124
-     * @example 0
-     */
-    NonNegative: number;
-    /**
-     * SignatoryName
-     * @example signatories/yubihsm2
-     */
-    SignatoryName: string;
-    /** SignaturePage */
-    SignaturePage: {
-      signatures?: components["schemas"]["Signature"][];
-    } & components["schemas"]["Pagination"];
-    /** Signature */
-    Signature: {
-      /** @description OUTPUT ONLY. */
-      name?: components["schemas"]["SignatureName"];
-      /** @description OUTPUT ONLY. */
-      state?: components["schemas"]["SignatureState"];
-    } & components["schemas"]["Metadata"] &
-      components["schemas"]["SignatureData"];
-    /**
-     * SignatureName
-     * @example signatures/some-signature
-     */
-    SignatureName: string;
-    /**
-     * SignatureState
-     * @enum {string}
-     */
-    SignatureState:
-      | "signing"
-      | "signed"
-      | "failed"
-      | "signatory-signing"
-      | "authorizing";
-    /**
-     * SignatureData
-     * @description The keys of the shares dictionary are set by the system to signal the participants for this `attempt` to sign the message. The signer uses signature ID + attempt as inputs to derive a session ID - it is security critical that this session ID is not reused.
-     */
-    SignatureData: {
-      key?: components["schemas"]["KeyName"];
-      /** @description Hex encoded message */
-      message?: components["schemas"]["StdBase64"];
-      format?: components["schemas"]["SignatureFormat"];
-      /** @description OUTPUT ONLY.  Hex encoded. */
-      signature?: components["schemas"]["Hex"];
-      shares?: components["schemas"]["Shares"];
-      /** @description OUTPUT ONLY. Forms (together with signature ID) the basis of a request ID to the signer, if state is generating. Must be unique within a given key (e.g. auto-incrementing during attempts to generate or rotate a key). */
-      attempt?: components["schemas"]["NonNegative"];
-      /** @description OUTPUT_ONLY.  This is a deprecated legacy field used internally by engine to request signatures. */
-      digest?: boolean;
-      /** @description OUTPUT_ONLY.  This is a selection of triples to use for MPC protocol.  Deprecated. */
-      triples?: number[];
-      /** @description Optional message set when signing fails. */
-      failure?: string;
-      /** @description embedded JSON encoding of a `Certificate` value. */
-      certificate?: components["schemas"]["Certificate"];
-    };
-    /**
-     * SignatureFormat
-     * @description Raw (default) format is (r, s) each as 32 byte big-endian integers.
-     *     With recovery adds a byte for a total length of 65 bytes for ECDSA signatures.
-     *     DER uses the DER encoding of the (r, s) pair, for a typical length of 70 bytes.
-     * @enum {string}
-     */
-    SignatureFormat: "raw" | "recovery" | "der";
-    /**
-     * Certificate
-     * @description A certificate is a request to a `Signatory` signer.  The certificate should be signed by an authorization key.  The `Signatory` should verify the signature and claims.  Pending verification, it should then sign `message` with the specified key.
-     */
-    Certificate: {
-      /** @description A JSON serialized `CertificateClaims` */
-      claims: string;
-      /** @description The signature by the authorization key. */
-      signature: components["schemas"]["SignatureName"];
-    };
-    KeyRequestPage: unknown;
-    KeyRequest: unknown;
-    SignatureRequestPage: unknown;
-    SignatureRequest: unknown;
-    /** TransactionPage */
-    TransactionPage: {
-      transactions?: components["schemas"]["Transaction"][];
-    } & components["schemas"]["Pagination"];
-    /**
-     * Transaction
-     * @description A transaction on an external blockchain. Treasury will create transactions when creating (or retrying) transfers.
-     *
-     *     The connector process in treasury will automatically manage updating transactions and submitting them to external chains.
-     */
-    Transaction: {
-      /** @description OUTPUT ONLY. */
-      name?: components["schemas"]["TransactionName"];
-      /** @description OUTPUT ONLY. */
-      state?: components["schemas"]["TransferState"];
-    } & components["schemas"]["Metadata"] &
-      components["schemas"]["TransactionData"];
-    /**
-     * TransactionData
-     * @description A transaction on an external blockchain.
-     */
-    TransactionData: {
-      /**
-       * @description Transaction hash.
-       *     It is encoded in the canonical way for the chain.
-       *     This value can be used to look up the transaction on external explorers.
-       */
-      hash?: string;
-      /** @description Any fees paid.  This will be updated only after the transaction is accepted on the public chain. */
-      fees?: components["schemas"]["AssetAndSymbolAndAmount"][];
-      /**
-       * @description The chain-specific inputs used for serialization.
-       *     This is a JSON serialized object.
-       *
-       *     Using these inputs, along with the parent transfer,
-       *     you can recreate the serialized data used for signing.
-       *
-       *     This type is not yet stable and differs for each chain.
-       */
-      input?: string;
-      /** @description Hex encoded signature of the serialization transaction. */
-      signatures?: components["schemas"]["Hex"][];
-      /**
-       * @description Hex encoded payload of the serialized transaction.
-       *     This was used for input to signing and can be used for broadcasting.
-       */
-      payload?: string;
-      /**
-       * @description If this transaction is in the `queued` state,
-       *     then this field will be set to indicate another transaction
-       *     that is being waited on.
-       *
-       *     Usually the transaction needs to get a confirmation in order
-       *     to advance the internal queue, or not use any conflicting resources on the chain.
-       */
-      after?: components["schemas"]["TransactionName"];
-      error?: components["schemas"]["TransactionError"];
-      /** @description Number of confirmations reported on chain */
-      confirmations?: number;
-      /** @description OUTPUT_ONLY.  Chain that the transaction is for. */
-      chain: components["schemas"]["ChainName"];
-      /** @description If the transaction is queued, this reports the position in the queue. */
-      position?: number;
-      origin: components["schemas"]["TransactionOrigin"];
-      /** @description Time when the transaction was signed. */
-      sign_time?: components["schemas"]["Timestamp"];
-      block?: components["schemas"]["Block"];
-      /** @description Additional input for broadcast/submit RPC, in addition to the transaction `payload`.  Used only for some chains.  Encoded as an embedded JSON. */
-      broadcast?: string;
-      /**
-       * @description Optional ID that is preferred when looking up the transaction using connector API or on explorers.
-       *
-       *     Usually the `hash` is sufficient, but some chains need to use an ID that's only discoverable after the transaction is confirmed on chain.
-       */
-      lookup_id?: string;
-      skip_broadcast?: boolean;
-    };
-    /** AssetAndSymbolAndAmount */
-    AssetAndSymbolAndAmount: {
-      asset: components["schemas"]["AssetName"];
-      amount: components["schemas"]["PositiveDecimal"];
-      /** @description OUTPUT ONLY. The symbol for the asset if there is one. */
-      symbol?: string;
-    };
-    /** TransactionOrigin */
-    TransactionOrigin:
-      | components["schemas"]["TransferName"]
-      | components["schemas"]["StakingName"];
-    /** SoftwareUpdatePage */
-    SoftwareUpdatePage: {
-      "software-updates"?: components["schemas"]["SoftwareUpdate"][];
-    } & components["schemas"]["Pagination"];
-    /** SoftwareUpdate */
-    SoftwareUpdate: {
-      name?: components["schemas"]["SoftwareUpdateName"];
-      state?: components["schemas"]["SoftwareUpdateState"];
-    } & components["schemas"]["SoftwareUpdateData"] &
-      components["schemas"]["Metadata"];
-    /** SoftwareUpdateName */
-    SoftwareUpdateName: string;
-    /**
-     * SoftwareUpdateState
-     * @description **Active**: The software update is ongoing and no more changes are allowed to be made to the Treasury instances until the update completes.
-     *
-     *     **Scheduled**: The software update is scheduled to occur in the future.
-     *
-     *     **Succeeded**:  The update has completed successfully by local supervisor process.
-     *
-     *     **Failed**: The update has failed and was aborted by local supervisor process.
-     * @enum {string}
-     */
-    SoftwareUpdateState: "active" | "scheduled" | "succeeded" | "failed";
-    /** SoftwareUpdateData */
-    SoftwareUpdateData: {
-      /**
-       * @description Schedule the software update to start after a particular time.
-       *     If omitted, the update will start immediately.
-       */
-      after_time?: components["schemas"]["Timestamp"];
-      /** @description Full OCI reference to a signed image to update to. */
-      artifact?: components["schemas"]["ImageReference"];
-    };
-    /**
-     * ImageReference
-     * @example us-docker.pkg.dev/cordialsys/containers/treasury:<version>
-     * @example us-docker.pkg.dev/cordialsys/containers/treasury:0.4.2
-     */
-    ImageReference: string;
-    /** Signer */
-    Signer: {
-      name?: components["schemas"]["SignerName"];
-      state?: components["schemas"]["SignerState"];
-    } & components["schemas"]["SignerData"] &
-      components["schemas"]["Metadata"];
-    /**
-     * SignerName
-     * @example signers/3
-     */
-    SignerName: string;
-    /**
-     * SignerState
-     * @description Added in `25.1.1`.
-     * @enum {string}
-     */
-    SignerState: "active" | "inactive";
-    /** SignerData */
-    SignerData: {
-      socket?: string;
-      /** @description Hex encoded. */
-      verifying_key?: string;
-      /** @description Hex encoded. */
-      recipient?: string;
-      /** @description The user that the signer authenticates as. */
-      user?: components["schemas"]["UserName"];
-    };
-    /** SignerPage */
-    SignerPage: {
-      signers?: components["schemas"]["Signer"][];
-    } & components["schemas"]["Pagination"];
-    /**
-     * Symbol
-     * @description A symbol that can be used to resolve to a specific asset.
-     *
-     *     No two symbols may resolve to the same asset.
-     */
-    Symbol: {
-      name?: components["schemas"]["SymbolName"];
-      state?: components["schemas"]["BasicState"];
-    } & components["schemas"]["SymbolData"] &
-      components["schemas"]["Metadata"];
-    /** SymbolData */
-    SymbolData: {
-      asset?: components["schemas"]["AssetName"];
-    };
-    /** SymbolPage */
-    SymbolPage: {
-      symbols?: components["schemas"]["Symbol"][];
-    } & components["schemas"]["Pagination"];
-    /** KeyResponse */
-    KeyResponse: {
-      name?: components["schemas"]["KeyResponseName"];
-      state?: components["schemas"]["BasicState"];
-      variant?: components["schemas"]["ShareVariant"];
-    } & components["schemas"]["Metadata"] &
-      components["schemas"]["KeyResponseData"];
-    /**
-     * KeyResponseName
-     * @description The final ID is the extension of the underlying key ID by the attempt.
-     *     That is, if the key ID is non-extended, then the final ID is `<key-id>+<attempt>`.
-     *     If the key ID were already extended, say `<key-id>+<extension-1>,<extension-2>`, then the final ID would be `<key-id>+<extension-1>,<extension-2>,<attempt>`.
-     * @example signers/1/key-responses/my-key+3
-     */
-    KeyResponseName: string;
-    /**
-     * ShareVariant
-     * @enum {string}
-     */
-    ShareVariant: "generated" | "rotated" | "failed";
-    /**
-     * KeyResponseData
-     * @example {
-     *       "share": "string",
-     *       "key": "string"
-     *     }
-     */
-    KeyResponseData:
-      | components["schemas"]["RawKeyShare"]
-      | components["schemas"]["Complaint"];
-    /** RawKeyShare */
-    RawKeyShare: {
-      rotation?: components["schemas"]["NonNegative"];
-      /** @description hex-encoded */
-      share?: components["schemas"]["Hex"];
-      /** @description optional, hex-encoded */
-      key?: components["schemas"]["Hex"];
-      algorithm?: components["schemas"]["Algorithm"];
-      threshold?: components["schemas"]["PositiveInteger"];
-    };
-    /** Complaint */
-    Complaint: {
-      message?: string;
-    };
-    /** SignatureResponse */
-    SignatureResponse: {
-      name?: components["schemas"]["SignatureResponseName"];
-      state?: components["schemas"]["BasicState"];
-      /** @enum {string} */
-      variant?: "signed" | "failed";
-    } & components["schemas"]["Metadata"] &
-      components["schemas"]["SignatureResponseData"];
-    /**
-     * SignatureResponseName
-     * @example signers/3/signature-responses/321
-     */
-    SignatureResponseName: string;
-    /** SignatureResponseData */
-    SignatureResponseData:
-      | components["schemas"]["RawSignatureShare"]
-      | components["schemas"]["Complaint"];
-    /** RawSignatureShare */
-    RawSignatureShare: {
-      /** @description hex-encoded */
-      share?: components["schemas"]["Hex"];
-      /** @description optional, hex-encoded */
-      signature?: components["schemas"]["Hex"];
-    };
-    /** KeyResponsePage */
-    KeyResponsePage: {
-      "key-responses"?: components["schemas"]["KeyResponse"][];
-    } & components["schemas"]["Pagination"];
-    /** SignatureResponsePage */
-    SignatureResponsePage: {
-      "signature-responses"?: components["schemas"]["SignatureResponse"][];
-    } & components["schemas"]["Pagination"];
-    /**
-     * Prices
-     * @example {
-     *       "prices": {
-     *         "chains/BTC/assets/BTC": "106200",
-     *         "chains/ETH/assets/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48": "1"
-     *       },
-     *       "valid_time": "2025-11-13T17:12:10Z"
-     *     }
-     */
-    Prices: {
-      prices: {
-        [key: string]: components["schemas"]["PositiveDecimal"];
-      };
-      valid_time: components["schemas"]["Timestamp"];
-    };
-    /**
-     * StakingCreate
-     * @description Semantic representation of a delegated staking operation of one native asset controlled by one address.
-     *
-     *     `stake` - move liquid assets into a active stake with some validator or provider.
-     *     `unstake` - move staked assets into an inactive or liquid state.
-     *     `withdraw` - withdraw inactive staked assets into the original liquid state.
-     *
-     *     Creation of a Stake resource requires:
-     *     - initiator and approvers are sufficiently authorized
-     *     - the staking resource passes the routing policy
-     *     - the staking resource passes the approvals policy
-     *
-     *     Once a staking resource exists (identified by monotonic ID),
-     *     the engine will produce a transaction that realizes the desired operation on the target chain.
-     *
-     *     Most chains require a validator.  Some chains, like Ethereum, require a 3rd party "provider" to manage the validator on your behalf.
-     */
-    StakingCreate: {
-      /** @description OUTPUT ONLY. */
-      name?: components["schemas"]["StakingName"];
-      /** @description OUTPUT ONLY. */
-      state?: components["schemas"]["TransferState"];
-      variant: components["schemas"]["StakingVariant"];
-    } & components["schemas"]["Metadata"] &
-      components["schemas"]["StakingCreateData"];
-    /** StakingCreateData */
-    StakingCreateData: {
-      /**
-       * @description Optional.  The asset to stake.
-       *
-       *     Most chains only support staking one asset, which will be used as the default.
-       */
-      asset: components["schemas"]["AssetOrSymbol"];
-      amount: components["schemas"]["PositiveDecimal"];
-      from: components["schemas"]["AddressChoice"];
-      /** @description The validator address to stake to.  This is optional depending on the chain or protocol.  It is required on most. */
-      to?: components["schemas"]["AddressChoice"];
-      priority?: components["schemas"]["Priority"];
-    };
-    /** Signatory */
-    Signatory: {
-      name?: components["schemas"]["SignatoryName"];
-      variant: components["schemas"]["SignatoryVariant"];
-      state?: components["schemas"]["SignatoryState"];
-    } & components["schemas"]["Metadata"] &
-      components["schemas"]["SignatoryData"];
-    /**
-     * SignatoryVariant
-     * @constant
-     */
-    SignatoryVariant: "yubi-hsm2";
-    /**
-     * SignatoryState
-     * @enum {string}
-     */
-    SignatoryState: "initializing" | "active";
-    /** SignatoryData */
-    SignatoryData: {
-      algorithms: components["schemas"]["Algorithm"][];
-      attestation?: components["schemas"]["KeyName"];
-      authorization?: components["schemas"]["KeyName"];
-      /** @description The user bound to make responses on behalf of the signatory. */
-      user?: components["schemas"]["UserName"];
-      signatory?: components["schemas"]["SignatoryName"];
-    };
-    /** SignatoryPage */
-    SignatoryPage: {
-      signatories?: components["schemas"]["Signatory"][];
-    } & components["schemas"]["Pagination"];
-    /** CertificateClaims */
-    CertificateClaims: {
-      /** @description Key with which to sign the message. */
-      key: components["schemas"]["KeyName"];
-      /** @description Message requested to be signed */
-      message: components["schemas"]["Hex"];
-      context: components["schemas"]["CertificateClaimsContext"];
-    };
-    /** CertificateClaimsContext */
-    CertificateClaimsContext: {
-      initiate: components["schemas"]["UserName"];
-      approve: components["schemas"]["UserName"][];
-      issue_time: components["schemas"]["Timestamp"];
-      /** @description If there is an intent behind the request, it will be copied here. */
-      origin?:
-        | components["schemas"]["Transfer"]
-        | components["schemas"]["Staking"];
-    };
-    /** StakingRulePage */
-    StakingRulePage: {
-      "staking-rules"?: components["schemas"]["StakingRule"][];
-    } & components["schemas"]["Pagination"];
-    /**
-     * StakingRule
-     * @description This is analogou to transfer rules, except the `to` address must be a `validator` address.
-     * @example {
-     *       "name": "transfer-rules/simple-btc-allowlist-account",
-     *       "variant": "allow",
-     *       "asset": "chains/BTC/assets/BTC",
-     *       "from": "accounts/x",
-     *       "to": "accounts/y",
-     *       "version": 1
-     *     }
-     * @example {
-     *       "name": "transfer-rules/simple-btc-allowlist-addresses",
-     *       "variant": "allow",
-     *       "asset": "chains/BTC/assets/BTC",
-     *       "from": "accounts/x",
-     *       "to": [
-     *         "chains/BTC/addresses/bc1pylz76fj9tcscnqk0gzfux87aguh3lxpnq5fyvyu9h99668wtufds479h8t",
-     *         "chains/BTC/addresses/bc1pylz76fj9tcscnqk0gzfux87aguh3lxpnq5fyvyu9h99668wtufds479h8t"
-     *       ],
-     *       "version": 1
-     *     }
-     * @example {
-     *       "name": "transfer-rules/multi-asset",
-     *       "variant": "allow",
-     *       "asset": [
-     *         "chains/BTC/assets/BTC",
-     *         "chains/ETH/assets/ETH",
-     *         "chains/ETH/assets/0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
-     *       ],
-     *       "from": "accounts/x",
-     *       "to": "accounts/y",
-     *       "version": 1
-     *     }
-     * @example {
-     *       "name": "transfer-rules/deny-btc-out-of-account-x",
-     *       "variant": "deny",
-     *       "asset": [
-     *         "chains/BTC/assets/BTC"
-     *       ],
-     *       "from": "accounts/x",
-     *       "to": "any/address",
-     *       "version": 1
-     *     }
-     * @example {
-     *       "name": "transfer-rules/require-2-approvals-account-x",
-     *       "variant": "require",
-     *       "asset": "any/asset",
-     *       "from": "accounts/x",
-     *       "to": "any/address",
-     *       "approve": [
-     *         "roles/admin",
-     *         "users/joesmith"
-     *       ],
-     *       "approvals": 2,
-     *       "version": 1
-     *     }
-     * @example {
-     *       "name": "transfer-rules/sent-to-default-address",
-     *       "variant": "allow",
-     *       "asset": "chains/BTC/assets/BTC",
-     *       "from": "accounts/x",
-     *       "to": "accounts/coinbase/defaults",
-     *       "version": 1
-     *     }
-     */
-    StakingRule: {
-      /** @description OUTPUT ONLY. */
-      name?: components["schemas"]["StakingRuleName"];
-      variant?: components["schemas"]["RuleVariant"];
-      /** @description OUTPUT ONLY. */
-      state?: components["schemas"]["DisableableState"];
-    } & components["schemas"]["Metadata"] &
-      components["schemas"]["StakingRuleData"];
-    /**
-     * StakingRuleName
-     * @example staking-rules/freeze-ETH
-     */
-    StakingRuleName: string;
-    /** StakingRuleData */
-    StakingRuleData: components["schemas"]["StakingFilter"] &
-      components["schemas"]["QuorumFilter"];
-    /** StakingFilter */
-    StakingFilter: {
-      asset: components["schemas"]["AssetFilter"];
-      amount?: components["schemas"]["AmountFilter"];
-      from: components["schemas"]["AddressFilter"];
-      to: components["schemas"]["AddressFilter"];
-      /** @description Must have at least one staking variant. */
-      staking: components["schemas"]["StakingVariant"][];
-    };
-    /** TagPage */
-    TagPage: {
-      tags?: components["schemas"]["Tag"][];
-    } & components["schemas"]["Pagination"];
-    /** Tag */
-    Tag: {
-      name?: components["schemas"]["TagName"];
-    } & components["schemas"]["TagData"] &
-      components["schemas"]["Metadata"];
-    /**
-     * TagName
-     * @example tags/secure
-     */
-    TagName: string;
-    /** TagData */
-    TagData: {
-      color?: string;
-      resource?: components["schemas"]["ResourceTypeFilter"];
-    };
-    /** CallPage */
-    CallPage: {
-      calls?: components["schemas"]["Call"][];
-    } & components["schemas"]["Pagination"];
-    /** Call */
-    Call: {
-      name?: components["schemas"]["CallName"];
-      state?: components["schemas"]["CallState"];
-    } & components["schemas"]["Metadata"] &
-      components["schemas"]["CallData"];
-    /**
-     * CallName
-     * @description The name of a Call
-     * @example calls/42
-     */
-    CallName: string;
-    /**
-     * CallState
-     * @description In the `active` state, the subordinate resource is being processed, lookup its state for more details.
-     * @enum {string}
-     */
-    CallState: "active" | "succeeded" | "failed";
-    /**
-     * CallData
-     * @description The call `method` determines the variants of `request` and `response` that are permissible.
-     *
-     *     | driver | method | request | response |
-     *     | ------ | ------ | ------- |----------|
-     *     | EVM | personal_sign | UnsignedMessage | signature |
-     *     | EVM | eth_signTypedData_v4 | Eip712TypedData | signature |
-     *     | EVM | eth_sendTransaction | UnsignedEvmTransaction | transaction |
-     *     | EVM | eth_signTransaction | UnsignedEvmTransaction | transaction |
-     *     | SVM | solana:signMessage | UnsignedMessage | signature |
-     *     | SVM | solana:signTransaction | UnsignedSvmTransaction | transaction |
-     *     | SVM | solana:signAndSendTransaction | UnsignedSvmTransaction | transaction |
-     *
-     *     The `method` must match the driver of the specified `chain`.
-     *
-     *     To determine the error causing a `failed` state, see the `error` field of the subordinate response resource.
-     */
-    CallData: {
-      address: components["schemas"]["AddressName"];
-      method: components["schemas"]["CallMethod"];
-      request: components["schemas"]["CallRequest"];
-      response?: components["schemas"]["CallResponse"];
-    };
-    /**
-     * CallMethod
-     * @enum {string}
-     */
-    CallMethod:
-      | "eth_sendTransaction"
-      | "eth_signTransaction"
-      | "personal_sign"
-      | "eth_signTypedData_v4"
-      | "solana:signIn"
-      | "solana:signMessage"
-      | "solana:signTransaction"
-      | "solana:signAndSendTransaction";
-    /** CallRequest */
-    CallRequest:
-      | components["schemas"]["UnsignedMessage"]
-      | components["schemas"]["UnsignedEvmTransaction"]
-      | components["schemas"]["UnsignedSvmTransaction"]
-      | components["schemas"]["Eip712TypedData"];
-    /** UnsignedMessage */
-    UnsignedMessage: {
-      message: components["schemas"]["Hex"];
-    };
     /** UnsignedEvmTransaction */
     UnsignedEvmTransaction: {
       amount?: components["schemas"]["PositiveDecimal"];
-      to: components["schemas"]["BlockchainAddress"];
       data: components["schemas"]["Hex"];
+      to: components["schemas"]["BlockchainAddress"];
+    };
+    /** UnsignedMessage */
+    UnsignedMessage: {
+      message: components["schemas"]["Hex"];
     };
     /** UnsignedSvmTransaction */
     UnsignedSvmTransaction: {
       transaction: components["schemas"]["Hex"];
     };
-    /** Eip712TypedData */
-    Eip712TypedData: {
-      domain: components["schemas"]["Eip712Domain"];
-      types: {
-        [key: string]: components["schemas"]["Eip712DomainTypes"];
-      };
-      primaryType: string;
-      message: Record<string, unknown>;
-    };
-    /** Eip712Domain */
-    Eip712Domain: {
-      name?: string;
-      version?: string;
-      chainId?: components["schemas"]["NumberOrString"];
-      verifyingContract?: components["schemas"]["BlockchainAddress"];
-      salt?: string;
+    /** User */
+    User: {
+      /** @description `OUTPUT ONLY`, `IMMUTABLE`. */
+      name?: components["schemas"]["UserName"];
+      /** @description OUTPUT ONLY. */
+      state?: components["schemas"]["UserState"];
+      /** @description `IMMUTABLE` */
+      variant: components["schemas"]["UserVariant"];
+    } & components["schemas"]["Metadata"] &
+      components["schemas"]["UserData"];
+    /**
+     * UserData
+     * @description The array of credentials for this user is not duplicated here - instead, perform a nested list of credentials under the user `GET /users/joe/credentials`.
+     */
+    UserData: {
+      active_time?: components["schemas"]["Timestamp"];
+      /**
+       * @description `INPUT_ONLY` The public key of an invite code.
+       *
+       *     The user will need to use this invite in order to register a credential.
+       *
+       *     Upon registering, the user will switch to `active` state.  Otherwise if the invite expires, then this user will be deleted.
+       *
+       *     Providing this field is equivilent to creating a User and then separately creating an `invite` credential.
+       */
+      invite?: components["schemas"]["Hex"];
+      roles?: components["schemas"]["RoleName"][];
+      /** @description `IMMUTABLE` The SSO subject (OAuth identifier) of the user, as used by identity provider, for use with OpenPubkey credentials. */
+      sso?: components["schemas"]["UserSso"];
     };
     /**
-     * NumberOrString
-     * @description ETH chain ID are sometimes sent as numbers, or as strings (sometimes decimal, sometimes hexadecimal with 0x prefix)
-     * @example 1
-     * @example 0x1
+     * UserFilter
+     * @example users/admin-2
+     * @example [
+     *       "users/admin-2",
+     *       "roles/trader"
+     *     ]
      */
-    NumberOrString: number | string;
-    /** Eip712DomainTypes */
-    Eip712DomainTypes: components["schemas"]["Eip712DomainType"][];
-    /** Eip712DomainType */
-    Eip712DomainType: {
-      name: string;
-      type: string;
-    };
+    UserFilter:
+      | components["schemas"]["UserFilterEntry"]
+      | components["schemas"]["UserFilterEntry"][];
     /**
-     * CallResponse
-     * @description Names the subordinate `signature` (for signing calls such as `personal_sign` and `solana:signMessage`) or `transaction` (for transactioning calls such as `eth_sendTransaction`, `eth_signTransaction`, `solana:signTransaction`, `solana:signAndSendTransaction`).
-     *
-     *     Exactly one of these fields must be set.
+     * UserFilterEntry
+     * @example users/admin-2
+     * @example roles/admin
+     * @example any/user
      */
-    CallResponse:
-      | components["schemas"]["CallSignature"]
-      | components["schemas"]["CallTransaction"];
-    /** CallSignature */
-    CallSignature: {
-      signature?: components["schemas"]["SignatureName"];
-    };
-    /** CallTransaction */
-    CallTransaction: {
-      transaction?: components["schemas"]["TransactionName"];
-    };
-    /** HostPage */
-    HostPage: {
-      hosts?: components["schemas"]["Host"][];
+    UserFilterEntry:
+      | components["schemas"]["UserName"]
+      | components["schemas"]["RoleName"];
+    /**
+     * UserName
+     * @description The resource name for a user.
+     * @example users/admin-2
+     */
+    UserName: string;
+    /** UserPage */
+    UserPage: {
+      users?: components["schemas"]["User"][];
     } & components["schemas"]["Pagination"];
-    /** Host */
-    Host: {
-      name?: components["schemas"]["HostName"];
-      state?: components["schemas"]["BasicState"];
-    } & components["schemas"]["HostData"] &
-      components["schemas"]["Metadata"];
-    /**
-     * HostName
-     * @example hosts/mMkv1VAXSvsaJF2pEyPyZ3
-     */
-    HostName: string;
-    /** HostData */
-    HostData: {
-      software?: components["schemas"]["SoftwareVersion"];
-      block?: components["schemas"]["Block"];
+    /** UserSso */
+    UserSso: {
+      issuer: string;
+      subject: string;
     };
+    /**
+     * UserState
+     * @description Added after `25.12.1`.
+     *
+     *     **active**: User has a credential registered.
+     *
+     *     **inactive**: User does not have any credential or invite code.
+     *
+     *     **invited**: User has been invited.  User will be deleted if their invitation expires or is deleted.
+     * @example active
+     * @example invited
+     * @enum {string}
+     */
+    UserState: "active" | "inactive" | "invited";
+    /**
+     * UserVariant
+     * @example human
+     * @enum {string}
+     */
+    UserVariant: "human" | "machine";
+    /** UserVariantFilter */
+    UserVariantFilter:
+      | components["schemas"]["UserVariant"]
+      | components["schemas"]["UserVariant"][];
+    /**
+     * Vote
+     * @example approve
+     * @enum {string}
+     */
+    Vote: "approve" | "cancel";
   };
   responses: {
     /** @description The name of the operation created, which can be queried for. */
@@ -4617,1558 +4631,292 @@ export interface components {
     };
   };
   parameters: {
-    /** @description The page size to download. */
-    page_size: number;
-    /** @description The token to load the next page from. */
-    page_token: string;
     /** @description A filter to apply before filling out the page (https://docs.cordialsystems.com/reference/filtering). */
     filter: string;
     /** @description Download in a output format (`csv` or `pdf`). */
     output: string;
     /** @description Retrieves the Nth page of data. */
     page_number: number;
+    /** @description The page size to download. */
+    page_size: number;
+    /** @description The token to load the next page from. */
+    page_token: string;
   };
   requestBodies: never;
   headers: never;
   pathItems: never;
 }
+export type AccessQuorumFilter = components["schemas"]["AccessQuorumFilter"];
+export type AccessRule = components["schemas"]["AccessRule"];
+export type AccessRuleData = components["schemas"]["AccessRuleData"];
+export type AccessRuleName = components["schemas"]["AccessRuleName"];
+export type AccessRulePage = components["schemas"]["AccessRulePage"];
+export type Account = components["schemas"]["Account"];
+export type AccountData = components["schemas"]["AccountData"];
+export type AccountDefaults = components["schemas"]["AccountDefaults"];
+export type AccountName = components["schemas"]["AccountName"];
+export type AccountPage = components["schemas"]["AccountPage"];
+export type Action = components["schemas"]["Action"];
+export type ActionFilter = components["schemas"]["ActionFilter"];
+export type Address = components["schemas"]["Address"];
+export type AddressChoice = components["schemas"]["AddressChoice"];
+export type AddressChoiceWithAmount =
+  components["schemas"]["AddressChoiceWithAmount"];
+export type AddressData = components["schemas"]["AddressData"];
+export type AddressFilter = components["schemas"]["AddressFilter"];
+export type AddressFilterEntry = components["schemas"]["AddressFilterEntry"];
+export type AddressName = components["schemas"]["AddressName"];
+export type AddressPage = components["schemas"]["AddressPage"];
+export type AddressVariant = components["schemas"]["AddressVariant"];
+export type AddressWithAmount = components["schemas"]["AddressWithAmount"];
+export type Algorithm = components["schemas"]["Algorithm"];
+export type AmountFilter = components["schemas"]["AmountFilter"];
+export type AnyAddress = components["schemas"]["AnyAddress"];
+export type AnyAsset = components["schemas"]["AnyAsset"];
+export type AnyUser = components["schemas"]["AnyUser"];
+export type ApiVersion = components["schemas"]["ApiVersion"];
+export type Asset = components["schemas"]["Asset"];
+export type AssetAndSymbolAndAmount =
+  components["schemas"]["AssetAndSymbolAndAmount"];
+export type AssetData = components["schemas"]["AssetData"];
+export type AssetFilter = components["schemas"]["AssetFilter"];
+export type AssetFilterEntry = components["schemas"]["AssetFilterEntry"];
+export type AssetName = components["schemas"]["AssetName"];
+export type AssetOrSymbol = components["schemas"]["AssetOrSymbol"];
+export type AssetPage = components["schemas"]["AssetPage"];
+export type AssetVariant = components["schemas"]["AssetVariant"];
+export type Authentication = components["schemas"]["Authentication"];
+export type BackupKey = components["schemas"]["BackupKey"];
+export type BasicState = components["schemas"]["BasicState"];
+export type Block = components["schemas"]["Block"];
+export type BlockchainAddress = components["schemas"]["BlockchainAddress"];
+export type Body = components["schemas"]["Body"];
+export type Call = components["schemas"]["Call"];
+export type CallData = components["schemas"]["CallData"];
+export type CallMethod = components["schemas"]["CallMethod"];
+export type CallName = components["schemas"]["CallName"];
+export type CallPage = components["schemas"]["CallPage"];
+export type CallRequest = components["schemas"]["CallRequest"];
+export type CallResponse = components["schemas"]["CallResponse"];
+export type CallSignature = components["schemas"]["CallSignature"];
+export type CallState = components["schemas"]["CallState"];
+export type CallTransaction = components["schemas"]["CallTransaction"];
+export type Certificate = components["schemas"]["Certificate"];
+export type CertificateClaims = components["schemas"]["CertificateClaims"];
+export type CertificateClaimsContext =
+  components["schemas"]["CertificateClaimsContext"];
+export type Chain = components["schemas"]["Chain"];
+export type ChainAddressConfig = components["schemas"]["ChainAddressConfig"];
+export type ChainAssets = components["schemas"]["ChainAssets"];
+export type ChainData = components["schemas"]["ChainData"];
+export type ChainName = components["schemas"]["ChainName"];
+export type ChainPage = components["schemas"]["ChainPage"];
+export type ChainVariant = components["schemas"]["ChainVariant"];
+export type ClientKeyData = components["schemas"]["ClientKeyData"];
+export type Complaint = components["schemas"]["Complaint"];
+export type Credential = components["schemas"]["Credential"];
+export type CredentialData = components["schemas"]["CredentialData"];
+export type CredentialName = components["schemas"]["CredentialName"];
+export type CredentialPage = components["schemas"]["CredentialPage"];
+export type CredentialVariant = components["schemas"]["CredentialVariant"];
+export type CredentialVariantFilter =
+  components["schemas"]["CredentialVariantFilter"];
+export type DataFilter = components["schemas"]["DataFilter"];
+export type DefaultAddresses = components["schemas"]["DefaultAddresses"];
+export type DisableableState = components["schemas"]["DisableableState"];
+export type Duration = components["schemas"]["Duration"];
+export type Eip712Domain = components["schemas"]["Eip712Domain"];
+export type Eip712DomainType = components["schemas"]["Eip712DomainType"];
+export type Eip712DomainTypes = components["schemas"]["Eip712DomainTypes"];
+export type Eip712TypedData = components["schemas"]["Eip712TypedData"];
+export type Error = components["schemas"]["Error"];
+export type ErrorCode = components["schemas"]["ErrorCode"];
+export type ErrorStatus = components["schemas"]["ErrorStatus"];
+export type EthHex = components["schemas"]["EthHex"];
+export type ExplicitFeePayerPolicy =
+  components["schemas"]["ExplicitFeePayerPolicy"];
+export type ExplicitUserFilter = components["schemas"]["ExplicitUserFilter"];
+export type Feature = components["schemas"]["Feature"];
+export type FeatureData = components["schemas"]["FeatureData"];
+export type FeatureName = components["schemas"]["FeatureName"];
+export type FeaturePage = components["schemas"]["FeaturePage"];
+export type Fee = components["schemas"]["Fee"];
+export type FeeCreate = components["schemas"]["FeeCreate"];
+export type FeeLimits = components["schemas"]["FeeLimits"];
+export type FeePayerPolicy = components["schemas"]["FeePayerPolicy"];
+export type Hex = components["schemas"]["Hex"];
+export type Host = components["schemas"]["Host"];
+export type HostData = components["schemas"]["HostData"];
+export type HostName = components["schemas"]["HostName"];
+export type HostPage = components["schemas"]["HostPage"];
+export type Id = components["schemas"]["Id"];
+export type ImageReference = components["schemas"]["ImageReference"];
+export type Key = components["schemas"]["Key"];
+export type KeyData = components["schemas"]["KeyData"];
+export type KeyFormat = components["schemas"]["KeyFormat"];
+export type KeyName = components["schemas"]["KeyName"];
+export type KeyPage = components["schemas"]["KeyPage"];
+export type KeyRequest = components["schemas"]["KeyRequest"];
+export type KeyRequestPage = components["schemas"]["KeyRequestPage"];
+export type KeyResponse = components["schemas"]["KeyResponse"];
+export type KeyResponseData = components["schemas"]["KeyResponseData"];
+export type KeyResponseName = components["schemas"]["KeyResponseName"];
+export type KeyResponsePage = components["schemas"]["KeyResponsePage"];
+export type KeyState = components["schemas"]["KeyState"];
+export type KeyVariant = components["schemas"]["KeyVariant"];
+export type Labels = components["schemas"]["Labels"];
+export type Metadata = components["schemas"]["Metadata"];
+export type NonNegative = components["schemas"]["NonNegative"];
+export type Notes = components["schemas"]["Notes"];
+export type NumberOrString = components["schemas"]["NumberOrString"];
+export type Operation = components["schemas"]["Operation"];
+export type OperationData = components["schemas"]["OperationData"];
+export type OperationName = components["schemas"]["OperationName"];
+export type OperationPage = components["schemas"]["OperationPage"];
+export type OperationState = components["schemas"]["OperationState"];
+export type Pagination = components["schemas"]["Pagination"];
+export type PartialResourceName =
+  components["schemas"]["Partial_Resource_Name"];
+export type PositiveDecimal = components["schemas"]["PositiveDecimal"];
+export type PositiveInteger = components["schemas"]["PositiveInteger"];
+export type Price = components["schemas"]["Price"];
+export type Prices = components["schemas"]["Prices"];
+export type Priority = components["schemas"]["Priority"];
+export type PriorityPreset = components["schemas"]["PriorityPreset"];
+export type Proposal = components["schemas"]["Proposal"];
+export type Query = components["schemas"]["Query"];
+export type QuorumFilter = components["schemas"]["QuorumFilter"];
+export type RawKeyShare = components["schemas"]["RawKeyShare"];
+export type RawSignatureShare = components["schemas"]["RawSignatureShare"];
+export type Reference = components["schemas"]["Reference"];
+export type Request = components["schemas"]["Request"];
+export type RequestFilter = components["schemas"]["RequestFilter"];
+export type ResourceFilter = components["schemas"]["ResourceFilter"];
+export type ResourceType = components["schemas"]["ResourceType"];
+export type ResourceTypeFilter = components["schemas"]["ResourceTypeFilter"];
+export type ResourceVersion = components["schemas"]["ResourceVersion"];
+export type Response = components["schemas"]["Response"];
+export type Retention = components["schemas"]["Retention"];
+export type RetryPolicy = components["schemas"]["RetryPolicy"];
+export type Role = components["schemas"]["Role"];
+export type RoleData = components["schemas"]["RoleData"];
+export type RoleName = components["schemas"]["RoleName"];
+export type RolePage = components["schemas"]["RolePage"];
+export type RuleVariant = components["schemas"]["RuleVariant"];
+export type Server = components["schemas"]["Server"];
+export type Shares = components["schemas"]["Shares"];
+export type ShareVariant = components["schemas"]["ShareVariant"];
+export type Signatory = components["schemas"]["Signatory"];
+export type SignatoryData = components["schemas"]["SignatoryData"];
+export type SignatoryName = components["schemas"]["SignatoryName"];
+export type SignatoryPage = components["schemas"]["SignatoryPage"];
+export type SignatoryState = components["schemas"]["SignatoryState"];
+export type SignatoryVariant = components["schemas"]["SignatoryVariant"];
+export type Signature = components["schemas"]["Signature"];
+export type SignatureData = components["schemas"]["SignatureData"];
+export type SignatureFormat = components["schemas"]["SignatureFormat"];
+export type SignatureName = components["schemas"]["SignatureName"];
+export type SignaturePage = components["schemas"]["SignaturePage"];
+export type SignatureRequest = components["schemas"]["SignatureRequest"];
+export type SignatureRequestPage =
+  components["schemas"]["SignatureRequestPage"];
+export type SignatureResponse = components["schemas"]["SignatureResponse"];
+export type SignatureResponseData =
+  components["schemas"]["SignatureResponseData"];
+export type SignatureResponseName =
+  components["schemas"]["SignatureResponseName"];
+export type SignatureResponsePage =
+  components["schemas"]["SignatureResponsePage"];
+export type SignatureState = components["schemas"]["SignatureState"];
+export type Signer = components["schemas"]["Signer"];
+export type SignerData = components["schemas"]["SignerData"];
+export type SignerName = components["schemas"]["SignerName"];
+export type SignerPage = components["schemas"]["SignerPage"];
+export type SignerState = components["schemas"]["SignerState"];
+export type SingleSignOn = components["schemas"]["SingleSignOn"];
+export type SoftwareUpdate = components["schemas"]["SoftwareUpdate"];
+export type SoftwareUpdateData = components["schemas"]["SoftwareUpdateData"];
+export type SoftwareUpdateName = components["schemas"]["SoftwareUpdateName"];
+export type SoftwareUpdatePage = components["schemas"]["SoftwareUpdatePage"];
+export type SoftwareUpdateState = components["schemas"]["SoftwareUpdateState"];
+export type SoftwareVersion = components["schemas"]["SoftwareVersion"];
+export type Staking = components["schemas"]["Staking"];
+export type StakingCreate = components["schemas"]["StakingCreate"];
+export type StakingCreateData = components["schemas"]["StakingCreateData"];
+export type StakingData = components["schemas"]["StakingData"];
+export type StakingFilter = components["schemas"]["StakingFilter"];
+export type StakingName = components["schemas"]["StakingName"];
+export type StakingPage = components["schemas"]["StakingPage"];
+export type StakingRule = components["schemas"]["StakingRule"];
+export type StakingRuleData = components["schemas"]["StakingRuleData"];
+export type StakingRuleName = components["schemas"]["StakingRuleName"];
+export type StakingRulePage = components["schemas"]["StakingRulePage"];
+export type StakingVariant = components["schemas"]["StakingVariant"];
+export type StdBase64 = components["schemas"]["StdBase64"];
+export type StringFilter = components["schemas"]["StringFilter"];
+export type Symbol = components["schemas"]["Symbol"];
+export type SymbolData = components["schemas"]["SymbolData"];
+export type SymbolName = components["schemas"]["SymbolName"];
+export type SymbolPage = components["schemas"]["SymbolPage"];
+export type Tag = components["schemas"]["Tag"];
+export type TagData = components["schemas"]["TagData"];
+export type TagName = components["schemas"]["TagName"];
+export type TagPage = components["schemas"]["TagPage"];
+export type Tags = components["schemas"]["Tags"];
+export type Timestamp = components["schemas"]["Timestamp"];
+export type Transaction = components["schemas"]["Transaction"];
+export type TransactionData = components["schemas"]["TransactionData"];
+export type TransactionError = components["schemas"]["TransactionError"];
+export type TransactionErrorStatus =
+  components["schemas"]["TransactionErrorStatus"];
+export type TransactionName = components["schemas"]["TransactionName"];
+export type TransactionOrigin = components["schemas"]["TransactionOrigin"];
+export type TransactionPage = components["schemas"]["TransactionPage"];
+export type Transfer = components["schemas"]["Transfer"];
+export type TransferCreate = components["schemas"]["TransferCreate"];
+export type TransferCreateData = components["schemas"]["TransferCreateData"];
+export type TransferData = components["schemas"]["TransferData"];
+export type TransferFilter = components["schemas"]["TransferFilter"];
+export type TransferName = components["schemas"]["TransferName"];
+export type TransferPage = components["schemas"]["TransferPage"];
+export type TransferRule = components["schemas"]["TransferRule"];
+export type TransferRuleData = components["schemas"]["TransferRuleData"];
+export type TransferRuleName = components["schemas"]["TransferRuleName"];
+export type TransferRulePage = components["schemas"]["TransferRulePage"];
+export type TransferState = components["schemas"]["TransferState"];
+export type Treasury = components["schemas"]["Treasury"];
+export type TreasuryData = components["schemas"]["TreasuryData"];
+export type TreasuryName = components["schemas"]["TreasuryName"];
+export type TreasuryPage = components["schemas"]["TreasuryPage"];
+export type Type = components["schemas"]["Type"];
+export type TypeData = components["schemas"]["TypeData"];
+export type TypeName = components["schemas"]["TypeName"];
+export type TypePage = components["schemas"]["TypePage"];
+export type UnsignedEvmTransaction =
+  components["schemas"]["UnsignedEvmTransaction"];
+export type UnsignedMessage = components["schemas"]["UnsignedMessage"];
+export type UnsignedSvmTransaction =
+  components["schemas"]["UnsignedSvmTransaction"];
+export type User = components["schemas"]["User"];
+export type UserData = components["schemas"]["UserData"];
+export type UserFilter = components["schemas"]["UserFilter"];
+export type UserFilterEntry = components["schemas"]["UserFilterEntry"];
+export type UserName = components["schemas"]["UserName"];
+export type UserPage = components["schemas"]["UserPage"];
+export type UserSso = components["schemas"]["UserSso"];
+export type UserState = components["schemas"]["UserState"];
+export type UserVariant = components["schemas"]["UserVariant"];
+export type UserVariantFilter = components["schemas"]["UserVariantFilter"];
+export type Vote = components["schemas"]["Vote"];
+export type ResponseOperationNameJson =
+  components["responses"]["OperationNameJson"];
+export type ParameterFilter = components["parameters"]["filter"];
+export type ParameterOutput = components["parameters"]["output"];
+export type ParameterPageNumber = components["parameters"]["page_number"];
+export type ParameterPageSize = components["parameters"]["page_size"];
+export type ParameterPageToken = components["parameters"]["page_token"];
 export type $defs = Record<string, never>;
 export interface operations {
-  "list-accounts": {
-    parameters: {
-      query?: {
-        /** @description The page size to download. */
-        page_size?: components["parameters"]["page_size"];
-        /** @description The token to load the next page from. */
-        page_token?: components["parameters"]["page_token"];
-        /** @description A filter to apply before filling out the page (https://docs.cordialsystems.com/reference/filtering). */
-        filter?: components["parameters"]["filter"];
-        /** @description Download in a output format (`csv` or `pdf`). */
-        output?: components["parameters"]["output"];
-        /** @description Retrieves the Nth page of data. */
-        page_number?: components["parameters"]["page_number"];
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["AccountPage"];
-        };
-      };
-    };
-  };
-  "create-account": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["Account"];
-      };
-    };
-    responses: {
-      200: components["responses"]["OperationNameJson"];
-    };
-  };
-  "get-account": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        account: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          "header-0"?: string;
-          "header-1"?: string;
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Account"];
-        };
-      };
-    };
-  };
-  "update-account": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        account: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["Account"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["OperationName"];
-        };
-      };
-    };
-  };
-  "import-account": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        account: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["Account"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["OperationName"];
-        };
-      };
-    };
-  };
-  "delete-account": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        account: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["OperationName"];
-        };
-      };
-    };
-  };
-  "fee-payer-account": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        account: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["ExplicitFeePayerPolicy"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["OperationName"];
-        };
-      };
-    };
-  };
-  "list-addresses": {
-    parameters: {
-      query?: {
-        /** @description The page size to download. */
-        page_size?: components["parameters"]["page_size"];
-        /** @description The token to load the next page from. */
-        page_token?: components["parameters"]["page_token"];
-        /** @description A filter to apply before filling out the page (https://docs.cordialsystems.com/reference/filtering). */
-        filter?: components["parameters"]["filter"];
-        /** @description Download in a output format (`csv` or `pdf`). */
-        output?: components["parameters"]["output"];
-        /** @description Retrieves the Nth page of data. */
-        page_number?: components["parameters"]["page_number"];
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["AddressPage"];
-        };
-      };
-    };
-  };
-  "get-account-addresses": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        account: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["AddressPage"];
-        };
-      };
-    };
-  };
-  "get-address": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        address: string;
-        chain: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Address"];
-        };
-      };
-    };
-  };
-  "update-address": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        address: string;
-        chain: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["Address"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["OperationName"];
-        };
-      };
-    };
-  };
-  "import-address": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        address: string;
-        chain: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["Address"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["OperationName"];
-        };
-      };
-    };
-  };
-  "delete-address": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        address: string;
-        chain: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["OperationName"];
-        };
-      };
-    };
-  };
-  "fee-payer-address": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        chain: string;
-        address: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["ExplicitFeePayerPolicy"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["OperationName"];
-        };
-      };
-    };
-  };
-  "list-assets": {
-    parameters: {
-      query?: {
-        /** @description The page size to download. */
-        page_size?: components["parameters"]["page_size"];
-        /** @description The token to load the next page from. */
-        page_token?: components["parameters"]["page_token"];
-        /** @description A filter to apply before filling out the page (https://docs.cordialsystems.com/reference/filtering). */
-        filter?: components["parameters"]["filter"];
-        /** @description Download in a output format (`csv` or `pdf`). */
-        output?: components["parameters"]["output"];
-        /** @description Retrieves the Nth page of data. */
-        page_number?: components["parameters"]["page_number"];
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["AssetPage"];
-        };
-      };
-    };
-  };
-  "get-asset": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        asset: string;
-        chain: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Asset"];
-        };
-      };
-    };
-  };
-  "update-asset": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        asset: string;
-        chain: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["Asset"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["OperationName"];
-        };
-      };
-    };
-  };
-  "import-asset": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        asset: string;
-        chain: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["Asset"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["OperationName"];
-        };
-      };
-    };
-  };
-  "delete-asset": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        asset: string;
-        chain: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["OperationName"];
-        };
-      };
-    };
-  };
-  "list-chains": {
-    parameters: {
-      query?: {
-        /** @description The page size to download. */
-        page_size?: components["parameters"]["page_size"];
-        /** @description The token to load the next page from. */
-        page_token?: components["parameters"]["page_token"];
-        /** @description A filter to apply before filling out the page (https://docs.cordialsystems.com/reference/filtering). */
-        filter?: components["parameters"]["filter"];
-        /** @description Download in a output format (`csv` or `pdf`). */
-        output?: components["parameters"]["output"];
-        /** @description Retrieves the Nth page of data. */
-        page_number?: components["parameters"]["page_number"];
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["ChainPage"];
-        };
-      };
-    };
-  };
-  "get-chain": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        chain: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Chain"];
-        };
-      };
-    };
-  };
-  "update-chain": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        chain: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["Chain"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["OperationName"];
-        };
-      };
-    };
-  };
-  "import-chain": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        chain: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["Chain"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["OperationName"];
-        };
-      };
-    };
-  };
-  "delete-chain": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        chain: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["OperationName"];
-        };
-      };
-    };
-  };
-  "list-credentials": {
-    parameters: {
-      query?: {
-        /** @description The page size to download. */
-        page_size?: components["parameters"]["page_size"];
-        /** @description The token to load the next page from. */
-        page_token?: components["parameters"]["page_token"];
-        /** @description A filter to apply before filling out the page (https://docs.cordialsystems.com/reference/filtering). */
-        filter?: components["parameters"]["filter"];
-        /** @description Download in a output format (`csv` or `pdf`). */
-        output?: components["parameters"]["output"];
-        /** @description Retrieves the Nth page of data. */
-        page_number?: components["parameters"]["page_number"];
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["CredentialPage"];
-        };
-      };
-    };
-  };
-  "get-credential": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        credential: string;
-        user: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Credential"];
-        };
-      };
-    };
-  };
-  "update-credential": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        credential: string;
-        user: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["Credential"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["OperationName"];
-        };
-      };
-    };
-  };
-  "create-credential": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        credential: string;
-        user: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["Credential"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["OperationName"];
-        };
-      };
-    };
-  };
-  "delete-credential": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        credential: string;
-        user: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["OperationName"];
-        };
-      };
-    };
-  };
-  "list-operations": {
-    parameters: {
-      query?: {
-        /** @description The page size to download. */
-        page_size?: components["parameters"]["page_size"];
-        /** @description The token to load the next page from. */
-        page_token?: components["parameters"]["page_token"];
-        /** @description A filter to apply before filling out the page (https://docs.cordialsystems.com/reference/filtering). */
-        filter?: components["parameters"]["filter"];
-        /** @description Download in a output format (`csv` or `pdf`). */
-        output?: components["parameters"]["output"];
-        /** @description Retrieves the Nth page of data. */
-        page_number?: components["parameters"]["page_number"];
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["OperationPage"];
-        };
-      };
-    };
-  };
-  "get-operation": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        operation: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Operation"];
-        };
-      };
-    };
-  };
-  "list-transfers": {
-    parameters: {
-      query?: {
-        /** @description The page size to download. */
-        page_size?: components["parameters"]["page_size"];
-        /** @description The token to load the next page from. */
-        page_token?: components["parameters"]["page_token"];
-        /** @description A filter to apply before filling out the page (https://docs.cordialsystems.com/reference/filtering). */
-        filter?: components["parameters"]["filter"];
-        /** @description Download in a output format (`csv` or `pdf`). */
-        output?: components["parameters"]["output"];
-        /** @description Retrieves the Nth page of data. */
-        page_number?: components["parameters"]["page_number"];
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["TransferPage"];
-        };
-      };
-    };
-  };
-  "update-transfer": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["Transfer"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["OperationName"];
-        };
-      };
-    };
-  };
-  "create-transfer": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["TransferCreate"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["OperationName"];
-        };
-      };
-    };
-  };
-  "list-stakings": {
-    parameters: {
-      query?: {
-        /** @description The page size to download. */
-        page_size?: components["parameters"]["page_size"];
-        /** @description The token to load the next page from. */
-        page_token?: components["parameters"]["page_token"];
-        /** @description A filter to apply before filling out the page (https://docs.cordialsystems.com/reference/filtering). */
-        filter?: components["parameters"]["filter"];
-        /** @description Download in a output format (`csv` or `pdf`). */
-        output?: components["parameters"]["output"];
-        /** @description Retrieves the Nth page of data. */
-        page_number?: components["parameters"]["page_number"];
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "*/*"?: never;
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["StakingPage"];
-        };
-      };
-    };
-  };
-  "update-staking": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["Staking"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["OperationName"];
-        };
-      };
-    };
-  };
-  "create-staking": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["Staking"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["OperationName"];
-        };
-      };
-    };
-  };
-  "get-transfer": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        transfer: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Transfer"];
-        };
-      };
-    };
-  };
-  "import-transfer": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        transfer: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["TransferCreate"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["OperationName"];
-        };
-      };
-    };
-  };
-  "delete-transfer": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        transfer: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["OperationName"];
-        };
-      };
-    };
-  };
-  "transfer-retry": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        transfer: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["OperationName"];
-        };
-      };
-    };
-  };
-  "list-users": {
-    parameters: {
-      query?: {
-        /** @description The page size to download. */
-        page_size?: components["parameters"]["page_size"];
-        /** @description The token to load the next page from. */
-        page_token?: components["parameters"]["page_token"];
-        /** @description A filter to apply before filling out the page (https://docs.cordialsystems.com/reference/filtering). */
-        filter?: components["parameters"]["filter"];
-        /** @description Download in a output format (`csv` or `pdf`). */
-        output?: components["parameters"]["output"];
-        /** @description Retrieves the Nth page of data. */
-        page_number?: components["parameters"]["page_number"];
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["UserPage"];
-        };
-      };
-    };
-  };
-  "generate-user": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["User"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["OperationName"];
-        };
-      };
-    };
-  };
-  "get-user": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description the user id */
-        user: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["User"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["User"];
-        };
-      };
-    };
-  };
-  "update-user": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description the user id */
-        user: string;
-      };
-      cookie?: never;
-    };
-    /** @description Patch user properties to update. */
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["User"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["OperationName"];
-        };
-      };
-    };
-  };
-  "create-user": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description the user id */
-        user: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["User"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["OperationName"];
-        };
-      };
-    };
-  };
-  "delete-user": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        /** @description the user id */
-        user: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["OperationName"];
-        };
-      };
-    };
-  };
-  "list-chain-assets": {
-    parameters: {
-      query?: {
-        /** @description The page size to download. */
-        page_size?: components["parameters"]["page_size"];
-        /** @description The token to load the next page from. */
-        page_token?: components["parameters"]["page_token"];
-        /** @description A filter to apply before filling out the page (https://docs.cordialsystems.com/reference/filtering). */
-        filter?: components["parameters"]["filter"];
-        /** @description Download in a output format (`csv` or `pdf`). */
-        output?: components["parameters"]["output"];
-        /** @description Retrieves the Nth page of data. */
-        page_number?: components["parameters"]["page_number"];
-      };
-      header?: never;
-      path: {
-        chain: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["AssetPage"];
-        };
-      };
-    };
-  };
-  "list-roles": {
-    parameters: {
-      query?: {
-        /** @description The page size to download. */
-        page_size?: components["parameters"]["page_size"];
-        /** @description The token to load the next page from. */
-        page_token?: components["parameters"]["page_token"];
-        /** @description A filter to apply before filling out the page (https://docs.cordialsystems.com/reference/filtering). */
-        filter?: components["parameters"]["filter"];
-        /** @description Download in a output format (`csv` or `pdf`). */
-        output?: components["parameters"]["output"];
-        /** @description Retrieves the Nth page of data. */
-        page_number?: components["parameters"]["page_number"];
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["RolePage"];
-        };
-      };
-    };
-  };
-  "get-role": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        role: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Role"];
-        };
-      };
-    };
-  };
-  "update-role": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        role: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["Role"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["OperationName"];
-        };
-      };
-    };
-  };
-  "create-role": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        role: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["Role"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["OperationName"];
-        };
-      };
-    };
-  };
-  "list-user-credentials": {
-    parameters: {
-      query?: {
-        /** @description The page size to download. */
-        page_size?: components["parameters"]["page_size"];
-        /** @description The token to load the next page from. */
-        page_token?: components["parameters"]["page_token"];
-        /** @description A filter to apply before filling out the page (https://docs.cordialsystems.com/reference/filtering). */
-        filter?: components["parameters"]["filter"];
-        /** @description Download in a output format (`csv` or `pdf`). */
-        output?: components["parameters"]["output"];
-        /** @description Retrieves the Nth page of data. */
-        page_number?: components["parameters"]["page_number"];
-      };
-      header?: never;
-      path: {
-        user: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["UserPage"];
-        };
-      };
-    };
-  };
-  "register-credential": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        user: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["Credential"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["OperationName"];
-        };
-      };
-    };
-  };
-  "list-chain-addresses": {
-    parameters: {
-      query?: {
-        /** @description The page size to download. */
-        page_size?: components["parameters"]["page_size"];
-        /** @description The token to load the next page from. */
-        page_token?: components["parameters"]["page_token"];
-        /** @description A filter to apply before filling out the page (https://docs.cordialsystems.com/reference/filtering). */
-        filter?: components["parameters"]["filter"];
-        /** @description Download in a output format (`csv` or `pdf`). */
-        output?: components["parameters"]["output"];
-        /** @description Retrieves the Nth page of data. */
-        page_number?: components["parameters"]["page_number"];
-      };
-      header?: never;
-      path: {
-        chain: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["AddressPage"];
-        };
-      };
-    };
-  };
-  "generate-address": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        chain: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["Address"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["OperationName"];
-        };
-      };
-    };
-  };
-  "get-features": {
-    parameters: {
-      query?: {
-        page_size?: number;
-        page_token?: string;
-        filter?: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["FeaturePage"];
-        };
-      };
-    };
-  };
-  "get-feature": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        feature: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Feature"];
-        };
-      };
-    };
-  };
-  "update-feature": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        feature: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["Feature"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["OperationName"];
-        };
-      };
-    };
-  };
   "get-access-policy": {
     parameters: {
       query?: {
@@ -6316,22 +5064,953 @@ export interface operations {
       };
     };
   };
-  "list-transfer-rules": {
+  "list-accounts": {
     parameters: {
       query?: {
-        /** @description The page size to download. */
-        page_size?: components["parameters"]["page_size"];
-        /** @description The token to load the next page from. */
-        page_token?: components["parameters"]["page_token"];
         /** @description A filter to apply before filling out the page (https://docs.cordialsystems.com/reference/filtering). */
         filter?: components["parameters"]["filter"];
         /** @description Download in a output format (`csv` or `pdf`). */
         output?: components["parameters"]["output"];
         /** @description Retrieves the Nth page of data. */
         page_number?: components["parameters"]["page_number"];
+        /** @description The page size to download. */
+        page_size?: components["parameters"]["page_size"];
+        /** @description The token to load the next page from. */
+        page_token?: components["parameters"]["page_token"];
       };
       header?: never;
       path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AccountPage"];
+        };
+      };
+    };
+  };
+  "create-account": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["Account"];
+      };
+    };
+    responses: {
+      200: components["responses"]["OperationNameJson"];
+    };
+  };
+  "get-account": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        account: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          "header-0"?: string;
+          "header-1"?: string;
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Account"];
+        };
+      };
+    };
+  };
+  "update-account": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        account: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["Account"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OperationName"];
+        };
+      };
+    };
+  };
+  "import-account": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        account: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["Account"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OperationName"];
+        };
+      };
+    };
+  };
+  "delete-account": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        account: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OperationName"];
+        };
+      };
+    };
+  };
+  "get-account-addresses": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        account: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AddressPage"];
+        };
+      };
+    };
+  };
+  "fee-payer-account": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        account: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["ExplicitFeePayerPolicy"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OperationName"];
+        };
+      };
+    };
+  };
+  "list-addresses": {
+    parameters: {
+      query?: {
+        /** @description A filter to apply before filling out the page (https://docs.cordialsystems.com/reference/filtering). */
+        filter?: components["parameters"]["filter"];
+        /** @description Download in a output format (`csv` or `pdf`). */
+        output?: components["parameters"]["output"];
+        /** @description Retrieves the Nth page of data. */
+        page_number?: components["parameters"]["page_number"];
+        /** @description The page size to download. */
+        page_size?: components["parameters"]["page_size"];
+        /** @description The token to load the next page from. */
+        page_token?: components["parameters"]["page_token"];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AddressPage"];
+        };
+      };
+    };
+  };
+  "list-assets": {
+    parameters: {
+      query?: {
+        /** @description A filter to apply before filling out the page (https://docs.cordialsystems.com/reference/filtering). */
+        filter?: components["parameters"]["filter"];
+        /** @description Download in a output format (`csv` or `pdf`). */
+        output?: components["parameters"]["output"];
+        /** @description Retrieves the Nth page of data. */
+        page_number?: components["parameters"]["page_number"];
+        /** @description The page size to download. */
+        page_size?: components["parameters"]["page_size"];
+        /** @description The token to load the next page from. */
+        page_token?: components["parameters"]["page_token"];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AssetPage"];
+        };
+      };
+    };
+  };
+  "list-calls": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CallPage"];
+        };
+      };
+    };
+  };
+  "list-chains": {
+    parameters: {
+      query?: {
+        /** @description A filter to apply before filling out the page (https://docs.cordialsystems.com/reference/filtering). */
+        filter?: components["parameters"]["filter"];
+        /** @description Download in a output format (`csv` or `pdf`). */
+        output?: components["parameters"]["output"];
+        /** @description Retrieves the Nth page of data. */
+        page_number?: components["parameters"]["page_number"];
+        /** @description The page size to download. */
+        page_size?: components["parameters"]["page_size"];
+        /** @description The token to load the next page from. */
+        page_token?: components["parameters"]["page_token"];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ChainPage"];
+        };
+      };
+    };
+  };
+  "get-chain": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        chain: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Chain"];
+        };
+      };
+    };
+  };
+  "update-chain": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        chain: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["Chain"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OperationName"];
+        };
+      };
+    };
+  };
+  "import-chain": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        chain: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["Chain"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OperationName"];
+        };
+      };
+    };
+  };
+  "delete-chain": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        chain: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OperationName"];
+        };
+      };
+    };
+  };
+  "list-chain-addresses": {
+    parameters: {
+      query?: {
+        /** @description A filter to apply before filling out the page (https://docs.cordialsystems.com/reference/filtering). */
+        filter?: components["parameters"]["filter"];
+        /** @description Download in a output format (`csv` or `pdf`). */
+        output?: components["parameters"]["output"];
+        /** @description Retrieves the Nth page of data. */
+        page_number?: components["parameters"]["page_number"];
+        /** @description The page size to download. */
+        page_size?: components["parameters"]["page_size"];
+        /** @description The token to load the next page from. */
+        page_token?: components["parameters"]["page_token"];
+      };
+      header?: never;
+      path: {
+        chain: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AddressPage"];
+        };
+      };
+    };
+  };
+  "generate-address": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        chain: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["Address"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OperationName"];
+        };
+      };
+    };
+  };
+  "get-address": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        address: string;
+        chain: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Address"];
+        };
+      };
+    };
+  };
+  "update-address": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        address: string;
+        chain: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["Address"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OperationName"];
+        };
+      };
+    };
+  };
+  "import-address": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        address: string;
+        chain: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["Address"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OperationName"];
+        };
+      };
+    };
+  };
+  "delete-address": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        address: string;
+        chain: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OperationName"];
+        };
+      };
+    };
+  };
+  "fee-payer-address": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        address: string;
+        chain: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["ExplicitFeePayerPolicy"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OperationName"];
+        };
+      };
+    };
+  };
+  "list-chain-assets": {
+    parameters: {
+      query?: {
+        /** @description A filter to apply before filling out the page (https://docs.cordialsystems.com/reference/filtering). */
+        filter?: components["parameters"]["filter"];
+        /** @description Download in a output format (`csv` or `pdf`). */
+        output?: components["parameters"]["output"];
+        /** @description Retrieves the Nth page of data. */
+        page_number?: components["parameters"]["page_number"];
+        /** @description The page size to download. */
+        page_size?: components["parameters"]["page_size"];
+        /** @description The token to load the next page from. */
+        page_token?: components["parameters"]["page_token"];
+      };
+      header?: never;
+      path: {
+        chain: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AssetPage"];
+        };
+      };
+    };
+  };
+  "get-asset": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        asset: string;
+        chain: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Asset"];
+        };
+      };
+    };
+  };
+  "update-asset": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        asset: string;
+        chain: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["Asset"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OperationName"];
+        };
+      };
+    };
+  };
+  "import-asset": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        asset: string;
+        chain: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["Asset"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OperationName"];
+        };
+      };
+    };
+  };
+  "delete-asset": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        asset: string;
+        chain: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OperationName"];
+        };
+      };
+    };
+  };
+  "set-asset-price": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        assets: string;
+        chain: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["Price"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OperationName"];
+        };
+      };
+    };
+  };
+  "set-prices": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        assets: string;
+        chain: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["Prices"];
+      };
+    };
+    responses: {
+      200: components["responses"]["OperationNameJson"];
+    };
+  };
+  "list-chain-calls": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        chain: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CallPage"];
+        };
+      };
+    };
+  };
+  "get-call": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        call: string;
+        chain: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Call"];
+        };
+      };
+    };
+  };
+  "create-call": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        call: string;
+        chain: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["Call"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OperationName"];
+        };
+      };
+    };
+  };
+  "delete-call": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        call: string;
+        chain: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description The name of the operation created, which can be queried for. */
+      "2XX": {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OperationName"];
+        };
+      };
+    };
+  };
+  "get-symbol": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        chain: string;
+        symbol: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Symbol"];
+        };
+      };
+    };
+  };
+  "update-symbol": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        chain: string;
+        symbol: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["Symbol"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OperationName"];
+        };
+      };
+    };
+  };
+  "create-symbol": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        chain: string;
+        symbol: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["Symbol"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OperationName"];
+        };
+      };
+    };
+  };
+  "delete-symbol": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        chain: string;
+        symbol: string;
+      };
       cookie?: never;
     };
     requestBody?: {
@@ -6346,237 +6025,263 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["TransferRulePage"];
-        };
-      };
-    };
-  };
-  "create-transfer-rule": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["TransferRule"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
           "application/json": components["schemas"]["OperationName"];
         };
       };
     };
   };
-  "get-transfer-rule": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        "transfer-rule": string;
-      };
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "*/*"?: never;
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["TransferRule"];
-        };
-      };
-    };
-  };
-  "update-transfer-rule": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        "transfer-rule": string;
-      };
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["TransferRule"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["OperationName"];
-        };
-      };
-    };
-  };
-  "create-named-transfer-rule": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        "transfer-rule": string;
-      };
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["TransferRule"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["OperationName"];
-        };
-      };
-    };
-  };
-  "delete-transfer-rule": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        "transfer-rule": string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["OperationName"];
-        };
-      };
-    };
-  };
-  "list-types": {
+  "list-credentials": {
     parameters: {
       query?: {
-        /** @description The page size to download. */
-        page_size?: components["parameters"]["page_size"];
-        /** @description The token to load the next page from. */
-        page_token?: components["parameters"]["page_token"];
         /** @description A filter to apply before filling out the page (https://docs.cordialsystems.com/reference/filtering). */
         filter?: components["parameters"]["filter"];
         /** @description Download in a output format (`csv` or `pdf`). */
         output?: components["parameters"]["output"];
         /** @description Retrieves the Nth page of data. */
         page_number?: components["parameters"]["page_number"];
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["TypePage"];
-        };
-      };
-    };
-  };
-  "get-type": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        type: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Type"];
-        };
-      };
-    };
-  };
-  "get-treasury-singleton": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Treasury"];
-        };
-      };
-    };
-  };
-  "update-treasury-singleton": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["Treasury"];
-      };
-    };
-    responses: {
-      200: components["responses"]["OperationNameJson"];
-    };
-  };
-  "list-treasuries": {
-    parameters: {
-      query?: {
         /** @description The page size to download. */
         page_size?: components["parameters"]["page_size"];
         /** @description The token to load the next page from. */
         page_token?: components["parameters"]["page_token"];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CredentialPage"];
+        };
+      };
+    };
+  };
+  "ws-events": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": Record<string, unknown>;
+        };
+      };
+    };
+  };
+  "get-features": {
+    parameters: {
+      query?: {
+        filter?: string;
+        page_size?: number;
+        page_token?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["FeaturePage"];
+        };
+      };
+    };
+  };
+  "get-feature": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        feature: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Feature"];
+        };
+      };
+    };
+  };
+  "update-feature": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        feature: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["Feature"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OperationName"];
+        };
+      };
+    };
+  };
+  "activate-feature": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        feature: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OperationName"];
+        };
+      };
+    };
+  };
+  "disable-feature": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        feature: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OperationName"];
+        };
+      };
+    };
+  };
+  healthy: {
+    parameters: {
+      query?: {
+        /** @description set this parameter to see the underlying checks, and reasons for the fails */
+        verbose?: string;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Treasury is healthy */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "text/html": Record<string, unknown>;
+        };
+      };
+      /** @description Treasury is not healthy */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  "list-hosts": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HostPage"];
+        };
+      };
+    };
+  };
+  "get-key-request-id": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["KeyRequest"];
+        };
+      };
+    };
+  };
+  "list-key-requests": {
+    parameters: {
+      query?: {
         /** @description A filter to apply before filling out the page (https://docs.cordialsystems.com/reference/filtering). */
         filter?: components["parameters"]["filter"];
         /** @description Download in a output format (`csv` or `pdf`). */
         output?: components["parameters"]["output"];
         /** @description Retrieves the Nth page of data. */
         page_number?: components["parameters"]["page_number"];
+        /** @description The page size to download. */
+        page_size?: components["parameters"]["page_size"];
+        /** @description The token to load the next page from. */
+        page_token?: components["parameters"]["page_token"];
       };
       header?: never;
       path?: never;
@@ -6590,64 +6295,24 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["TreasuryPage"];
+          "application/json": components["schemas"]["KeyRequestPage"];
         };
       };
-    };
-  };
-  "get-treasury": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        treasury: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Treasury"];
-        };
-      };
-    };
-  };
-  "update-treasury": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        treasury: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["Treasury"];
-      };
-    };
-    responses: {
-      200: components["responses"]["OperationNameJson"];
     };
   };
   "list-keys": {
     parameters: {
       query?: {
-        /** @description The page size to download. */
-        page_size?: components["parameters"]["page_size"];
-        /** @description The token to load the next page from. */
-        page_token?: components["parameters"]["page_token"];
         /** @description A filter to apply before filling out the page (https://docs.cordialsystems.com/reference/filtering). */
         filter?: components["parameters"]["filter"];
         /** @description Download in a output format (`csv` or `pdf`). */
         output?: components["parameters"]["output"];
         /** @description Retrieves the Nth page of data. */
         page_number?: components["parameters"]["page_number"];
+        /** @description The page size to download. */
+        page_size?: components["parameters"]["page_size"];
+        /** @description The token to load the next page from. */
+        page_token?: components["parameters"]["page_token"];
       };
       header?: never;
       path?: never;
@@ -6764,19 +6429,471 @@ export interface operations {
       };
     };
   };
-  "list-signatures": {
+  "list-operations": {
     parameters: {
       query?: {
-        /** @description The page size to download. */
-        page_size?: components["parameters"]["page_size"];
-        /** @description The token to load the next page from. */
-        page_token?: components["parameters"]["page_token"];
         /** @description A filter to apply before filling out the page (https://docs.cordialsystems.com/reference/filtering). */
         filter?: components["parameters"]["filter"];
         /** @description Download in a output format (`csv` or `pdf`). */
         output?: components["parameters"]["output"];
         /** @description Retrieves the Nth page of data. */
         page_number?: components["parameters"]["page_number"];
+        /** @description The page size to download. */
+        page_size?: components["parameters"]["page_size"];
+        /** @description The token to load the next page from. */
+        page_token?: components["parameters"]["page_token"];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OperationPage"];
+        };
+      };
+    };
+  };
+  "get-operation": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        operation: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Operation"];
+        };
+      };
+    };
+  };
+  "list-call-proposals": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        chain: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CallPage"];
+        };
+      };
+    };
+  };
+  "propose-call": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        chain: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Call"];
+        };
+      };
+    };
+  };
+  "delete-call-proposal": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        chain: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  "get-call-proposal": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        call: string;
+        chain: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Call"];
+        };
+      };
+    };
+  };
+  "get-call-proposal-request": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        call: string;
+        chain: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Request"];
+        };
+      };
+    };
+  };
+  "get-ref-certificate": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CertificateClaims"];
+        };
+      };
+    };
+  };
+  "list-roles": {
+    parameters: {
+      query?: {
+        /** @description A filter to apply before filling out the page (https://docs.cordialsystems.com/reference/filtering). */
+        filter?: components["parameters"]["filter"];
+        /** @description Download in a output format (`csv` or `pdf`). */
+        output?: components["parameters"]["output"];
+        /** @description Retrieves the Nth page of data. */
+        page_number?: components["parameters"]["page_number"];
+        /** @description The page size to download. */
+        page_size?: components["parameters"]["page_size"];
+        /** @description The token to load the next page from. */
+        page_token?: components["parameters"]["page_token"];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["RolePage"];
+        };
+      };
+    };
+  };
+  "get-role": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        role: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Role"];
+        };
+      };
+    };
+  };
+  "update-role": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        role: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["Role"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OperationName"];
+        };
+      };
+    };
+  };
+  "create-role": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        role: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["Role"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OperationName"];
+        };
+      };
+    };
+  };
+  "list-signatories": {
+    parameters: {
+      query?: {
+        /** @description A filter to apply before filling out the page (https://docs.cordialsystems.com/reference/filtering). */
+        filter?: components["parameters"]["filter"];
+        /** @description Download in a output format (`csv` or `pdf`). */
+        output?: components["parameters"]["output"];
+        /** @description Retrieves the Nth page of data. */
+        page_number?: components["parameters"]["page_number"];
+        /** @description The page size to download. */
+        page_size?: components["parameters"]["page_size"];
+        /** @description The token to load the next page from. */
+        page_token?: components["parameters"]["page_token"];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "*/*"?: never;
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SignatoryPage"];
+        };
+      };
+    };
+  };
+  "get-signatory": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        signatory: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Signatory"];
+        };
+      };
+    };
+  };
+  "update-signatory": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        signatory: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["Signatory"];
+      };
+    };
+    responses: {
+      200: components["responses"]["OperationNameJson"];
+    };
+  };
+  "create-named-signatory": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        signatory: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["Signatory"];
+      };
+    };
+    responses: {
+      200: components["responses"]["OperationNameJson"];
+    };
+  };
+  "delete-signatory": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        signatory: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": Record<string, unknown>;
+      };
+    };
+    responses: {
+      200: components["responses"]["OperationNameJson"];
+    };
+  };
+  "get-signature-request-id": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SignatureRequest"];
+        };
+      };
+    };
+  };
+  "list-signature-requests": {
+    parameters: {
+      query?: {
+        /** @description A filter to apply before filling out the page (https://docs.cordialsystems.com/reference/filtering). */
+        filter?: components["parameters"]["filter"];
+        /** @description Download in a output format (`csv` or `pdf`). */
+        output?: components["parameters"]["output"];
+        /** @description Retrieves the Nth page of data. */
+        page_number?: components["parameters"]["page_number"];
+        /** @description The page size to download. */
+        page_size?: components["parameters"]["page_size"];
+        /** @description The token to load the next page from. */
+        page_token?: components["parameters"]["page_token"];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SignatureRequestPage"];
+        };
+      };
+    };
+  };
+  "list-signatures": {
+    parameters: {
+      query?: {
+        /** @description A filter to apply before filling out the page (https://docs.cordialsystems.com/reference/filtering). */
+        filter?: components["parameters"]["filter"];
+        /** @description Download in a output format (`csv` or `pdf`). */
+        output?: components["parameters"]["output"];
+        /** @description Retrieves the Nth page of data. */
+        page_number?: components["parameters"]["page_number"];
+        /** @description The page size to download. */
+        page_size?: components["parameters"]["page_size"];
+        /** @description The token to load the next page from. */
+        page_token?: components["parameters"]["page_token"];
       };
       header?: never;
       path?: never;
@@ -6893,19 +7010,19 @@ export interface operations {
       };
     };
   };
-  "list-key-requests": {
+  "list-signers": {
     parameters: {
       query?: {
-        /** @description The page size to download. */
-        page_size?: components["parameters"]["page_size"];
-        /** @description The token to load the next page from. */
-        page_token?: components["parameters"]["page_token"];
         /** @description A filter to apply before filling out the page (https://docs.cordialsystems.com/reference/filtering). */
         filter?: components["parameters"]["filter"];
         /** @description Download in a output format (`csv` or `pdf`). */
         output?: components["parameters"]["output"];
         /** @description Retrieves the Nth page of data. */
         page_number?: components["parameters"]["page_number"];
+        /** @description The page size to download. */
+        page_size?: components["parameters"]["page_size"];
+        /** @description The token to load the next page from. */
+        page_token?: components["parameters"]["page_token"];
       };
       header?: never;
       path?: never;
@@ -6919,151 +7036,189 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["KeyRequestPage"];
+          "application/json": components["schemas"]["SignerPage"];
         };
       };
     };
   };
-  "list-signature-requests": {
+  "get-signer": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        signer: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Signer"];
+        };
+      };
+    };
+  };
+  "list-key-responses": {
     parameters: {
       query?: {
-        /** @description The page size to download. */
-        page_size?: components["parameters"]["page_size"];
-        /** @description The token to load the next page from. */
-        page_token?: components["parameters"]["page_token"];
         /** @description A filter to apply before filling out the page (https://docs.cordialsystems.com/reference/filtering). */
         filter?: components["parameters"]["filter"];
         /** @description Download in a output format (`csv` or `pdf`). */
         output?: components["parameters"]["output"];
         /** @description Retrieves the Nth page of data. */
         page_number?: components["parameters"]["page_number"];
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["SignatureRequestPage"];
-        };
-      };
-    };
-  };
-  "get-signature-request-id": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["SignatureRequest"];
-        };
-      };
-    };
-  };
-  "get-key-request-id": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        id: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["KeyRequest"];
-        };
-      };
-    };
-  };
-  "list-transactions": {
-    parameters: {
-      query?: {
         /** @description The page size to download. */
         page_size?: components["parameters"]["page_size"];
         /** @description The token to load the next page from. */
         page_token?: components["parameters"]["page_token"];
+      };
+      header?: never;
+      path: {
+        signer: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["KeyResponsePage"];
+        };
+      };
+    };
+  };
+  "get-key-response": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        "key-request": string;
+        signer: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["KeyResponse"];
+        };
+      };
+    };
+  };
+  "propose-key-share": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        "key-request": string;
+        signer: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["KeyResponse"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": Record<string, unknown>;
+        };
+      };
+    };
+  };
+  "list-signature-responses": {
+    parameters: {
+      query?: {
         /** @description A filter to apply before filling out the page (https://docs.cordialsystems.com/reference/filtering). */
         filter?: components["parameters"]["filter"];
         /** @description Download in a output format (`csv` or `pdf`). */
         output?: components["parameters"]["output"];
         /** @description Retrieves the Nth page of data. */
         page_number?: components["parameters"]["page_number"];
+        /** @description The page size to download. */
+        page_size?: components["parameters"]["page_size"];
+        /** @description The token to load the next page from. */
+        page_token?: components["parameters"]["page_token"];
       };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["TransactionPage"];
-        };
-      };
-    };
-  };
-  "get-transaction": {
-    parameters: {
-      query?: never;
       header?: never;
       path: {
-        transaction: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Transaction"];
-        };
-      };
-    };
-  };
-  "recheck-transaction": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        transaction: string;
+        signer: string;
       };
       cookie?: never;
     };
     requestBody?: {
       content: {
         "*/*"?: never;
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SignatureResponsePage"];
+        };
+      };
+    };
+  };
+  "get-signature-response": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        "signature-request": string;
+        signer: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SignatureResponse"];
+        };
+      };
+    };
+  };
+  "propose-signature-share": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        "signature-request": string;
+        signer: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["SignatureResponse"];
       };
     };
     responses: {
@@ -7081,16 +7236,16 @@ export interface operations {
   "list-software-updates": {
     parameters: {
       query?: {
-        /** @description The page size to download. */
-        page_size?: components["parameters"]["page_size"];
-        /** @description The token to load the next page from. */
-        page_token?: components["parameters"]["page_token"];
         /** @description A filter to apply before filling out the page (https://docs.cordialsystems.com/reference/filtering). */
         filter?: components["parameters"]["filter"];
         /** @description Download in a output format (`csv` or `pdf`). */
         output?: components["parameters"]["output"];
         /** @description Retrieves the Nth page of data. */
         page_number?: components["parameters"]["page_number"];
+        /** @description The page size to download. */
+        page_size?: components["parameters"]["page_size"];
+        /** @description The token to load the next page from. */
+        page_token?: components["parameters"]["page_token"];
       };
       header?: never;
       path?: never;
@@ -7203,839 +7358,19 @@ export interface operations {
       };
     };
   };
-  "get-signer": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        signer: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Signer"];
-        };
-      };
-    };
-  };
-  "list-signers": {
-    parameters: {
-      query?: {
-        /** @description The page size to download. */
-        page_size?: components["parameters"]["page_size"];
-        /** @description The token to load the next page from. */
-        page_token?: components["parameters"]["page_token"];
-        /** @description A filter to apply before filling out the page (https://docs.cordialsystems.com/reference/filtering). */
-        filter?: components["parameters"]["filter"];
-        /** @description Download in a output format (`csv` or `pdf`). */
-        output?: components["parameters"]["output"];
-        /** @description Retrieves the Nth page of data. */
-        page_number?: components["parameters"]["page_number"];
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["SignerPage"];
-        };
-      };
-    };
-  };
-  "get-symbol": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        chain: string;
-        symbol: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Symbol"];
-        };
-      };
-    };
-  };
-  "update-symbol": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        chain: string;
-        symbol: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["Symbol"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["OperationName"];
-        };
-      };
-    };
-  };
-  "create-symbol": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        chain: string;
-        symbol: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["Symbol"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["OperationName"];
-        };
-      };
-    };
-  };
-  "delete-symbol": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        chain: string;
-        symbol: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "*/*"?: never;
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["OperationName"];
-        };
-      };
-    };
-  };
-  "list-symbols": {
-    parameters: {
-      query?: {
-        /** @description The page size to download. */
-        page_size?: components["parameters"]["page_size"];
-        /** @description The token to load the next page from. */
-        page_token?: components["parameters"]["page_token"];
-        /** @description A filter to apply before filling out the page (https://docs.cordialsystems.com/reference/filtering). */
-        filter?: components["parameters"]["filter"];
-        /** @description Download in a output format (`csv` or `pdf`). */
-        output?: components["parameters"]["output"];
-        /** @description Retrieves the Nth page of data. */
-        page_number?: components["parameters"]["page_number"];
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["SymbolPage"];
-        };
-      };
-    };
-  };
-  "list-transfer-transactions": {
-    parameters: {
-      query?: {
-        /** @description The page size to download. */
-        page_size?: components["parameters"]["page_size"];
-        /** @description The token to load the next page from. */
-        page_token?: components["parameters"]["page_token"];
-        /** @description A filter to apply before filling out the page (https://docs.cordialsystems.com/reference/filtering). */
-        filter?: components["parameters"]["filter"];
-        /** @description Download in a output format (`csv` or `pdf`). */
-        output?: components["parameters"]["output"];
-        /** @description Retrieves the Nth page of data. */
-        page_number?: components["parameters"]["page_number"];
-      };
-      header?: never;
-      path: {
-        transfer: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["TransactionPage"];
-        };
-      };
-    };
-  };
-  "get-key-response": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        signer: string;
-        "key-request": string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["KeyResponse"];
-        };
-      };
-    };
-  };
-  "propose-key-share": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        signer: string;
-        "key-request": string;
-      };
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["KeyResponse"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": Record<string, unknown>;
-        };
-      };
-    };
-  };
-  "get-signature-response": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        signer: string;
-        "signature-request": string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["SignatureResponse"];
-        };
-      };
-    };
-  };
-  "propose-signature-share": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        signer: string;
-        "signature-request": string;
-      };
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["SignatureResponse"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": Record<string, unknown>;
-        };
-      };
-    };
-  };
-  "list-key-responses": {
-    parameters: {
-      query?: {
-        /** @description The page size to download. */
-        page_size?: components["parameters"]["page_size"];
-        /** @description The token to load the next page from. */
-        page_token?: components["parameters"]["page_token"];
-        /** @description A filter to apply before filling out the page (https://docs.cordialsystems.com/reference/filtering). */
-        filter?: components["parameters"]["filter"];
-        /** @description Download in a output format (`csv` or `pdf`). */
-        output?: components["parameters"]["output"];
-        /** @description Retrieves the Nth page of data. */
-        page_number?: components["parameters"]["page_number"];
-      };
-      header?: never;
-      path: {
-        signer: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["KeyResponsePage"];
-        };
-      };
-    };
-  };
-  "list-signature-responses": {
-    parameters: {
-      query?: {
-        /** @description The page size to download. */
-        page_size?: components["parameters"]["page_size"];
-        /** @description The token to load the next page from. */
-        page_token?: components["parameters"]["page_token"];
-        /** @description A filter to apply before filling out the page (https://docs.cordialsystems.com/reference/filtering). */
-        filter?: components["parameters"]["filter"];
-        /** @description Download in a output format (`csv` or `pdf`). */
-        output?: components["parameters"]["output"];
-        /** @description Retrieves the Nth page of data. */
-        page_number?: components["parameters"]["page_number"];
-      };
-      header?: never;
-      path: {
-        signer: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "*/*"?: never;
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["SignatureResponsePage"];
-        };
-      };
-    };
-  };
-  "heartbeat-user": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        user: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": Record<string, unknown>;
-        };
-      };
-    };
-  };
-  "activate-transfer-rule": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        "transfer-rule": string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["OperationName"];
-        };
-      };
-    };
-  };
-  "disable-transfer-rule": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        "transfer-rule": string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["OperationName"];
-        };
-      };
-    };
-  };
-  "activate-feature": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        feature: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["OperationName"];
-        };
-      };
-    };
-  };
-  "disable-feature": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        feature: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["OperationName"];
-        };
-      };
-    };
-  };
-  "transfer-abort": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        transfer: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["OperationName"];
-        };
-      };
-    };
-  };
-  "transfer-cancel": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        transfer: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["OperationName"];
-        };
-      };
-    };
-  };
-  "set-asset-price": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        chain: string;
-        assets: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["Price"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["OperationName"];
-        };
-      };
-    };
-  };
-  "set-prices": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        chain: string;
-        assets: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["Prices"];
-      };
-    };
-    responses: {
-      200: components["responses"]["OperationNameJson"];
-    };
-  };
-  "get-staking": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        staking: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Staking"];
-        };
-      };
-    };
-  };
-  "import-staking": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        staking: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["StakingCreate"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["OperationName"];
-        };
-      };
-    };
-  };
-  "ws-events": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": Record<string, unknown>;
-        };
-      };
-    };
-  };
-  healthy: {
-    parameters: {
-      query?: {
-        /** @description set this parameter to see the underlying checks, and reasons for the fails */
-        verbose?: string;
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description Treasury is healthy */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "text/html": Record<string, unknown>;
-        };
-      };
-      /** @description Treasury is not healthy */
-      503: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  "get-signatory": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        signatory: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Signatory"];
-        };
-      };
-    };
-  };
-  "update-signatory": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        signatory: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["Signatory"];
-      };
-    };
-    responses: {
-      200: components["responses"]["OperationNameJson"];
-    };
-  };
-  "create-named-signatory": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        signatory: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["Signatory"];
-      };
-    };
-    responses: {
-      200: components["responses"]["OperationNameJson"];
-    };
-  };
-  "delete-signatory": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        signatory: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "application/json": Record<string, unknown>;
-      };
-    };
-    responses: {
-      200: components["responses"]["OperationNameJson"];
-    };
-  };
-  "list-signatories": {
-    parameters: {
-      query?: {
-        /** @description The page size to download. */
-        page_size?: components["parameters"]["page_size"];
-        /** @description A filter to apply before filling out the page (https://docs.cordialsystems.com/reference/filtering). */
-        filter?: components["parameters"]["filter"];
-        /** @description The token to load the next page from. */
-        page_token?: components["parameters"]["page_token"];
-        /** @description Download in a output format (`csv` or `pdf`). */
-        output?: components["parameters"]["output"];
-        /** @description Retrieves the Nth page of data. */
-        page_number?: components["parameters"]["page_number"];
-      };
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: {
-      content: {
-        "*/*"?: never;
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["SignatoryPage"];
-        };
-      };
-    };
-  };
-  "get-ref-certificate": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path?: never;
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["CertificateClaims"];
-        };
-      };
-    };
-  };
   "list-staking-rules": {
     parameters: {
       query?: {
-        /** @description The page size to download. */
-        page_size?: components["parameters"]["page_size"];
-        /** @description The token to load the next page from. */
-        page_token?: components["parameters"]["page_token"];
         /** @description A filter to apply before filling out the page (https://docs.cordialsystems.com/reference/filtering). */
         filter?: components["parameters"]["filter"];
         /** @description Download in a output format (`csv` or `pdf`). */
         output?: components["parameters"]["output"];
         /** @description Retrieves the Nth page of data. */
         page_number?: components["parameters"]["page_number"];
+        /** @description The page size to download. */
+        page_size?: components["parameters"]["page_size"];
+        /** @description The token to load the next page from. */
+        page_token?: components["parameters"]["page_token"];
       };
       header?: never;
       path?: never;
@@ -8202,6 +7537,168 @@ export interface operations {
       200: components["responses"]["OperationNameJson"];
     };
   };
+  "list-stakings": {
+    parameters: {
+      query?: {
+        /** @description A filter to apply before filling out the page (https://docs.cordialsystems.com/reference/filtering). */
+        filter?: components["parameters"]["filter"];
+        /** @description Download in a output format (`csv` or `pdf`). */
+        output?: components["parameters"]["output"];
+        /** @description Retrieves the Nth page of data. */
+        page_number?: components["parameters"]["page_number"];
+        /** @description The page size to download. */
+        page_size?: components["parameters"]["page_size"];
+        /** @description The token to load the next page from. */
+        page_token?: components["parameters"]["page_token"];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "*/*"?: never;
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["StakingPage"];
+        };
+      };
+    };
+  };
+  "update-staking": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["Staking"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OperationName"];
+        };
+      };
+    };
+  };
+  "create-staking": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["Staking"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OperationName"];
+        };
+      };
+    };
+  };
+  "get-staking": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        staking: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Staking"];
+        };
+      };
+    };
+  };
+  "import-staking": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        staking: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["StakingCreate"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OperationName"];
+        };
+      };
+    };
+  };
+  "list-symbols": {
+    parameters: {
+      query?: {
+        /** @description A filter to apply before filling out the page (https://docs.cordialsystems.com/reference/filtering). */
+        filter?: components["parameters"]["filter"];
+        /** @description Download in a output format (`csv` or `pdf`). */
+        output?: components["parameters"]["output"];
+        /** @description Retrieves the Nth page of data. */
+        page_number?: components["parameters"]["page_number"];
+        /** @description The page size to download. */
+        page_size?: components["parameters"]["page_size"];
+        /** @description The token to load the next page from. */
+        page_token?: components["parameters"]["page_token"];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SymbolPage"];
+        };
+      };
+    };
+  };
   "list-tags": {
     parameters: {
       query?: never;
@@ -8298,9 +7795,20 @@ export interface operations {
       200: components["responses"]["OperationNameJson"];
     };
   };
-  "list-calls": {
+  "list-transactions": {
     parameters: {
-      query?: never;
+      query?: {
+        /** @description A filter to apply before filling out the page (https://docs.cordialsystems.com/reference/filtering). */
+        filter?: components["parameters"]["filter"];
+        /** @description Download in a output format (`csv` or `pdf`). */
+        output?: components["parameters"]["output"];
+        /** @description Retrieves the Nth page of data. */
+        page_number?: components["parameters"]["page_number"];
+        /** @description The page size to download. */
+        page_size?: components["parameters"]["page_size"];
+        /** @description The token to load the next page from. */
+        page_token?: components["parameters"]["page_token"];
+      };
       header?: never;
       path?: never;
       cookie?: never;
@@ -8313,17 +7821,17 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["CallPage"];
+          "application/json": components["schemas"]["TransactionPage"];
         };
       };
     };
   };
-  "list-chain-calls": {
+  "get-transaction": {
     parameters: {
       query?: never;
       header?: never;
       path: {
-        chain: string;
+        transaction: string;
       };
       cookie?: never;
     };
@@ -8335,47 +7843,82 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["CallPage"];
+          "application/json": components["schemas"]["Transaction"];
         };
       };
     };
   };
-  "get-call": {
+  "recheck-transaction": {
     parameters: {
       query?: never;
       header?: never;
       path: {
-        chain: string;
-        call: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content: {
-          "application/json": components["schemas"]["Call"];
-        };
-      };
-    };
-  };
-  "create-call": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        chain: string;
-        call: string;
+        transaction: string;
       };
       cookie?: never;
     };
     requestBody?: {
       content: {
-        "application/json": components["schemas"]["Call"];
+        "*/*"?: never;
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": Record<string, unknown>;
+        };
+      };
+    };
+  };
+  "list-transfer-rules": {
+    parameters: {
+      query?: {
+        /** @description A filter to apply before filling out the page (https://docs.cordialsystems.com/reference/filtering). */
+        filter?: components["parameters"]["filter"];
+        /** @description Download in a output format (`csv` or `pdf`). */
+        output?: components["parameters"]["output"];
+        /** @description Retrieves the Nth page of data. */
+        page_number?: components["parameters"]["page_number"];
+        /** @description The page size to download. */
+        page_size?: components["parameters"]["page_size"];
+        /** @description The token to load the next page from. */
+        page_token?: components["parameters"]["page_token"];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "*/*"?: never;
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TransferRulePage"];
+        };
+      };
+    };
+  };
+  "create-transfer-rule": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["TransferRule"];
       };
     };
     responses: {
@@ -8390,20 +7933,49 @@ export interface operations {
       };
     };
   };
-  "delete-call": {
+  "get-transfer-rule": {
     parameters: {
       query?: never;
       header?: never;
       path: {
-        chain: string;
-        call: string;
+        "transfer-rule": string;
       };
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody?: {
+      content: {
+        "*/*"?: never;
+      };
+    };
     responses: {
-      /** @description The name of the operation created, which can be queried for. */
-      "2XX": {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TransferRule"];
+        };
+      };
+    };
+  };
+  "update-transfer-rule": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        "transfer-rule": string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["TransferRule"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
         headers: {
           [name: string]: unknown;
         };
@@ -8413,12 +7985,38 @@ export interface operations {
       };
     };
   };
-  "list-call-proposals": {
+  "create-named-transfer-rule": {
     parameters: {
       query?: never;
       header?: never;
       path: {
-        chain: string;
+        "transfer-rule": string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["TransferRule"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OperationName"];
+        };
+      };
+    };
+  };
+  "delete-transfer-rule": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        "transfer-rule": string;
       };
       cookie?: never;
     };
@@ -8430,17 +8028,17 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["CallPage"];
+          "application/json": components["schemas"]["OperationName"];
         };
       };
     };
   };
-  "propose-call": {
+  "activate-transfer-rule": {
     parameters: {
       query?: never;
       header?: never;
       path: {
-        chain: string;
+        "transfer-rule": string;
       };
       cookie?: never;
     };
@@ -8452,38 +8050,17 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["Call"];
+          "application/json": components["schemas"]["OperationName"];
         };
       };
     };
   };
-  "delete-call-proposal": {
+  "disable-transfer-rule": {
     parameters: {
       query?: never;
       header?: never;
       path: {
-        chain: string;
-      };
-      cookie?: never;
-    };
-    requestBody?: never;
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          [name: string]: unknown;
-        };
-        content?: never;
-      };
-    };
-  };
-  "get-call-proposal": {
-    parameters: {
-      query?: never;
-      header?: never;
-      path: {
-        chain: string;
-        call: string;
+        "transfer-rule": string;
       };
       cookie?: never;
     };
@@ -8495,18 +8072,96 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["Call"];
+          "application/json": components["schemas"]["OperationName"];
         };
       };
     };
   };
-  "get-call-proposal-request": {
+  "list-transfers": {
+    parameters: {
+      query?: {
+        /** @description A filter to apply before filling out the page (https://docs.cordialsystems.com/reference/filtering). */
+        filter?: components["parameters"]["filter"];
+        /** @description Download in a output format (`csv` or `pdf`). */
+        output?: components["parameters"]["output"];
+        /** @description Retrieves the Nth page of data. */
+        page_number?: components["parameters"]["page_number"];
+        /** @description The page size to download. */
+        page_size?: components["parameters"]["page_size"];
+        /** @description The token to load the next page from. */
+        page_token?: components["parameters"]["page_token"];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TransferPage"];
+        };
+      };
+    };
+  };
+  "update-transfer": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["Transfer"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OperationName"];
+        };
+      };
+    };
+  };
+  "create-transfer": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["TransferCreate"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OperationName"];
+        };
+      };
+    };
+  };
+  "get-transfer": {
     parameters: {
       query?: never;
       header?: never;
       path: {
-        chain: string;
-        call: string;
+        transfer: string;
       };
       cookie?: never;
     };
@@ -8518,12 +8173,230 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["Request"];
+          "application/json": components["schemas"]["Transfer"];
         };
       };
     };
   };
-  "list-hosts": {
+  "import-transfer": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        transfer: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["TransferCreate"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OperationName"];
+        };
+      };
+    };
+  };
+  "delete-transfer": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        transfer: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OperationName"];
+        };
+      };
+    };
+  };
+  "transfer-abort": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        transfer: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OperationName"];
+        };
+      };
+    };
+  };
+  "transfer-cancel": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        transfer: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OperationName"];
+        };
+      };
+    };
+  };
+  "transfer-retry": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        transfer: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OperationName"];
+        };
+      };
+    };
+  };
+  "list-transfer-transactions": {
+    parameters: {
+      query?: {
+        /** @description A filter to apply before filling out the page (https://docs.cordialsystems.com/reference/filtering). */
+        filter?: components["parameters"]["filter"];
+        /** @description Download in a output format (`csv` or `pdf`). */
+        output?: components["parameters"]["output"];
+        /** @description Retrieves the Nth page of data. */
+        page_number?: components["parameters"]["page_number"];
+        /** @description The page size to download. */
+        page_size?: components["parameters"]["page_size"];
+        /** @description The token to load the next page from. */
+        page_token?: components["parameters"]["page_token"];
+      };
+      header?: never;
+      path: {
+        transfer: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TransactionPage"];
+        };
+      };
+    };
+  };
+  "list-treasuries": {
+    parameters: {
+      query?: {
+        /** @description A filter to apply before filling out the page (https://docs.cordialsystems.com/reference/filtering). */
+        filter?: components["parameters"]["filter"];
+        /** @description Download in a output format (`csv` or `pdf`). */
+        output?: components["parameters"]["output"];
+        /** @description Retrieves the Nth page of data. */
+        page_number?: components["parameters"]["page_number"];
+        /** @description The page size to download. */
+        page_size?: components["parameters"]["page_size"];
+        /** @description The token to load the next page from. */
+        page_token?: components["parameters"]["page_token"];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TreasuryPage"];
+        };
+      };
+    };
+  };
+  "get-treasury": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        treasury: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Treasury"];
+        };
+      };
+    };
+  };
+  "update-treasury": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        treasury: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["Treasury"];
+      };
+    };
+    responses: {
+      200: components["responses"]["OperationNameJson"];
+    };
+  };
+  "get-treasury-singleton": {
     parameters: {
       query?: never;
       header?: never;
@@ -8538,7 +8411,417 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["HostPage"];
+          "application/json": components["schemas"]["Treasury"];
+        };
+      };
+    };
+  };
+  "update-treasury-singleton": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["Treasury"];
+      };
+    };
+    responses: {
+      200: components["responses"]["OperationNameJson"];
+    };
+  };
+  "list-types": {
+    parameters: {
+      query?: {
+        /** @description A filter to apply before filling out the page (https://docs.cordialsystems.com/reference/filtering). */
+        filter?: components["parameters"]["filter"];
+        /** @description Download in a output format (`csv` or `pdf`). */
+        output?: components["parameters"]["output"];
+        /** @description Retrieves the Nth page of data. */
+        page_number?: components["parameters"]["page_number"];
+        /** @description The page size to download. */
+        page_size?: components["parameters"]["page_size"];
+        /** @description The token to load the next page from. */
+        page_token?: components["parameters"]["page_token"];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["TypePage"];
+        };
+      };
+    };
+  };
+  "get-type": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        type: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Type"];
+        };
+      };
+    };
+  };
+  "list-users": {
+    parameters: {
+      query?: {
+        /** @description A filter to apply before filling out the page (https://docs.cordialsystems.com/reference/filtering). */
+        filter?: components["parameters"]["filter"];
+        /** @description Download in a output format (`csv` or `pdf`). */
+        output?: components["parameters"]["output"];
+        /** @description Retrieves the Nth page of data. */
+        page_number?: components["parameters"]["page_number"];
+        /** @description The page size to download. */
+        page_size?: components["parameters"]["page_size"];
+        /** @description The token to load the next page from. */
+        page_token?: components["parameters"]["page_token"];
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["UserPage"];
+        };
+      };
+    };
+  };
+  "generate-user": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["User"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OperationName"];
+        };
+      };
+    };
+  };
+  "get-user": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description the user id */
+        user: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["User"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["User"];
+        };
+      };
+    };
+  };
+  "update-user": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description the user id */
+        user: string;
+      };
+      cookie?: never;
+    };
+    /** @description Patch user properties to update. */
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["User"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OperationName"];
+        };
+      };
+    };
+  };
+  "create-user": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description the user id */
+        user: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["User"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OperationName"];
+        };
+      };
+    };
+  };
+  "delete-user": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description the user id */
+        user: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OperationName"];
+        };
+      };
+    };
+  };
+  "list-user-credentials": {
+    parameters: {
+      query?: {
+        /** @description A filter to apply before filling out the page (https://docs.cordialsystems.com/reference/filtering). */
+        filter?: components["parameters"]["filter"];
+        /** @description Download in a output format (`csv` or `pdf`). */
+        output?: components["parameters"]["output"];
+        /** @description Retrieves the Nth page of data. */
+        page_number?: components["parameters"]["page_number"];
+        /** @description The page size to download. */
+        page_size?: components["parameters"]["page_size"];
+        /** @description The token to load the next page from. */
+        page_token?: components["parameters"]["page_token"];
+      };
+      header?: never;
+      path: {
+        user: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["UserPage"];
+        };
+      };
+    };
+  };
+  "register-credential": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        user: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["Credential"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OperationName"];
+        };
+      };
+    };
+  };
+  "get-credential": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        credential: string;
+        user: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Credential"];
+        };
+      };
+    };
+  };
+  "update-credential": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        credential: string;
+        user: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["Credential"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OperationName"];
+        };
+      };
+    };
+  };
+  "create-credential": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        credential: string;
+        user: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: {
+      content: {
+        "application/json": components["schemas"]["Credential"];
+      };
+    };
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OperationName"];
+        };
+      };
+    };
+  };
+  "delete-credential": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        credential: string;
+        user: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["OperationName"];
+        };
+      };
+    };
+  };
+  "heartbeat-user": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        user: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description OK */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": Record<string, unknown>;
         };
       };
     };

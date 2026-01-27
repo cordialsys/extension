@@ -1,4 +1,5 @@
 import { Config } from "@/lib/config";
+import { Port } from "@/lib/handler";
 import { Err, None, Ok, Option, Sol, Some } from "@/lib/types";
 import { Sdk } from "@/lib/sdk";
 import { Error, Result } from "@/lib/sdk/error";
@@ -20,8 +21,13 @@ function notifyConfig(config: Option<Sol.Config>) {
   const notify = CONFIG !== config;
   CONFIG = config;
   if (notify) {
-    // TODO: Notify providers
     console.log("SVM config changed", config);
+    Port.broadcast({
+      provider: "SOL",
+      kind: "cordial:extension:broadcast",
+      method: "cordial:config",
+      value: config,
+    });
   }
 }
 
