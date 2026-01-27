@@ -137,8 +137,8 @@ export class Solana implements Wallet {
     return features;
   }
 
-  async config(): Promise<Option<Config>> {
-    return requestConfig();
+  config(): Option<Config> {
+    return CONFIG;
   }
 
   // manually trigger a reconfiguration, returning the config that was used
