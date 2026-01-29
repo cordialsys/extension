@@ -212,6 +212,7 @@ export function eth_accounts(): string[] {
 export async function wallet_getCapabilities(
   params: unknown,
 ): Promise<Result<unknown>> {
+  const _ = params;
   // Uniswap sends undefined..
   // It's supposed to send
   // https://docs.metamask.io/wallet/reference/json-rpc-methods/wallet_getcapabilities
