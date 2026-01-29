@@ -27,25 +27,43 @@ function notLoggedIn(): Error {
   return Error.failedPrecondition("not logged in");
 }
 
+function headers(): HeadersInit {
+  const headers: HeadersInit = {
+    "Content-Type": "application/json",
+  };
+  const config = Config.current();
+  if (!config) return headers;
+  headers.treasury = config.treasury.name.slice("treasuries/".length);
+  return headers;
+}
+
 // All Cordial APIs work in this same way.
 async function apiGet<R>(url: string): Promise<Result<R>> {
-  const response = await fetch(url);
-  if (!response.ok) {
-    return Err((await response.json()) as Error);
+  try {
+    const response = await fetch(url, { headers: headers() });
+    if (!response.ok) {
+      return Err((await response.json()) as Error);
+    }
+    return Ok((await response.json()) as R);
+  } catch (error) {
+    return Err(Error.unknown(`Could not GET ${url}: ${error}`));
   }
-  return Ok((await response.json()) as R);
 }
 
 async function apiPut<R>(url: string, body: R): Promise<Result<unknown>> {
-  const response = await fetch(url, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
-  if (!response.ok) {
-    return Err((await response.json()) as Error);
+  try {
+    const response = await fetch(url, {
+      method: "PUT",
+      headers: headers(),
+      body: JSON.stringify(body),
+    });
+    if (!response.ok) {
+      return Err((await response.json()) as Error);
+    }
+    return Ok(await response.json());
+  } catch (error) {
+    return Err(Error.unknown(`Could not PUT ${url}: ${error}`));
   }
-  return Ok(await response.json());
 }
 
 async function apiList<R>(
@@ -58,13 +76,17 @@ async function apiList<R>(
     filtered.searchParams.set("filter", options.filter);
     url = filtered.toString();
   }
-  const response = await fetch(url);
-  if (!response.ok) {
-    return Err((await response.json()) as Error);
+  try {
+    const response = await fetch(url, { headers: headers() });
+    if (!response.ok) {
+      return Err((await response.json()) as Error);
+    }
+    // TODO: pagination
+    const page = (await response.json()) as { [plural]: R[] };
+    return Ok(page[plural]);
+  } catch (error) {
+    return Err(Error.unknown(`Could not LIST ${url}: ${error}`));
   }
-  // TODO: pagination
-  const page = (await response.json()) as { [plural]: R[] };
-  return Ok(page[plural]);
 }
 
 export namespace Sdk {
