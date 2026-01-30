@@ -103,7 +103,7 @@ export namespace Sdk {
       resource: R,
     ): Promise<Result<unknown>> {
       const url = `${API}v1/${name}`;
-      console.log(`putting ${url} to ${resource}`);
+      console.log(`putting ${url} to`, resource);
       return await apiPut<R>(url, resource);
     }
 

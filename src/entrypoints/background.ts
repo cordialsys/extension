@@ -36,10 +36,12 @@ async function init() {
 }
 
 async function background() {
+  Config.addContextMenu();
   browser.runtime.onConnect.addListener(Port.set);
   await init();
   browser.action.onClicked.addListener(onClicked);
   browser.runtime.onMessage.addListener(onMessage);
+  browser.contextMenus.onClicked.addListener(Config.onContextMenu);
 }
 
 export default defineBackground(() => {

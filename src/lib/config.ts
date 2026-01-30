@@ -1,4 +1,4 @@
-import { browser_action, CONFIG_REFRESH } from "./constants";
+import { COLOR, CONFIG_REFRESH } from "./constants";
 import { Login } from "./login";
 import { Sdk } from "./sdk";
 import * as A from "./sdk/admin";
@@ -6,6 +6,8 @@ import { None, Option } from "./types";
 import { evm, svm } from "./handler";
 
 let CONFIG: Option<Config> = None;
+
+const CONTEXT_MENU_ID = "treasury-api-access";
 
 export const Config = {
   // fetches the latest config if logged in
@@ -29,10 +31,101 @@ export const Config = {
       .map((a) => a.slice(prefix.length));
   },
 
+  addContextMenu() {
+    browser.contextMenus.create({
+      enabled: false,
+      id: CONTEXT_MENU_ID,
+      title: "No API access required at this time",
+      contexts: ["action"],
+    });
+  },
+
+  inactiveContextMenu(api?: string) {
+    let title = "No API access configured at this time";
+    if (api) title = `API: ${api}`;
+
+    browser.contextMenus.update(
+      CONTEXT_MENU_ID,
+      { enabled: false, title },
+      () => {
+        const error = browser.runtime.lastError;
+        if (error) console.log("update error:", error);
+      },
+    );
+  },
+
+  grantContextMenu(api: string) {
+    browser.contextMenus.update(CONTEXT_MENU_ID, {
+      enabled: true,
+      title: `Grant API access: ${api}`,
+    });
+    Config.notify(
+      "Grant access",
+      `Grant access to Treasury API ${api} by right-clicking the extension icon`,
+    );
+  },
+
+  matchPattern(api: string): string {
+    const apiWithTrailingSlash = new URL(api).toString();
+    return `${apiWithTrailingSlash}*`;
+  },
+
   async propagate(config: Option<Config>) {
+    if (config) {
+      const api = Config.matchPattern(config.treasury.url);
+      const has = await browser.permissions.contains({ origins: [api] });
+      if (!has) Config.grantContextMenu(api);
+      else Config.inactiveContextMenu(api);
+    } else {
+      Config.inactiveContextMenu(None);
+    }
     CONFIG = config;
     await evm.propagate(None, config);
     await svm.propagate(config);
+  },
+
+  // It's IMPORTANT to not introduce `async` in here, otherwise it will no
+  // longer be recognized as "user gesture" driven.
+  onContextMenu(info: Browser.contextMenus.OnClickData) {
+    if (info.menuItemId !== CONTEXT_MENU_ID) return;
+    const config = CONFIG;
+    if (!config) return;
+    const api = Config.matchPattern(config.treasury.url);
+
+    // Again.. don't use the async version of `permissions.contains` or the user gesture
+    // status will be lost.
+    browser.permissions.contains({ origins: [api] }, (has) => {
+      if (has) return;
+
+      browser.permissions.request({ origins: [api] }, (granted) => {
+        const error = browser.runtime.lastError;
+        if (error) {
+          console.error("Permission request error:", error);
+          Config.notify(
+            "Permission request error",
+            error?.message ?? "Unknown error",
+          );
+          return;
+        }
+
+        const treasury =
+          CONFIG?.treasury.name.slice("treasuries/".length) ?? "<none>";
+        if (granted) {
+          console.log("✅ Permission granted for", api);
+          Config.inactiveContextMenu(api);
+          Config.notify(
+            "Permission granted!",
+            `You can now access treasury ${treasury}`,
+          );
+        } else {
+          console.log("❌ User denied permission for", api);
+          Config.notify(
+            "Permission denied.",
+            `Please grant permission to access treasury ${treasury}`,
+          );
+        }
+      });
+    });
   },
 
   allowed(origin: string): boolean {
@@ -67,11 +160,21 @@ export const Config = {
     await Config.propagate(config);
   },
 
+  notify(title: string, message: string) {
+    browser.notifications.create({
+      type: "basic",
+      iconUrl: COLOR[48],
+      title,
+      message,
+    });
+  },
+
   async track() {
     const config = await Config.fetch();
 
     if (JSON.stringify(Config.current()) !== JSON.stringify(config)) {
       console.log("Config changed", config);
+      Config.notify("Config changed", JSON.stringify(config, null, 2));
       await Config.propagate(config);
     }
 
