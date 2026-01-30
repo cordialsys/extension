@@ -8,7 +8,7 @@ import { Temporal } from "temporal-polyfill";
 // This would remove any kind of storage requirements,
 // and the login should be retained as long as the browser is open.
 import { get, set } from "idb-keyval";
-import { browser_action, COLOR, GRAY, LOGIN_REFRESH } from "./constants";
+import { COLOR, GRAY, LOGIN_REFRESH } from "./constants";
 import { short_sleep } from "./util";
 import { None, Option } from "./types";
 
@@ -78,12 +78,12 @@ export const Request = {
 
 export async function showOff() {
   console.log("🥺 Turning off");
-  await browser_action.setIcon({ path: GRAY });
+  await browser.action.setIcon({ path: GRAY });
 }
 
 export async function showOn() {
   console.log("🤩 Turning on");
-  await browser_action.setIcon({ path: COLOR });
+  await browser.action.setIcon({ path: COLOR });
 }
 
 function parseJwt(jwt: string): unknown {

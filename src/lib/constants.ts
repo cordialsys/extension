@@ -1,8 +1,5 @@
 // TODO: use fetchTimeout, see https://dmitripavlutin.com/timeout-fetch-request/
 
-// browser.actions is MV3, for firefox MV2 need browser.browserAction
-export const browser_action = browser.action ?? browser.browserAction;
-
 // 15 minutes
 // TODO: Should this depend on how long we're still logged into Clerk?
 export const LOGIN_REFRESH: number = 15 * 60 * 1000;

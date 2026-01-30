@@ -81,9 +81,9 @@ export const Config = {
   async setBadge(config: Option<Config>, tab: number, allowed: boolean) {
     const text = allowed ? "✓" : "✗";
     const color = allowed ? "#0F0" : "#F00";
-    browser_action.setBadgeText({ tabId: tab, text });
-    browser_action.setBadgeBackgroundColor({ tabId: tab, color });
-    browser_action.setTitle({
+    browser.action.setBadgeText({ tabId: tab, text });
+    browser.action.setBadgeBackgroundColor({ tabId: tab, color });
+    browser.action.setTitle({
       title: JSON.stringify(config, null, 2) ?? "No config yet",
     });
   },

@@ -6,7 +6,7 @@
 //
 // THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import { browser_action, COLOR } from "@/lib/constants";
+import { COLOR } from "@/lib/constants";
 import { onClicked } from "@/lib/click";
 import { Config } from "@/lib/config";
 import { Login, /*loginFirstName,*/ showOff } from "@/lib/login";
@@ -32,13 +32,13 @@ async function init() {
   // const firstName = await loginFirstName(login);
   // console.log(`👋 Welcome back, ${firstName}`);
 
-  await browser_action.setIcon({ path: COLOR });
+  await browser.action.setIcon({ path: COLOR });
 }
 
 async function background() {
   browser.runtime.onConnect.addListener(Port.set);
   await init();
-  browser_action.onClicked.addListener(onClicked);
+  browser.action.onClicked.addListener(onClicked);
   browser.runtime.onMessage.addListener(onMessage);
 }
 
