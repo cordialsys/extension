@@ -33,6 +33,15 @@ test("EVM transaction input validation", () => {
       maxFeePerGas: "0x83c9630c",
       maxPriorityFeePerGas: "0x443f1c40",
     },
+    {
+      data: "0xa9059cbb000000000000000000000000f70da97812cb96acdf810712aa562db8dfa3dbef00000000000000000000000000000000000000000000000000000000000f9b82851a7f9406162c3ec593cf492f3d5b13678f9fcfc13a692fd1dcc204a2981733",
+      from: "0xf489F61bd3d8e477f94a81f5E9dB2d5fD00b1F1A",
+      gas: "0x2625a0",
+      maxFeePerGas: "0xa07e881e9b",
+      maxPriorityFeePerGas: "0x2526dd9020",
+      to: "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
+      value: "0x0",
+    },
   ];
   vectors.forEach((v) => {
     Evm.SignTransactionInputs.parse([v]);

@@ -102,10 +102,10 @@ export namespace Provider {
 const HexAddress = z.string().regex(/^0x[0-9a-fA-F]{40}$/);
 // 0 or more hex character pairs (or just '0')
 // This means Vec<u8>
-const HexData0 = z.string().regex(/^0x([[0-9a-fA-F]{2})*|0]$/);
+const HexData0 = z.string().regex(/^(?:0x0|0x(?:[0-9A-Fa-f]{2})*)$/);
 // 1 or more hex character pairs (or just '0')
 // This means non-empty Vec<u8>
-const HexData1 = z.string().regex(/^0x([[0-9a-fA-F]{2})+|0]$/);
+const HexData1 = z.string().regex(/^(?:0x0|0x(?:[0-9A-Fa-f]{2})+)$/);
 const HexValue = HexData1;
 
 // https://docs.metamask.io/wallet/reference/json-rpc-methods/eth_sendtransaction
