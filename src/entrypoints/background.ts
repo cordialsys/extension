@@ -42,6 +42,9 @@ async function background() {
   browser.action.onClicked.addListener(onClicked);
   browser.runtime.onMessage.addListener(onMessage);
   browser.contextMenus.onClicked.addListener(Config.onContextMenu);
+  browser.notifications.onButtonClicked.addListener(
+    Config.onNotificationButtonClicked,
+  );
 }
 
 export default defineBackground(() => {

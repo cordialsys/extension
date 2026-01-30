@@ -59,10 +59,7 @@ export const Config = {
       enabled: true,
       title: `Grant API access: ${api}`,
     });
-    Config.notify(
-      "Grant access",
-      `Grant access to Treasury API ${api} by right-clicking the extension icon`,
-    );
+    Config.notifyApi("Grant access", "Grant access to Treasury API");
   },
 
   matchPattern(api: string): string {
@@ -84,10 +81,18 @@ export const Config = {
     await svm.propagate(config);
   },
 
+  onNotificationButtonClicked(notificationId: string, buttonIndex: number) {
+    console.log("notification", notificationId);
+    if (buttonIndex === 0) Config.requestPermission();
+  },
+
+  onContextMenu(info: Browser.contextMenus.OnClickData) {
+    if (info.menuItemId !== CONTEXT_MENU_ID) Config.requestPermission();
+  },
+
   // It's IMPORTANT to not introduce `async` in here, otherwise it will no
   // longer be recognized as "user gesture" driven.
-  onContextMenu(info: Browser.contextMenus.OnClickData) {
-    if (info.menuItemId !== CONTEXT_MENU_ID) return;
+  requestPermission() {
     const config = CONFIG;
     if (!config) return;
     const api = Config.matchPattern(config.treasury.url);
@@ -166,6 +171,16 @@ export const Config = {
       iconUrl: COLOR[48],
       title,
       message,
+    });
+  },
+
+  notifyApi(title: string, message: string) {
+    browser.notifications.create({
+      type: "basic",
+      iconUrl: COLOR[48],
+      title,
+      message,
+      buttons: [{ title: "Allow" }],
     });
   },
 
