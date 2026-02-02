@@ -1,15 +1,17 @@
 {
   "name": "cordial-treasury-browser-wallet-extension",
   "description": "Silent crosschain browser wallet connecting to a Cordial Treasury deployment",
+  "license": "Apache-2.0",
   "private": true,
   "version": "0.1.0",
-  "version_name": "0.1.0-alpha1",
+  "version_name": "0.1.0-alpha2",
   "type": "module",
   "scripts": {
     "dev": "wxt",
     "dev:chromium": "wxt -b chromium",
     "dev:edge": "wxt -b edge",
     "dev:firefox": "wxt -b firefox",
+    "lint": "eslint src",
     "test": "vitest",
     "build": "wxt build",
     "build:edge": "wxt build -b edge",
