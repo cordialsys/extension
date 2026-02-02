@@ -28,3 +28,4 @@ web-ext.config.ts
 # manually added
 tsconfig.tsbuildinfo
 .env.local
+chrome-mv3.pem
