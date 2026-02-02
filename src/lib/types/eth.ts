@@ -106,7 +106,7 @@ const HexData0 = z.string().regex(/^(?:0x0|0x(?:[0-9A-Fa-f]{2})*)$/);
 // 1 or more hex character pairs (or just '0')
 // This means non-empty Vec<u8>
 const HexData1 = z.string().regex(/^(?:0x0|0x(?:[0-9A-Fa-f]{2})+)$/);
-const HexValue = HexData1;
+export const HexValue = HexData1;
 
 // https://docs.metamask.io/wallet/reference/json-rpc-methods/eth_sendtransaction
 // https://docs.metamask.io/snaps/reference/keyring-api/chain-methods#eth_signtransaction
