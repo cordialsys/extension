@@ -39,12 +39,12 @@ api:
     just fmt
 
 # configures Edge at Mosyle-installed location
-setup-mac: install
+setup-mac: pnpm-install
 	ln -sf web-ext.config.mac.ts web-ext.config.ts
 
 # configures Edge for `microsoft-edge-stable-bin` AUR package
-setup-arch: install
+setup-arch: pnpm-install
 	ln -sf web-ext.config.arch.ts web-ext.config.ts
 
-install:
+pnpm-install:
 	pnpm install

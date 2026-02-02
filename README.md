@@ -1,7 +1,3 @@
-# WXT + Svelte
+# Cordial Treasury Browser Wallet Extension
 
-This template should help get you started developing with Svelte in WXT.
-
-## Recommended IDE Setup
-
-[VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode).
+Designed to integrate seamlessly with Cordial Treasury's ecosystem.
