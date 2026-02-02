@@ -8,16 +8,13 @@ build:
 zip:
 	pnpm run zip
 
-feedback:
-	watchexec -r -w src/ "clear && pnpm run typecheck && pnpm dlx --package jiti eslint src"
-
 fmt:
 	pnpm exec prettier . --write
 
 lint:
 	pnpm exec prettier . --check
 	pnpm run typecheck
-	pnpm dlx --package jiti eslint src
+	pnpm run lint
 
 test:
     pnpm run test
@@ -39,12 +36,13 @@ api:
     just fmt
 
 # configures Edge at Mosyle-installed location
-setup-mac: install
+setup-mac: pnpm-install
 	ln -sf web-ext.config.mac.ts web-ext.config.ts
 
 # configures Edge for `microsoft-edge-stable-bin` AUR package
-setup-arch: install
+setup-arch: pnpm-install
 	ln -sf web-ext.config.arch.ts web-ext.config.ts
 
-install:
+pnpm-install:
+	pnpm -v
 	pnpm install

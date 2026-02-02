@@ -1,0 +1,9 @@
+agents:
+  queue: amd-2
+
+steps:
+  - group: ":safety_vest: Checks"
+    key: "checks"
+    steps:
+      - label: ":safety_vest: Build, lint, and test"
+        command: "just pnpm-install build lint test"

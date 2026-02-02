@@ -24,7 +24,6 @@ command = [
     "pnpm", "exec",
     "eslint",
     "--color", "src",
-    "--ignore-pattern", "./src/gen/treasury.d.ts",
 ]
 need_stdout = true
 analyzer = "eslint"
