@@ -127,6 +127,16 @@ async function clerkLoggedIn(): Promise<boolean> {
 }
 
 export const Login = {
+  async init() {
+    // Check if we're logged in
+    // The default icon set is colorful otherwise it looks bad in webstore etc.
+    const login = await Login.load();
+    if (!login) return await showOff();
+
+    // stay logged in (once triggered by click on extension icon)
+    Login.track();
+  },
+
   // TODO: Would be pretty cool to set extension icon to "rotating"
   // while logging in. This can be done with timers: https://stackoverflow.com/a/44082232
   async login() {
@@ -145,6 +155,11 @@ export const Login = {
 
     // refresh every five minutes
     setTimeout(Login.track, LOGIN_REFRESH);
+  },
+
+  async logout() {
+    await set("login", None);
+    await showOff();
   },
 
   async new(): Promise<Login> {

@@ -17,8 +17,11 @@ export async function onClicked(tab: globalThis.Browser.tabs.Tab) {
   // a) Not logged in => login
   if (!login) return await Login.login();
 
-  // b) Logged in => toggle origin allowanc
-  if (!tab.url || !tab.id) return;
+  // b) Logged in => toggle origin allowance
+  if (!tab.url || !tab.id) {
+    console.log("no tab url nor id:", tab);
+    return;
+  }
 
   const url = new URL(tab.url);
   const origin = url.origin;

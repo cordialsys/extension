@@ -5,7 +5,7 @@
 // VITE_PROPOSE_API=http://127.0.0.1:8777/
 // ```
 
-import { Config, Extension } from "./config";
+import { Config } from "./config";
 import { Login } from "./login";
 import { Error, Result } from "./sdk/error";
 export { Error, Result } from "./sdk/error";
@@ -135,6 +135,14 @@ export namespace Sdk {
           return await genericGet(name);
         }
 
+        export async function poll(
+          userId: string,
+          revision: string,
+        ): Promise<Result<A.Extension>> {
+          const name = `users/${userId}/extension/poll?revision=${revision}`;
+          return await genericGet(name);
+        }
+
         export async function set(
           userId: string,
           config: A.ExtensionConfig,
@@ -145,18 +153,6 @@ export namespace Sdk {
           const extension = extensionResult.value;
           extension.config = config;
           return await genericPut(name, extension);
-        }
-
-        // syntactic sugar
-        export async function maybe(userId: string): Promise<Option<Config>> {
-          const result = await get(userId);
-          if (!result.ok) {
-            // console.log("didn't get extension:", result);
-            return None;
-          }
-          const extension = result.value as Extension;
-          // console.log("extension:", extension);
-          return extension.config;
         }
       }
     }

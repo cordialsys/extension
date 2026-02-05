@@ -1,4 +1,5 @@
 import { Config } from "./config";
+import { Login } from "./login";
 import { Error, Result } from "./sdk";
 import { Broadcast, Err, None, Ok, Option, Request, Response } from "./types";
 
@@ -97,13 +98,17 @@ async function handle(
 ): Promise<Response> {
   const config = Config.current();
 
-  const log = `${request.header.provider} :: ${request.header.id} :: ${sender.origin} :: ${request.method} ::`;
-  console.log("➡️", log, request.params);
+  const log = `${request.header.provider} :: ${request.header.id} :: ${sender.origin} :: ${request.method}`;
+  if (request.params) {
+    console.log(`➡️ ${log} ::`, request.params);
+  } else {
+    console.log(`➡️ ${log}`);
+  }
 
   const result = await process(request, config, sender.origin, sender.tab?.id);
 
-  if (result.ok) console.log("⬅️", log, result.value);
-  else console.log("◀️", log, result.error);
+  if (result.ok) console.log("⬅️", log, "::", result.value);
+  else console.log("◀️", log, "::", result.error);
 
   return {
     header: request.header,
@@ -130,9 +135,12 @@ async function process(
   if (!tab) return Err(Error.permissionDenied("Not a tab"));
 
   if (!allowed(config, origin)) {
-    await Config.setBadge(config, tab, false);
+    await Config.updateAppearance(config, tab, false);
     switch (method) {
       case "cordial:config":
+        return Ok(None);
+      case "cordial:logout":
+        await Login.logout();
         return Ok(None);
       case "cordial:ping":
         return Ok("pong");
@@ -143,7 +151,7 @@ async function process(
     }
   }
 
-  await Config.setBadge(config, tab, true);
+  await Config.updateAppearance(config, tab, true);
 
   if (method === "cordial:ping") return Ok("pong");
 
