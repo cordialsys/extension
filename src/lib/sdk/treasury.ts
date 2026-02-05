@@ -28,6 +28,9 @@ export type Id = Schemas["Id"];
 export type Signature = Schemas["Signature"];
 export type Transaction = Schemas["Transaction"];
 
+const _UI: string = "https://connector.cordialapis.com/";
+export const UI: boolean = import.meta.env.VITE_UI ?? _UI;
+
 const Id = {
   new(s: string): Id {
     return s
@@ -45,7 +48,7 @@ const AddressName = {
 
 export function prompt(proposalName: string) {
   const _ = proposalName;
-  const url = `https://treasury.cordial.systems/propose/${proposalName}`;
+  const url = `${UI}propose/${proposalName}`;
   browser.windows.create({ url });
 }
 

@@ -34,9 +34,27 @@ const PROMISES: Promises = new Map();
 
 let CONFIGURATOR: Option<Configurator> = None;
 
-export function init(configurator: Configurator) {
-  CONFIGURATOR = configurator;
-}
+export const Relay = {
+  init(configurator: Configurator) {
+    CONFIGURATOR = configurator;
+  },
+
+  async heartbeat() {
+    // console.log("Sending heartbeat");
+    await cordialRequest("cordial:ping");
+    // Not sure this is the right way.
+    // It would give extension the opportunity to "update appearance".
+    // setTimeout(Relay.heartbeat, 5 * 1000);
+  },
+
+  logout(): Promise<unknown> {
+    return cordialRequest("cordial:logout");
+  },
+
+  ping(): Promise<unknown> {
+    return cordialRequest("cordial:ping");
+  },
+};
 
 export function cordialRequest(
   method: string,
@@ -64,8 +82,13 @@ export function request(
   const request = Request.new(provider, method, params);
   const id = request.header.id;
   PROMISES.set(id, [resolve, reject]);
+  const log = `▶️ ${provider} :: ${id} :: ${method}`;
   // console.log(`❓ ${provider} :: ${id} :: ${method} ::`, params);
-  console.log(`▶️ ${provider} :: ${id} :: ${method} ::`, params);
+  if (params) {
+    console.log(`${log} ::`, params);
+  } else {
+    console.log(log);
+  }
 
   window.postMessage(request, "*");
   return promise;

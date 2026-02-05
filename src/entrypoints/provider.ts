@@ -1,7 +1,7 @@
 // "unlisted script" that is injected by content.ts into the defi app
 import { Ethereum } from "@/lib/provider/eth";
 import { Solana } from "@/lib/provider/sol";
-import { cordialRequest, init, message } from "@/lib/relay";
+import { Relay, message } from "@/lib/relay";
 
 export default defineUnlistedScript(() => {
   console.log("♥️ Starting the Cordial Provider");
@@ -13,7 +13,7 @@ export default defineUnlistedScript(() => {
   const eth = new Ethereum();
   const sol = new Solana();
 
-  init({
+  Relay.init({
     eth: eth.configure.bind(eth),
     sol: sol.configure.bind(sol),
   });
@@ -24,9 +24,10 @@ export default defineUnlistedScript(() => {
   attach.cordial = {
     eth,
     sol,
-    ping: () => cordialRequest("cordial:ping"),
+    logout: Relay.logout,
+    ping: Relay.ping,
   };
 
   // send a kind of heartbeat, this can update the extension icon
-  cordialRequest("cordial:ping");
+  Relay.heartbeat();
 });

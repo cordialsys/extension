@@ -5,20 +5,62 @@ import * as A from "./sdk/admin";
 import { None, Option } from "./types";
 import { evm, svm } from "./handler";
 
+let REVISION: Option<string> = None;
 let CONFIG: Option<Config> = None;
 
 const CONTEXT_MENU_ID = "treasury-api-access";
 
 export const Config = {
+  current(): Option<Config> {
+    return CONFIG;
+  },
+
   // fetches the latest config if logged in
   async fetch(): Promise<Option<Config>> {
     const login = await Login.load();
-    if (!login) return login;
-    return await Sdk.admin.users.extension.maybe(login.userId);
+    if (!login) return None;
+
+    const result = await Sdk.admin.users.extension.get(login.userId);
+    if (!result.ok) {
+      return None;
+    }
+    const extension = result.value as Extension;
+    REVISION = extension.revision;
+    // console.log("extension:", extension);
+    return extension.config;
   },
 
-  current(): Option<Config> {
-    return CONFIG;
+  async poll(): Promise<Option<Config>> {
+    const login = await Login.load();
+    if (!login) return None;
+
+    // 1. If we have no REVISION, fetch it
+    if (!REVISION) return await Config.fetch();
+
+    // 2. If we do, try to poll it
+    // console.log("POLLING CONFIG, was", REVISION, Config.current());
+    const result = await Sdk.admin.users.extension.poll(login.userId, REVISION);
+    // console.log("POLLING CONFIG RESULT:", result);
+    if (!result.ok) {
+      // might be a timeout
+      return await Config.fetch();
+    }
+
+    const extension = result.value as Extension;
+    REVISION = extension.revision;
+    return extension.config;
+  },
+
+  async track() {
+    const config = await Config.poll();
+
+    if (JSON.stringify(Config.current()) !== JSON.stringify(config)) {
+      console.log("Config changed", config);
+      Config.notify("Config changed", JSON.stringify(config, null, 2));
+      await Config.propagate(config);
+    }
+
+    setTimeout(Config.track, CONFIG_REFRESH);
   },
 
   chainAddresses(chain: string): string[] {
@@ -142,7 +184,11 @@ export const Config = {
   async toggle(origin: string, tab: number) {
     const config = Config.current();
     const login = await Login.load();
-    if (!config || !login) return;
+    if (!config || !login) {
+      console.log("Click handler with no config or no login");
+      Config.updateAppearance(config, tab, false);
+      return;
+    }
     const allowed = config.origins.includes(origin);
     console.log(`Origin ${origin} currently allowed? ${allowed}`);
     if (allowed) {
@@ -150,19 +196,20 @@ export const Config = {
       const result = await Sdk.admin.users.extension.set(login.userId, config);
       if (!result.ok) return;
       await Config.propagate(config);
-      Config.setBadge(config, tab, false);
+      Config.updateAppearance(config, tab, false);
     } else {
       config.origins.push(origin);
       const result = await Sdk.admin.users.extension.set(login.userId, config);
       if (!result.ok) return;
       await Config.propagate(config);
-      Config.setBadge(config, tab, true);
+      Config.updateAppearance(config, tab, true);
     }
   },
 
   async init() {
     const config = await Config.fetch();
     await Config.propagate(config);
+    Config.track();
   },
 
   notify(title: string, message: string) {
@@ -184,23 +231,16 @@ export const Config = {
     });
   },
 
-  async track() {
-    const config = await Config.fetch();
-
-    if (JSON.stringify(Config.current()) !== JSON.stringify(config)) {
-      console.log("Config changed", config);
-      Config.notify("Config changed", JSON.stringify(config, null, 2));
-      await Config.propagate(config);
-    }
-
-    setTimeout(Config.track, CONFIG_REFRESH);
-  },
-
-  async setBadge(config: Option<Config>, tab: number, allowed: boolean) {
+  async updateAppearance(
+    config: Option<Config>,
+    tab: number,
+    allowed: boolean,
+  ) {
     const text = allowed ? "✓" : "✗";
     const color = allowed ? "#0F0" : "#F00";
     browser.action.setBadgeText({ tabId: tab, text });
     browser.action.setBadgeBackgroundColor({ tabId: tab, color });
+    // console.log("setting badge with config", config);
     browser.action.setTitle({
       title: JSON.stringify(config, null, 2) ?? "No config yet",
     });
