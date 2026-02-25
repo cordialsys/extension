@@ -1,30 +1,32 @@
-import { Config } from "./config";
 import { Login } from "./login";
 
+async function openSidePanel(tabId: number) {
+  await browser.sidePanel.open({ tabId }).catch((error) => {
+    console.log("Could not open side panel:", error);
+  });
+}
+
 // Click has the following meanings:
-// a) turned off -> turn on
-// b) turned on
-//    1) origin not allowed -> allow origin
-//    1) origin allowed -> unallow origin
+// a) not logged in -> login
+// b) logged in -> open side panel
 //
-// Question: How to "turn off"?
+// Note that this is all annoyingly buggy.
+// https://issues.chromium.org/issues/40929586
+// https://groups.google.com/a/chromium.org/g/chromium-extensions/c/WRGFOAHxoaY/m/r_D0ldVGAAAJ
+// https://github.com/w3c/webextensions/issues/521
 export async function onClicked(tab: globalThis.Browser.tabs.Tab) {
   // console.log("tab", tab);
   // console.log(`extension icon clicked on page "${tab.title}" (${tab.url})`);
 
-  const login = await Login.load();
-
-  // a) Not logged in => login
-  if (!login) return await Login.login();
-
-  // b) Logged in => toggle origin allowance
-  if (!tab.url || !tab.id) {
-    console.log("no tab url nor id:", tab);
+  if (!tab.id) {
+    console.log("no tab id:", tab);
     return;
   }
 
-  const url = new URL(tab.url);
-  const origin = url.origin;
+  await openSidePanel(tab.id);
 
-  await Config.toggle(origin, tab.id);
+  const login = await Login.load();
+
+  // Not logged in => login
+  if (!login) return await Login.login();
 }
