@@ -28,6 +28,9 @@ async function background() {
   browser.notifications.onButtonClicked.addListener(
     Config.onNotificationButtonClicked,
   );
+  // browser.sidePanel
+  //   .setPanelBehavior({ openPanelOnActionClick: true })
+  //   .catch((error) => console.error(error));
 }
 
 export default defineBackground(() => {
