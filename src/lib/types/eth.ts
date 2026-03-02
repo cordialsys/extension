@@ -100,13 +100,10 @@ export namespace Provider {
 }
 
 const HexAddress = z.string().regex(/^0x[0-9a-fA-F]{40}$/);
-// 0 or more hex character pairs (or just '0')
-// This means Vec<u8>
-const HexData0 = z.string().regex(/^(?:0x0|0x(?:[0-9A-Fa-f]{2})*)$/);
-// 1 or more hex character pairs (or just '0')
-// This means non-empty Vec<u8>
-const HexData1 = z.string().regex(/^(?:0x0|0x(?:[0-9A-Fa-f]{2})+)$/);
-export const HexValue = HexData1;
+// We used to have separate HexData0 and HexData1 types, requiring
+// pairs of hex characters apart from the 0x0 special case.
+// It turns out clients do send uneven numbers of hex characters.
+export const HexValue = z.string().regex(/^0x[0-9A-Fa-f]+$/);
 
 // https://docs.metamask.io/wallet/reference/json-rpc-methods/eth_sendtransaction
 // https://docs.metamask.io/snaps/reference/keyring-api/chain-methods#eth_signtransaction
@@ -114,11 +111,11 @@ const SignTransactionInput = z.looseObject({
   from: HexAddress,
   to: HexAddress,
   value: HexValue,
-  data: HexData0,
+  data: HexValue,
 });
 export const SignTransactionInputs = z.array(SignTransactionInput).length(1);
 //https://docs.metamask.io/wallet/reference/json-rpc-methods/personal_sign/
-export const SignMessageInputs = z.tuple([HexData1, HexAddress]);
+export const SignMessageInputs = z.tuple([HexValue, HexAddress]);
 
 export const Eip712Domain = z.object({
   name: z.string().optional(),
@@ -142,7 +139,7 @@ export const Eip712TypedData = z.object({
 
 // we don't set the second parameter to Eip712TypedData yet,
 // as it could be both literal or encoded as JSON
-export const SignTypedDataInputs = z.tuple([HexData1, z.unknown()]);
+export const SignTypedDataInputs = z.tuple([HexValue, z.unknown()]);
 
 // The specified JSON Schema is a bit more implicit
 // about `domain` and the `EIP712Domain` property.
