@@ -165,15 +165,16 @@ async function process(
     if (method === "cordial:config") return Ok(svm.config());
 
     // signing calls
-    if (method === "solana:signMessage") return svm.signMessage(request.params);
+    if (method === "solana:signMessage")
+      return svm.signMessage(request.params, tab);
     // if (method === "solana:signIn")
     //   return await svm.signIn(request.params as solTypes.SolanaSignInInput[]);
 
     // transacting calls
     if (method === "solana:signTransaction")
-      return await svm.signTransaction(request.params);
+      return await svm.signTransaction(request.params, tab);
     if (method === "solana:signAndSendTransaction")
-      return await svm.signAndSendTransaction(request.params);
+      return await svm.signAndSendTransaction(request.params, tab);
 
     return Err(Error.unimplemented(`method ${request.method} not implemented`));
   }
@@ -183,13 +184,14 @@ async function process(
     if (method === "cordial:config") return Ok(evm.config());
 
     // signing calls
-    if (method === "personal_sign") return evm.personal_sign(request.params);
+    if (method === "personal_sign")
+      return evm.personal_sign(request.params, tab);
     if (method === "eth_signTypedData_v4")
-      return evm.eth_signTypedData_v4(request.params);
+      return evm.eth_signTypedData_v4(request.params, tab);
 
     // transacting calls
     if (method === "eth_sendTransaction")
-      return evm.eth_sendTransaction(request.params);
+      return evm.eth_sendTransaction(request.params, tab);
 
     // helper calls
     if (method === "eth_blockNumber") return evm.eth_blockNumber();

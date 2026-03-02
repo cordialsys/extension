@@ -1,4 +1,19 @@
+import { Config } from "./config";
 import { Login } from "./login";
+import { SidePanel } from "./sidepanel";
+import { Option } from "./types";
+
+function parseOrigin(tabUrl: Option<string>): Option<string> {
+  if (!tabUrl) return;
+
+  try {
+    const parsed = new URL(tabUrl);
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return;
+    return parsed.origin;
+  } catch {
+    return;
+  }
+}
 
 async function openSidePanel(tabId: number) {
   await browser.sidePanel.open({ tabId }).catch((error) => {
@@ -9,6 +24,7 @@ async function openSidePanel(tabId: number) {
 // Click has the following meanings:
 // a) not logged in -> login
 // b) logged in -> open side panel
+// c) if origin is not allowed, route side panel to /defi add-origin flow
 //
 // Note that this is all annoyingly buggy.
 // https://issues.chromium.org/issues/40929586
@@ -29,4 +45,17 @@ export async function onClicked(tab: globalThis.Browser.tabs.Tab) {
 
   // Not logged in => login
   if (!login) return await Login.login();
+
+  const origin = parseOrigin(tab.url);
+  if (!origin) {
+    await SidePanel.setPath(tab.id, SidePanel.defaultPath());
+    return;
+  }
+
+  if (!Config.allowed(origin)) {
+    await SidePanel.setPath(tab.id, SidePanel.addExtensionOriginPath(origin));
+    return;
+  }
+
+  await SidePanel.setPath(tab.id, SidePanel.defaultPath());
 }

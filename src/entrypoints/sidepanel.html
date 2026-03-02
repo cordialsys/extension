@@ -46,7 +46,7 @@
   </head>
   <body>
     <iframe
-      src="%VITE_UI%"
+      id="treasury-ui"
       frameborder="0"
       marginheight="0"
       marginwidth="0"
@@ -55,5 +55,58 @@
       scrolling="auto"
       allow="publickey-credentials-get *"
     ></iframe>
+
+    <script type="module">
+      const ui = "%VITE_UI%";
+
+      function iframeSrcFromSearch(search) {
+        const proposal = search.get("proposal");
+        const treasury = search.get("t");
+        const addExtensionOrigin = search.get("add-extension-origin");
+
+        let iframeSrc = ui;
+        if (proposal) {
+          const defiSearch = new URLSearchParams();
+          defiSearch.set("proposal", proposal);
+          if (treasury) {
+            defiSearch.set("t", treasury);
+          }
+          iframeSrc = `${ui}defi?${defiSearch.toString()}`;
+        } else if (addExtensionOrigin) {
+          try {
+            const parsed = new URL(addExtensionOrigin);
+            if (parsed.protocol === "http:" || parsed.protocol === "https:") {
+              iframeSrc = `${ui}defi?add-extension-origin=${encodeURIComponent(parsed.origin)}`;
+            }
+          } catch {
+            // Ignore invalid add-origin hints and keep default panel route.
+          }
+        }
+
+        return iframeSrc;
+      }
+
+      function navigateFromSearch(search) {
+        const iframe = document.getElementById("treasury-ui");
+        if (iframe instanceof HTMLIFrameElement) {
+          iframe.src = iframeSrcFromSearch(search);
+        }
+      }
+
+      navigateFromSearch(new URLSearchParams(window.location.search));
+
+      browser.runtime.onMessage.addListener((message) => {
+        if (!message || message.kind !== "cordial:sidepanel:navigate") {
+          return;
+        }
+
+        const rawSearch =
+          typeof message.search === "string" ? message.search : "";
+        const cleanSearch = rawSearch.startsWith("?")
+          ? rawSearch.slice(1)
+          : rawSearch;
+        navigateFromSearch(new URLSearchParams(cleanSearch));
+      });
+    </script>
   </body>
 </html>

@@ -1,4 +1,5 @@
 import { Config } from "@/lib/config";
+import { SidePanel } from "@/lib/sidepanel";
 import { Port } from "@/lib/handler";
 import { Error, Result, Sdk } from "@/lib/sdk";
 import { Err, Eth, None, Ok, Option, Some } from "@/lib/types";
@@ -33,6 +34,11 @@ function clearConfig() {
 
 function setConfig(config: Eth.Config) {
   notifyConfig(Some(config));
+}
+
+async function showProposal(proposalName: string, tab: number) {
+  const path = SidePanel.proposalPath(proposalName, Config.treasuryId());
+  await SidePanel.setPath(tab, path);
 }
 
 export async function propagate(
@@ -91,13 +97,14 @@ export async function propagate(
 
 export async function ethereumSignature(
   proposal: T.Call,
+  tab: number,
 ): Promise<Result<string>> {
   // 1. propose
   const proposalNameR = await Sdk.propose.chains.calls.create(proposal);
   if (!proposalNameR.ok) return proposalNameR;
   const proposalName = proposalNameR.value;
   console.log("proposal name:", proposalName);
-  T.prompt(proposalName);
+  await showProposal(proposalName, tab);
 
   // 2. wait for call
   const callR = await T.Call.byProposal(proposalName);
@@ -122,7 +129,10 @@ export async function ethereumSignature(
   return Ok(ethSignature);
 }
 
-export async function personal_sign(params: unknown): Promise<Result<string>> {
+export async function personal_sign(
+  params: unknown,
+  tab: number,
+): Promise<Result<string>> {
   if (!CONFIG) return Err(Error.permissionDenied("Not configured"));
   // 1. transform
   const proposalR = T.Call.newPersonalSign(CONFIG.id, params);
@@ -130,11 +140,12 @@ export async function personal_sign(params: unknown): Promise<Result<string>> {
   const proposal = proposalR.value;
   console.log("proposal for `personal_sign`:", proposal);
 
-  return ethereumSignature(proposal);
+  return ethereumSignature(proposal, tab);
 }
 
 export async function eth_signTypedData_v4(
   params: unknown,
+  tab: number,
 ): Promise<Result<string>> {
   if (!CONFIG) return Err(Error.permissionDenied("Not configured"));
   const proposalR = T.Call.newSignTypedData(CONFIG.id, params);
@@ -142,7 +153,7 @@ export async function eth_signTypedData_v4(
   const proposal = proposalR.value;
   console.log("proposal for `eth_signTypedData_v4`:", proposal);
 
-  return ethereumSignature(proposal);
+  return ethereumSignature(proposal, tab);
 }
 
 export async function eth_signTransaction(
@@ -155,6 +166,7 @@ export async function eth_signTransaction(
 
 export async function eth_sendTransaction(
   params: unknown,
+  tab: number,
 ): Promise<Result<string>> {
   if (!CONFIG) return Err(Error.permissionDenied("Not configured"));
   // 1. transform
@@ -172,7 +184,7 @@ export async function eth_sendTransaction(
   if (!proposalNameR.ok) return proposalNameR;
   const proposalName = proposalNameR.value;
   console.log("proposal name:", proposalName);
-  T.prompt(proposalName);
+  await showProposal(proposalName, tab);
 
   // 3. wait for call
   const callR = await T.Call.byProposal(proposalName);

@@ -15,6 +15,16 @@ export const Config = {
     return CONFIG;
   },
 
+  treasuryId(): Option<string> {
+    const treasuryName = Config.current()?.treasury.name;
+    if (!treasuryName) return None;
+
+    const prefix = "treasuries/";
+    if (!treasuryName.startsWith(prefix)) return None;
+
+    return treasuryName.slice(prefix.length);
+  },
+
   // fetches the latest config if logged in
   async fetch(): Promise<Option<Config>> {
     const login = await Login.load();
