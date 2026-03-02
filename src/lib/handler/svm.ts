@@ -1,4 +1,5 @@
 import { Config } from "@/lib/config";
+import { SidePanel } from "@/lib/sidepanel";
 import { Port } from "@/lib/handler";
 import { Err, None, Ok, Option, Sol, Some } from "@/lib/types";
 import { Sdk } from "@/lib/sdk";
@@ -39,6 +40,11 @@ function setConfig(config: Sol.Config) {
   notifyConfig(Some(config));
 }
 
+async function showProposal(proposalName: string, tab: number) {
+  const path = SidePanel.proposalPath(proposalName, Config.treasuryId());
+  await SidePanel.setPath(tab, path);
+}
+
 export async function propagate(config: Option<Config>) {
   // console.log("updating SVM config with", config);
   if (!config) return clearConfig();
@@ -76,6 +82,7 @@ export async function propagate(config: Option<Config>) {
 
 export async function signMessage(
   params: unknown,
+  tab: number,
 ): Promise<Result<Sol.SolanaSignMessageOutput[]>> {
   // 1. transform
   const proposalR = T.Call.newSolanaSignMessage(params);
@@ -88,7 +95,7 @@ export async function signMessage(
   if (!proposalNameR.ok) return proposalNameR;
   const proposalName = proposalNameR.value;
   console.log("proposal name:", proposalName);
-  T.prompt(proposalName);
+  await showProposal(proposalName, tab);
 
   // 3. wait for call
   const callR = await T.Call.byProposal(proposalName);
@@ -115,6 +122,7 @@ export async function signMessage(
 export async function solanaTransaction(
   method: "solana:signTransaction" | "solana:signAndSendTransaction",
   params: unknown,
+  tab: number,
 ): Promise<Result<T.Transaction>> {
   // 1. transform
   const proposalR = T.Call.newSvmTransaction(method, params);
@@ -127,7 +135,7 @@ export async function solanaTransaction(
   if (!proposalNameR.ok) return proposalNameR;
   const proposalName = proposalNameR.value;
   console.log("proposal name:", proposalName);
-  T.prompt(proposalName);
+  await showProposal(proposalName, tab);
 
   // 3. wait for call
   const callR = await T.Call.byProposal(proposalName);
@@ -144,8 +152,9 @@ export async function solanaTransaction(
 
 export async function signTransaction(
   params: unknown,
+  tab: number,
 ): Promise<Result<{ signedTransaction: Uint8Array }[]>> {
-  const txR = await solanaTransaction("solana:signTransaction", params);
+  const txR = await solanaTransaction("solana:signTransaction", params, tab);
   if (!txR.ok) return txR;
   const tx = txR.value;
   return Ok([{ signedTransaction: hex.decode(tx.payload as string) }]);
@@ -153,8 +162,13 @@ export async function signTransaction(
 
 export async function signAndSendTransaction(
   params: unknown,
+  tab: number,
 ): Promise<Result<{ signature: Uint8Array }[]>> {
-  const txR = await solanaTransaction("solana:signAndSendTransaction", params);
+  const txR = await solanaTransaction(
+    "solana:signAndSendTransaction",
+    params,
+    tab,
+  );
   if (!txR.ok) return txR;
   const tx = txR.value;
 
