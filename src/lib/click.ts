@@ -34,17 +34,22 @@ export async function onClicked(tab: globalThis.Browser.tabs.Tab) {
   // console.log("tab", tab);
   // console.log(`extension icon clicked on page "${tab.title}" (${tab.url})`);
 
-  if (!tab.id) {
+  if (tab.id === undefined) {
     console.log("no tab id:", tab);
     return;
   }
 
   await openSidePanel(tab.id);
+  void Config.refreshAppearanceForTab(tab.id, tab.url);
 
   const login = await Login.load();
 
   // Not logged in => login
-  if (!login) return await Login.login();
+  if (!login) {
+    await Login.login();
+    await Config.refreshAppearanceForTab(tab.id, tab.url);
+    return;
+  }
 
   const origin = parseOrigin(tab.url);
   if (!origin) {

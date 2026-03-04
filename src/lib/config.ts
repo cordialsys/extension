@@ -10,6 +10,19 @@ let CONFIG: Option<Config> = None;
 
 const CONTEXT_MENU_ID = "treasury-api-access";
 
+function parseOrigin(tabUrl: Option<string>): Option<string> {
+  if (!tabUrl) return None;
+
+  try {
+    const parsed = new URL(tabUrl);
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:")
+      return None;
+    return parsed.origin;
+  } catch {
+    return None;
+  }
+}
+
 export const Config = {
   current(): Option<Config> {
     return CONFIG;
@@ -62,15 +75,19 @@ export const Config = {
   },
 
   async track() {
-    const config = await Config.poll();
+    try {
+      const config = await Config.poll();
 
-    if (JSON.stringify(Config.current()) !== JSON.stringify(config)) {
-      console.log("Config changed", config);
-      Config.notify("Config changed", JSON.stringify(config, null, 2));
-      await Config.propagate(config);
+      if (JSON.stringify(Config.current()) !== JSON.stringify(config)) {
+        console.log("Config changed", config);
+        Config.notify("Config changed", JSON.stringify(config, null, 2));
+        await Config.propagate(config);
+      }
+    } catch (error) {
+      console.error("Config.track failed:", error);
+    } finally {
+      setTimeout(Config.track, CONFIG_REFRESH);
     }
-
-    setTimeout(Config.track, CONFIG_REFRESH);
   },
 
   chainAddresses(chain: string): string[] {
@@ -131,6 +148,7 @@ export const Config = {
     CONFIG = config;
     await evm.propagate(None, config);
     await svm.propagate(config);
+    await Config.refreshAppearanceForVisibleTabs();
   },
 
   onNotificationButtonClicked(notificationId: string, buttonIndex: number) {
@@ -196,7 +214,7 @@ export const Config = {
     const login = await Login.load();
     if (!config || !login) {
       console.log("Click handler with no config or no login");
-      Config.updateAppearance(config, tab, false);
+      await Config.updateAppearance(config, tab, false);
       return;
     }
     const allowed = config.origins.includes(origin);
@@ -206,13 +224,13 @@ export const Config = {
       const result = await Sdk.admin.users.extension.set(login.userId, config);
       if (!result.ok) return;
       await Config.propagate(config);
-      Config.updateAppearance(config, tab, false);
+      await Config.updateAppearance(config, tab, false);
     } else {
       config.origins.push(origin);
       const result = await Sdk.admin.users.extension.set(login.userId, config);
       if (!result.ok) return;
       await Config.propagate(config);
-      Config.updateAppearance(config, tab, true);
+      await Config.updateAppearance(config, tab, true);
     }
   },
 
@@ -241,6 +259,53 @@ export const Config = {
     });
   },
 
+  async clearAppearance(tab: number) {
+    await browser.action
+      .setBadgeText({ tabId: tab, text: "" })
+      .catch((error) => {
+        console.log("Could not clear badge text:", error);
+      });
+    await browser.action
+      .setTitle({ tabId: tab, title: "No config yet" })
+      .catch((error) => {
+        console.log("Could not set action title:", error);
+      });
+  },
+
+  async refreshAppearanceForTab(tab: number, tabUrl?: Option<string>) {
+    let url: Option<string> = tabUrl;
+    if (!url) {
+      const tabResult = await browser.tabs.get(tab).catch((error) => {
+        console.log("Could not get tab for appearance refresh:", error);
+        return None;
+      });
+      url = tabResult?.url;
+    }
+
+    const origin = parseOrigin(url);
+    if (!origin) {
+      await Config.clearAppearance(tab);
+      return;
+    }
+
+    const config = Config.current();
+    const login = await Login.load();
+    const allowed = !!(config && login && config.origins.includes(origin));
+    await Config.updateAppearance(config, tab, allowed);
+  },
+
+  async refreshAppearanceForVisibleTabs() {
+    const tabs = await browser.tabs.query({}).catch((error) => {
+      console.log("Could not query tabs for appearance refresh:", error);
+      return [];
+    });
+
+    for (const tab of tabs) {
+      if (tab.id === undefined) continue;
+      await Config.refreshAppearanceForTab(tab.id, tab.url);
+    }
+  },
+
   async updateAppearance(
     config: Option<Config>,
     tab: number,
@@ -248,12 +313,21 @@ export const Config = {
   ) {
     const text = allowed ? "✓" : "✗";
     const color = allowed ? "#0F0" : "#F00";
-    browser.action.setBadgeText({ tabId: tab, text });
-    browser.action.setBadgeBackgroundColor({ tabId: tab, color });
-    // console.log("setting badge with config", config);
-    browser.action.setTitle({
-      title: JSON.stringify(config, null, 2) ?? "No config yet",
-    });
+    const title = JSON.stringify(config, null, 2) ?? "No config yet";
+
+    await Promise.all([
+      browser.action.setBadgeText({ tabId: tab, text }).catch((error) => {
+        console.log("Could not set badge text:", error);
+      }),
+      browser.action
+        .setBadgeBackgroundColor({ tabId: tab, color })
+        .catch((error) => {
+          console.log("Could not set badge color:", error);
+        }),
+      browser.action.setTitle({ tabId: tab, title }).catch((error) => {
+        console.log("Could not set action title:", error);
+      }),
+    ]);
   },
 };
 
