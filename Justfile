@@ -9,12 +9,12 @@ zip:
 	pnpm run zip
 
 fmt:
-	pnpm exec prettier . --write
+	pnpm format:fix
 
 lint:
-	pnpm exec prettier . --check
 	pnpm run typecheck
 	pnpm run lint
+	pnpm format
 
 test:
     pnpm run test
