@@ -7,6 +7,7 @@
   "type": "module",
   "scripts": {
     "dev": "wxt",
+    "dev:chrome": "wxt -b chrome",
     "dev:chromium": "wxt -b chromium",
     "dev:edge": "wxt -b edge",
     "dev:firefox": "wxt -b firefox",

@@ -28,23 +28,50 @@ import {
 // Currently, Nonce is the primitive type string so it works.
 type Resolver = (value: unknown) => void;
 type Rejecter = (reason?: unknown) => void;
-export type Promises = Map<Nonce, [Resolver, Rejecter]>;
+
+interface PendingRequest {
+  reject: Rejecter;
+  resolve: Resolver;
+  timeoutId: number;
+}
+
+export type Promises = Map<Nonce, PendingRequest>;
 
 const PROMISES: Promises = new Map();
+const HEARTBEAT_INTERVAL = 5_000;
+const HEARTBEAT_RETRY = 1_000;
+const REQUEST_TIMEOUT = 15_000;
+let HEARTBEAT_STARTED = false;
 
 let CONFIGURATOR: Option<Configurator> = None;
+
+function rejectPending(id: Nonce, reason: unknown) {
+  const pending = PROMISES.get(id);
+  if (!pending) return;
+  PROMISES.delete(id);
+  clearTimeout(pending.timeoutId);
+  pending.reject(reason);
+}
+
+async function heartbeatLoop() {
+  try {
+    await cordialRequest("cordial:ping");
+    setTimeout(heartbeatLoop, HEARTBEAT_INTERVAL);
+  } catch (error) {
+    console.error("Heartbeat failed:", error);
+    setTimeout(heartbeatLoop, HEARTBEAT_RETRY);
+  }
+}
 
 export const Relay = {
   init(configurator: Configurator) {
     CONFIGURATOR = configurator;
   },
 
-  async heartbeat() {
-    // console.log("Sending heartbeat");
-    await cordialRequest("cordial:ping");
-    // Not sure this is the right way.
-    // It would give extension the opportunity to "update appearance".
-    // setTimeout(Relay.heartbeat, 5 * 1000);
+  heartbeat() {
+    if (HEARTBEAT_STARTED) return;
+    HEARTBEAT_STARTED = true;
+    void heartbeatLoop();
   },
 
   logout(): Promise<unknown> {
@@ -81,7 +108,10 @@ export function request(
   const { promise, resolve, reject } = Promise.withResolvers();
   const request = Request.new(provider, method, params);
   const id = request.header.id;
-  PROMISES.set(id, [resolve, reject]);
+  const timeoutId = window.setTimeout(() => {
+    rejectPending(id, new Error(`Request timed out: ${provider} ${method}`));
+  }, REQUEST_TIMEOUT);
+  PROMISES.set(id, { resolve, reject, timeoutId });
   const log = `▶️ ${provider} :: ${id} :: ${method}`;
   // console.log(`❓ ${provider} :: ${id} :: ${method} ::`, params);
   if (params) {
@@ -115,18 +145,30 @@ export function relayRequest(event: MessageEvent<Request>) {
   // relay
   // console.log("  provider 👉 relay ::", request);
   const requestJson: string = superjson.stringify(request ?? null);
-  browser.runtime.sendMessage(requestJson, relayResponse);
+  void browser.runtime
+    .sendMessage(requestJson)
+    .then((responseJson) => relayResponse(responseJson))
+    .catch((error) => {
+      console.error("Extension message failed:", error);
+      rejectPending(request.header.id, error);
+    });
 }
 
-function relayResponse(responseJson: string) {
-  const response: Response = superjson.parse(responseJson ?? null);
-  // console.log("    relay 👈 extension ::", response);
+function relayResponse(responseJson: Option<string>) {
+  if (!responseJson) return;
 
-  // checks
-  if (!response || response.kind !== "cordial:extension:response") return;
+  try {
+    const response: Response = superjson.parse(responseJson ?? null);
+    // console.log("    relay 👈 extension ::", response);
 
-  // relay
-  window.postMessage(response);
+    // checks
+    if (!response || response.kind !== "cordial:extension:response") return;
+
+    // relay
+    window.postMessage(response);
+  } catch (error) {
+    console.error("Failed to parse extension response:", error);
+  }
 }
 
 export function message(event: MessageEvent<Broadcast | Response>) {
@@ -165,21 +207,25 @@ export function response(response: Response) {
     return;
   }
   PROMISES.delete(id);
-  const [resolve, reject] = request;
+  clearTimeout(request.timeoutId);
   const result = response.result;
   // const log = `✍ ${provider} :: ${id} :: ${response.method} ::`;
   const log = `⬅️ ${provider} :: ${id} :: ${response.method} ::`;
   if (result.ok) {
     console.log(log, result.value);
-    resolve(result.value);
+    request.resolve(result.value);
   } else {
     console.error(log, result.error);
-    reject(result.error);
+    request.reject(result.error);
   }
 }
 
 export function relayBroadcast(broadcastJson: string) {
-  const broadcast: Broadcast = superjson.parse(broadcastJson);
-  // console.log("received broadcast:", broadcast);
-  window.postMessage(broadcast);
+  try {
+    const broadcast: Broadcast = superjson.parse(broadcastJson);
+    // console.log("received broadcast:", broadcast);
+    window.postMessage(broadcast);
+  } catch (error) {
+    console.error("Failed to parse broadcast:", error);
+  }
 }

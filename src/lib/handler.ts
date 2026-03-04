@@ -20,16 +20,18 @@ const PORTS: Port[] = [];
 export const Port = {
   set(port: Port) {
     // 1. Validate and store port
-    if (!port.sender?.tab?.id) {
+    const sender = port.sender;
+    const maybeId = sender?.tab?.id;
+    if (sender === None || sender.tab === None || maybeId === None) {
       return;
     }
-    const id: number = port.sender.tab.id;
-    const url: Option<string> = port.sender.tab.url;
+    const id: number = maybeId;
+    const url: Option<string> = sender.tab.url;
     console.log("Connecting tab", id, "running", url);
     PORTS[id] = port;
 
     // 2. Initialize provider if allowed
-    if (!allowed(Config.current(), port.sender.origin)) return;
+    if (!allowed(Config.current(), sender.origin)) return;
 
     Port.send(port, {
       provider: "ETH",
@@ -132,7 +134,7 @@ async function process(
   const provider = request.header.provider;
   const method = request.method;
 
-  if (!tab) return Err(Error.permissionDenied("Not a tab"));
+  if (tab === None) return Err(Error.permissionDenied("Not a tab"));
 
   if (!allowed(config, origin)) {
     await Config.updateAppearance(config, tab, false);

@@ -1,6 +1,6 @@
 # company-owned devices have locked down extensions
 dev:
-	pnpm run dev:edge
+	pnpm run dev
 
 build:
 	pnpm run build
