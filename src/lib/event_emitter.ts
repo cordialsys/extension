@@ -30,9 +30,9 @@ export class EventEmitter {
   }
 
   emit(event: Event, ...args: unknown[]) {
-    console.log("👂 Provider emit", event, "with args", args);
+    console.log("👂 Provider emit", event, "with args", ...args);
     this.listeners[event]?.forEach((listener) => {
-      listener(args);
+      listener(...args);
     });
   }
 }
