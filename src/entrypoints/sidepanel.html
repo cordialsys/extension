@@ -65,7 +65,7 @@
         const treasury = search.get("t");
         const addExtensionOrigin = search.get("add-extension-origin");
 
-        let iframeSrc = ui;
+        let iframeSrc = `${ui}defi`;
         if (proposal) {
           const defiSearch = new URLSearchParams();
           defiSearch.set("proposal", proposal);
