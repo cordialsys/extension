@@ -30,6 +30,9 @@ type Resolver = (value: unknown) => void;
 type Rejecter = (reason?: unknown) => void;
 
 interface PendingRequest {
+  id: Nonce;
+  method: string;
+  provider: Provider;
   reject: Rejecter;
   resolve: Resolver;
   timeoutId: number;
@@ -45,12 +48,40 @@ let HEARTBEAT_STARTED = false;
 
 let CONFIGURATOR: Option<Configurator> = None;
 
+// function pendingLabel(pending: PendingRequest): string {
+//   return `${pending.provider} :: ${pending.id} :: ${pending.method}`;
+// }
+
+function requestLabel(request: Request): string {
+  return `${request.header.provider} :: ${request.header.id} :: ${request.method}`;
+}
+
 function rejectPending(id: Nonce, reason: unknown) {
   const pending = PROMISES.get(id);
   if (!pending) return;
+
   PROMISES.delete(id);
   clearTimeout(pending.timeoutId);
+
+  // console.error(
+  //   `Rejecting pending request ${pendingLabel(pending)} ::`,
+  //   reason,
+  // );
   pending.reject(reason);
+}
+
+async function sendToExtension(request: Request) {
+  const requestJson: string = superjson.stringify(request ?? null);
+  return browser.runtime
+    .sendMessage(requestJson)
+    .then((responseJson) => relayResponse(responseJson))
+    .catch((error) => {
+      console.error(
+        `Extension message failed for ${requestLabel(request)}:`,
+        error,
+      );
+      rejectPending(request.header.id, error);
+    });
 }
 
 async function heartbeatLoop() {
@@ -111,7 +142,7 @@ export function request(
   const timeoutId = window.setTimeout(() => {
     rejectPending(id, new Error(`Request timed out: ${provider} ${method}`));
   }, REQUEST_TIMEOUT);
-  PROMISES.set(id, { resolve, reject, timeoutId });
+  PROMISES.set(id, { id, provider, method, resolve, reject, timeoutId });
   const log = `▶️ ${provider} :: ${id} :: ${method}`;
   // console.log(`❓ ${provider} :: ${id} :: ${method} ::`, params);
   if (params) {
@@ -142,27 +173,25 @@ export function relayRequest(event: MessageEvent<Request>) {
   const request: Request = event.data;
   if (!request || request.kind !== "cordial:provider:request") return;
 
-  // relay
   // console.log("  provider 👉 relay ::", request);
-  const requestJson: string = superjson.stringify(request ?? null);
-  void browser.runtime
-    .sendMessage(requestJson)
-    .then((responseJson) => relayResponse(responseJson))
-    .catch((error) => {
-      console.error("Extension message failed:", error);
-      rejectPending(request.header.id, error);
-    });
+  void sendToExtension(request);
 }
 
 function relayResponse(responseJson: Option<string>) {
-  if (!responseJson) return;
+  if (!responseJson) {
+    // console.error("Empty extension response");
+    return;
+  }
 
   try {
     const response: Response = superjson.parse(responseJson ?? null);
     // console.log("    relay 👈 extension ::", response);
 
     // checks
-    if (!response || response.kind !== "cordial:extension:response") return;
+    if (!response || response.kind !== "cordial:extension:response") {
+      // console.error("Invalid extension response", response);
+      return;
+    }
 
     // relay
     window.postMessage(response);

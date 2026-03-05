@@ -57,7 +57,7 @@ export class Ethereum extends EventEmitter implements Eth.Provider {
     // set CONFIG early since "announce" has no argument
     CONFIG = config;
     this.announce();
-    this.emit("chainChanged", config.chain);
+    this.emit("chainChanged", config.id);
     this.emit("accountsChanged", Array.from(config.addresses));
   }
 
@@ -77,7 +77,7 @@ export class Ethereum extends EventEmitter implements Eth.Provider {
   async _update(config: Config) {
     if (JSON.stringify(config) === JSON.stringify(CONFIG)) return;
     console.log("Updating Cordial Ethereum Provider to", config);
-    this.emit("chainChanged", config.chain);
+    this.emit("chainChanged", config.id);
     this.emit("accountsChanged", Array.from(config.addresses));
   }
 
