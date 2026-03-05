@@ -80,7 +80,6 @@ export const Config = {
 
       if (JSON.stringify(Config.current()) !== JSON.stringify(config)) {
         console.log("Config changed", config);
-        Config.notify("Config changed", JSON.stringify(config, null, 2));
         await Config.propagate(config);
       }
     } catch (error) {
