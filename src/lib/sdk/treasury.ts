@@ -170,7 +170,8 @@ export const Call = {
   },
 
   async byProposal(proposalName: string): Promise<Result<Call>> {
-    while (true) {
+    const start = Date.now();
+    while (Date.now() < start + CALL_POLL_TIMEOUT) {
       // Once our API filtering implements JSON expansion, we will
       // be able to do this, for now we have to use `proposal_id`.
       // const filter = `json(proposal).name = "${proposalName}"`;
@@ -187,13 +188,15 @@ export const Call = {
       }
       await short_sleep();
     }
+    return Err(timedOut("Call", CALL_POLL_TIMEOUT));
   },
 };
 
+const CALL_POLL_TIMEOUT = 60_000;
 const TIMEOUT = 180_000;
 
-const timedOut = (resource: string) =>
-  Error.unknown(`${resource} failed to complete with ${TIMEOUT} milliseconds`);
+const timedOut = (resource: string, timeout: number) =>
+  Error.unknown(`${resource} failed to complete with ${timeout} milliseconds`);
 
 // function timeOut<T>(f: () => Promise<Result<T>>) => {
 //   const start = Date.now()
@@ -215,7 +218,7 @@ export const Signature = {
         return Err(Error.unknown(sig.failure as string));
       await short_sleep();
     }
-    return Err(timedOut("Signature"));
+    return Err(timedOut("Signature", TIMEOUT));
   },
 };
 
@@ -234,6 +237,6 @@ export const Transaction = {
         return Err(Error.unknown(tx.error?.message ?? ""));
       await short_sleep();
     }
-    return Err(timedOut("Transaction"));
+    return Err(timedOut("Transaction", TIMEOUT));
   },
 };
