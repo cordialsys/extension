@@ -223,7 +223,7 @@ export const Signature = {
 };
 
 export const Transaction = {
-  async completed(name: string): Promise<Result<Transaction>> {
+  async finalizing(name: string): Promise<Result<Transaction>> {
     const start = Date.now();
     while (Date.now() < start + TIMEOUT) {
       const result = await Sdk.treasury.get<Transaction>(name);
@@ -232,7 +232,7 @@ export const Transaction = {
       if (tx.state === "submitting" && tx.skip_broadcast) {
         return Ok(tx);
       }
-      if (tx.state === "succeeded") return Ok(tx);
+      if (tx.state === "finalizing" || tx.state === "succeeded") return Ok(tx);
       if (tx.state === "failed")
         return Err(Error.unknown(tx.error?.message ?? ""));
       await short_sleep();
