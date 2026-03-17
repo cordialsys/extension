@@ -72,7 +72,10 @@ export const Call = {
 
     const address = AddressName.new(Eth.Chains[id], input.from.slice(2));
     // keep the `.slice(2)` out, BigNumber detects hex numbers using the `0x` prefix
-    const amount = new BigNumber(input.value).shiftedBy(-18).toFixed();
+    let amount: string;
+    if (input.value)
+      amount = new BigNumber(input.value).shiftedBy(-18).toFixed();
+    else amount = new BigNumber(0).shiftedBy(-18).toFixed();
 
     return Ok({
       address,
