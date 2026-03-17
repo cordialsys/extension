@@ -196,7 +196,11 @@ export async function eth_sendTransaction(
   console.log("transaction name:", call);
 
   // 4. wait for signature
-  const txR = await T.Transaction.completed(txName);
+  // Notably, dapps don't like waiting very long; they prefer
+  // getting a transaction hash to then track separately, which
+  // is what we have once we are in "finalizing" state.
+  // const txR = await T.Transaction.completed(txName);
+  const txR = await T.Transaction.finalizing(txName);
   if (!txR.ok) return txR;
   const hash = txR.value.hash as string;
 

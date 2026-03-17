@@ -147,7 +147,7 @@ export async function solanaTransaction(
   console.log("transaction name:", call);
 
   // 4. wait for signature
-  return T.Transaction.completed(txName);
+  return T.Transaction.finalizing(txName);
 }
 
 export async function signTransaction(
