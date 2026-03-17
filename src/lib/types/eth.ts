@@ -110,7 +110,7 @@ export const HexValue = z.string().regex(/^0x[0-9A-Fa-f]+$/);
 const SignTransactionInput = z.looseObject({
   from: HexAddress,
   to: HexAddress,
-  value: HexValue,
+  value: HexValue.optional(),
   data: HexValue,
 });
 export const SignTransactionInputs = z.array(SignTransactionInput).length(1);
