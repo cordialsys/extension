@@ -287,27 +287,10 @@ export function eth_chainId(): Result<Eth.Id> {
   return Ok(CONFIG.id);
 }
 
-export async function eth_blockNumber(): Promise<Result<string>> {
+export async function eth_rpc(
+  method: string,
+  params: unknown,
+): Promise<Result<unknown>> {
   if (!CONFIG) return Err(Error.permissionDenied("Not configured"));
-  const blockNumber = await Sdk.connector.blockNumber(
-    CONFIG.chain,
-    CONFIG.mainnet,
-  );
-  return Ok(`0x${Number(blockNumber).toString(16)}`);
-}
-
-// preparing this as Uniswap calls it
-// should be able to dispatch to Connector API call
-export async function eth_getCode(params: unknown): Promise<Result<string>> {
-  const Tags = z.enum(["earliest", "latest", "pending", "safe", "finalized"]);
-  const GetCode = z.tuple([Eth.HexValue, z.union([Eth.HexValue, Tags])]);
-  const result = GetCode.safeParse(params);
-  if (!result.success) {
-    console.log("eth_getCode with", params, "invalid:", result.error);
-    return Err(
-      Error.invalidArgument(`Invalid eth_getCode params: ${result.error}`),
-    );
-  }
-  // console.log("eth_getCode with", result.data);
-  return Err(Error.unimplemented(`💔 Method eth_getCode not supported`));
+  return await Sdk.connector.rpc(CONFIG.chain, method, params);
 }

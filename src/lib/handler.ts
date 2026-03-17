@@ -196,9 +196,7 @@ async function process(
       return evm.eth_sendTransaction(request.params, tab);
 
     // helper calls
-    if (method === "eth_blockNumber") return evm.eth_blockNumber();
     if (method === "eth_chainId") return evm.eth_chainId();
-    if (method === "eth_getCode") return evm.eth_getCode(request.params);
     if (method === "eth_requestAccounts") return evm.eth_requestAccounts();
     if (method === "eth_accounts") return Ok(evm.eth_accounts());
     if (method === "wallet_getCapabilities")
@@ -207,6 +205,9 @@ async function process(
       return evm.wallet_requestPermissions(request.params);
     if (method === "wallet_switchEthereumChain")
       return evm.wallet_switchEthereumChain(request.params);
+
+    // Connector API RPC
+    if (method.startsWith("eth_")) return evm.eth_rpc(method, request.params);
 
     // unsupported method;
     return Err(Error.unimplemented(`💔 Method ${method} not supported`));
