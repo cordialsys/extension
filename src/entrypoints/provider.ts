@@ -28,6 +28,11 @@ export default defineUnlistedScript(() => {
     ping: Relay.ping,
   };
 
+  // This is UGLY.
+  // Unfortunately, some dapps like Lido don't follow the newer standards
+  // and only look at `window.ethereum` for the EVM provider.
+  (window as unknown as { ethereum: unknown }).ethereum = eth;
+
   // Focus events alone can be missed depending on tab/window transitions.
   // Ping on multiple resume signals and throttle duplicate bursts.
   const PING_THROTTLE_MS = 500;
