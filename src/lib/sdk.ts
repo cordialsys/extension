@@ -14,6 +14,7 @@ import { Err, None, Ok, Option } from "./types";
 
 import * as A from "./sdk/admin";
 import * as T from "./sdk/treasury";
+import * as z from "zod";
 
 interface ListOptions {
   filter?: string;
@@ -162,20 +163,82 @@ export namespace Sdk {
     const _API: string = "https://connector.cordialapis.com/";
     export const API: boolean = import.meta.env.VITE_CONNECTOR_API ?? _API;
 
-    export async function blockNumber(
+    export async function rpc(
       chainId: string,
-      mainnet: boolean,
-    ): Promise<Option<string>> {
+      method: string,
+      params: unknown,
+    ): Promise<Result<unknown>> {
       // TODO: handle mainnet vs testnet
-      let url = `${API}v1/chains/${chainId}/block`;
-      if (!mainnet) {
-        url += "?network=testnet";
+
+      const url = `${API}v1/chains/${chainId}/rpc`;
+
+      const body = {
+        method,
+        params,
+        jsonrpc: "2.0",
+        id: 1,
+      };
+
+      const fetchResponse = await fetch(url, {
+        method: "POST",
+        // headers: headers(),
+        body: JSON.stringify(body),
+      });
+
+      if (!fetchResponse.ok)
+        return Err(Error.unknown("Connector RPC failed to respond with OK"));
+
+      let textResponse: string;
+      let jsonResponse: unknown;
+      try {
+        textResponse = await fetchResponse.text();
+
+        try {
+          jsonResponse = JSON.parse(textResponse);
+        } catch (error) {
+          console.error(`Invalid JSON: ${error}`);
+          console.error(textResponse);
+          return Err(
+            Error.unknown(`Connector RPC returned invalid JSON: ${error}`),
+          );
+        }
+      } catch (error) {
+        console.log(error);
+        return Err(
+          Error.unknown(
+            `Connector RPC returned invalid JSON (no text at all): ${error}`,
+          ),
+        );
       }
-      const response = await fetch(url);
-      if (!response.ok) return None;
-      const chain = (await response.json()) as { height: string };
-      return chain.height;
+
+      const JsonRpcError = z.object({
+        code: z.number(),
+        message: z.string(),
+      });
+
+      const errorResult = JsonRpcError.safeParse(jsonResponse);
+      if (errorResult.success) {
+        const errorString = JSON.stringify(errorResult.data);
+        return Err(Error.unknown(`RPC error: ${errorString}`));
+      }
+
+      const JsonRpcResult = z.object({
+        result: z.unknown(),
+      });
+
+      const resultResult = JsonRpcResult.safeParse(jsonResponse);
+      if (resultResult.success) {
+        return Ok(resultResult.data.result);
+      }
+
+      const responseString = JSON.stringify(jsonResponse);
+      return Err(
+        Error.unknown(
+          `Connector RPC returned unexpected response: invalid JSON: ${responseString}`,
+        ),
+      );
     }
+
     export async function testnetChainNetwork(
       chainId: string,
     ): Promise<Option<string>> {
