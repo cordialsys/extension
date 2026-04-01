@@ -1,7 +1,17 @@
 import { None, Option } from "@/lib/types";
 import * as z from "zod";
 
-export type Chain = "ETH" | "MATIC";
+export type Chain =
+  | "ETH"
+  | "AVAX"
+  | "BASE"
+  | "BNB"
+  | "BERA"
+  | "MATIC"
+  | "MON"
+  | "OptETH"
+  | "XPL"
+  | "0G";
 
 export type Id =
   // ETH
@@ -10,8 +20,24 @@ export type Id =
   | "0xaa36a7"
   // ETH+hoodi
   | "0x88bb0"
+  // AVAX
+  | "0xa86a"
+  // BASE
+  | "0x2105"
+  // BNB
+  | "0x38"
+  // BERA
+  | "0x138de"
   // MATIC
-  | "0x89";
+  | "0x89"
+  // MON
+  | "0x8f"
+  // OptETH
+  | "0xa"
+  // XPL
+  | "0x2611"
+  // 0G
+  | "0x4115";
 
 export const Id = {
   normalize(id: string | number): Option<string> {
@@ -28,12 +54,28 @@ export const Chains: { [id in Id]: Chain } = {
   "0x1": "ETH",
   "0xaa36a7": "ETH",
   "0x88bb0": "ETH",
+  "0x2105": "BASE",
+  "0xa86a": "AVAX",
   "0x89": "MATIC",
+  "0x8f": "MON",
+  "0x38": "BNB",
+  "0x138de": "BERA",
+  "0xa": "OptETH",
+  "0x2611": "XPL",
+  "0x4115": "0G",
 };
 
 export const Mainnet: { [chain in Chain]: Id } = {
   ETH: "0x1",
+  AVAX: "0xa86a",
+  BASE: "0x2105",
+  BNB: "0x38",
+  BERA: "0x138de",
   MATIC: "0x89",
+  MON: "0x8f",
+  OptETH: "0xa",
+  XPL: "0x2611",
+  "0G": "0x4115",
 };
 
 export type Config = {
