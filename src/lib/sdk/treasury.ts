@@ -106,7 +106,7 @@ export const Call = {
     const input = inputR.data;
 
     const blockchainAddress = input[1];
-    const address = AddressName.new(Eth.Chains[id], blockchainAddress);
+    const address = AddressName.new(Eth.Chains[id], blockchainAddress.slice(2));
 
     return Ok({
       address,
@@ -122,7 +122,7 @@ export const Call = {
     const input = inputR.data;
 
     const blockchainAddress = input[0];
-    const address = AddressName.new(Eth.Chains[id], blockchainAddress);
+    const address = AddressName.new(Eth.Chains[id], blockchainAddress.slice(2));
 
     let typedData: z.infer<typeof Eth.Eip712TypedData>;
     const directR = Eth.Eip712TypedData.safeParse(input[1]);

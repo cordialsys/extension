@@ -37,8 +37,7 @@ function setConfig(config: Eth.Config) {
 }
 
 async function showProposal(proposalName: string, tab: number) {
-  const path = SidePanel.proposalPath(proposalName, Config.treasuryId());
-  await SidePanel.setPath(tab, path);
+  await SidePanel.setDefiContext(tab, { proposalName }, { replace: false });
 }
 
 export async function propagate(

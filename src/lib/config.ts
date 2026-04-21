@@ -4,6 +4,7 @@ import { Sdk } from "./sdk";
 import * as A from "./sdk/admin";
 import { None, Option } from "./types";
 import { evm, svm } from "./handler";
+import { SidePanel } from "./sidepanel";
 
 let REVISION: Option<string> = None;
 let CONFIG: Option<Config> = None;
@@ -148,6 +149,7 @@ export const Config = {
     await evm.propagate(None, config);
     await svm.propagate(config);
     await Config.refreshAppearanceForVisibleTabs();
+    await Config.refreshSidePanelForVisibleTabs();
   },
 
   onNotificationButtonClicked(notificationId: string, buttonIndex: number) {
@@ -208,6 +210,15 @@ export const Config = {
     return config.origins.includes(origin);
   },
 
+  defiContext(tabUrl?: Option<string>): { addExtensionOrigin: Option<string> } {
+    const origin = parseOrigin(tabUrl);
+    if (!origin || Config.allowed(origin)) {
+      return { addExtensionOrigin: None };
+    }
+
+    return { addExtensionOrigin: origin };
+  },
+
   async toggle(origin: string, tab: number) {
     const config = Config.current();
     const login = await Login.load();
@@ -237,6 +248,11 @@ export const Config = {
     const config = await Config.fetch();
     await Config.propagate(config);
     Config.track();
+  },
+
+  async refreshNow() {
+    const config = await Config.fetch();
+    await Config.propagate(config);
   },
 
   notify(title: string, message: string) {
@@ -302,6 +318,40 @@ export const Config = {
     for (const tab of tabs) {
       if (tab.id === undefined) continue;
       await Config.refreshAppearanceForTab(tab.id, tab.url);
+    }
+  },
+
+  async syncSidePanelForTab(tab: number, tabUrl?: Option<string>) {
+    const currentPath = SidePanel.currentPath(tab);
+    const resolvedCurrentPath = currentPath ?? SidePanel.defaultPath();
+
+    let url: Option<string> = tabUrl;
+    if (!url) {
+      const tabResult = await browser.tabs.get(tab).catch((error) => {
+        console.log("Could not get tab for side panel sync:", error);
+        return None;
+      });
+      url = tabResult?.url;
+    }
+
+    const { addExtensionOrigin } = Config.defiContext(url);
+    const nextPath = SidePanel.defaultPath();
+
+    if (resolvedCurrentPath !== nextPath) {
+      await SidePanel.setPath(tab, nextPath);
+    }
+    await SidePanel.setDefiContext(tab, { addExtensionOrigin });
+  },
+
+  async refreshSidePanelForVisibleTabs() {
+    const tabs = await browser.tabs.query({}).catch((error) => {
+      console.log("Could not query tabs for side panel refresh:", error);
+      return [];
+    });
+
+    for (const tab of tabs) {
+      if (tab.id === undefined) continue;
+      await Config.syncSidePanelForTab(tab.id, tab.url);
     }
   },
 
