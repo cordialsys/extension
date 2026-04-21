@@ -75,10 +75,12 @@ export const Port = {
 };
 
 export function onMessage(
-  requestJson: string,
+  requestJson: unknown,
   sender: MessageSender,
   respond: (response: string) => void,
 ) {
+  if (typeof requestJson !== "string") return;
+
   const request: Request = superjson.parse(requestJson ?? null);
   // console.log("request:", request);
   if (!request || request.kind !== "cordial:provider:request") return;

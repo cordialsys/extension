@@ -24,7 +24,7 @@ async function openSidePanel(tabId: number) {
 // Click has the following meanings:
 // a) not logged in -> login
 // b) logged in -> open side panel
-// c) if origin is not allowed, route side panel to /defi add-origin flow
+// c) if origin is not allowed, keep /defi open and push connect context
 //
 // Note that this is all annoyingly buggy.
 // https://issues.chromium.org/issues/40929586
@@ -54,13 +54,18 @@ export async function onClicked(tab: globalThis.Browser.tabs.Tab) {
   const origin = parseOrigin(tab.url);
   if (!origin) {
     await SidePanel.setPath(tab.id, SidePanel.defaultPath());
-    return;
-  }
-
-  if (!Config.allowed(origin)) {
-    await SidePanel.setPath(tab.id, SidePanel.addExtensionOriginPath(origin));
+    await SidePanel.setDefiContext(
+      tab.id,
+      { addExtensionOrigin: undefined },
+      { replace: false },
+    );
     return;
   }
 
   await SidePanel.setPath(tab.id, SidePanel.defaultPath());
+  await SidePanel.setDefiContext(
+    tab.id,
+    { addExtensionOrigin: Config.allowed(origin) ? undefined : origin },
+    { replace: false },
+  );
 }

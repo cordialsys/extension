@@ -59,54 +59,116 @@
 
     <script type="module">
       const ui = "%VITE_UI%";
-
-      function iframeSrcFromSearch(search) {
-        const proposal = search.get("proposal");
-        const treasury = search.get("t");
-        const addExtensionOrigin = search.get("add-extension-origin");
-
-        let iframeSrc = `${ui}defi`;
-        if (proposal) {
-          const defiSearch = new URLSearchParams();
-          defiSearch.set("proposal", proposal);
-          if (treasury) {
-            defiSearch.set("t", treasury);
-          }
-          iframeSrc = `${ui}defi?${defiSearch.toString()}`;
-        } else if (addExtensionOrigin) {
-          try {
-            const parsed = new URL(addExtensionOrigin);
-            if (parsed.protocol === "http:" || parsed.protocol === "https:") {
-              iframeSrc = `${ui}defi?add-extension-origin=${encodeURIComponent(parsed.origin)}`;
-            }
-          } catch {
-            // Ignore invalid add-origin hints and keep default panel route.
-          }
-        }
-
-        return iframeSrc;
+      let uiOrigin = "";
+      try {
+        uiOrigin = new URL(ui).origin;
+      } catch {
+        uiOrigin = "";
       }
 
-      function navigateFromSearch(search) {
+      function normalizeAddExtensionOrigin(value) {
+        if (typeof value !== "string" || !value.trim()) {
+          return null;
+        }
+
+        try {
+          const parsed = new URL(value);
+          if (parsed.protocol === "http:" || parsed.protocol === "https:") {
+            return parsed.origin;
+          }
+        } catch {
+          // Ignore invalid add-origin hints.
+        }
+
+        return null;
+      }
+
+      function postDefiContext(addExtensionOrigin, proposalName) {
         const iframe = document.getElementById("treasury-ui");
-        if (iframe instanceof HTMLIFrameElement) {
-          iframe.src = iframeSrcFromSearch(search);
+        if (!(iframe instanceof HTMLIFrameElement) || !iframe.contentWindow) {
+          return;
+        }
+        const message = {
+          kind: "cordial:defi:navigate-context",
+          addExtensionOrigin: normalizeAddExtensionOrigin(addExtensionOrigin),
+          proposalName:
+            typeof proposalName === "string" && proposalName.trim()
+              ? proposalName
+              : null,
+        };
+        iframe.contentWindow.postMessage(message, uiOrigin || "*");
+      }
+
+      async function requestCurrentDefiContext() {
+        try {
+          const response = await browser.runtime.sendMessage({
+            kind: "cordial:sidepanel:get-context",
+          });
+          postDefiContext(
+            response?.addExtensionOrigin ?? null,
+            response?.proposalName ?? null,
+          );
+        } catch (error) {
+          console.log("Could not request current DeFi context:", error);
         }
       }
 
-      navigateFromSearch(new URLSearchParams(window.location.search));
+      const iframe = document.getElementById("treasury-ui");
+      if (iframe instanceof HTMLIFrameElement) {
+        iframe.onload = () => {
+          void requestCurrentDefiContext();
+        };
+        iframe.src = `${ui}defi`;
+      }
 
       browser.runtime.onMessage.addListener((message) => {
-        if (!message || message.kind !== "cordial:sidepanel:navigate") {
+        if (!message) {
           return;
         }
 
-        const rawSearch =
-          typeof message.search === "string" ? message.search : "";
-        const cleanSearch = rawSearch.startsWith("?")
-          ? rawSearch.slice(1)
-          : rawSearch;
-        navigateFromSearch(new URLSearchParams(cleanSearch));
+        if (message.kind === "cordial:sidepanel:defi-context") {
+          postDefiContext(
+            message.addExtensionOrigin ?? null,
+            message.proposalName ?? null,
+          );
+        }
+      });
+
+      window.addEventListener("message", (event) => {
+        const iframe = document.getElementById("treasury-ui");
+        if (!(iframe instanceof HTMLIFrameElement)) {
+          return;
+        }
+        if (event.source !== iframe.contentWindow) {
+          return;
+        }
+        if (uiOrigin && event.origin !== uiOrigin) {
+          return;
+        }
+
+        const message = event.data;
+        if (!message || typeof message !== "object" || !("kind" in message)) {
+          return;
+        }
+
+        if (message.kind === "cordial:defi:config-updated") {
+          browser.runtime
+            .sendMessage(
+              JSON.stringify({ kind: "cordial:sidepanel:refresh-config" }),
+            )
+            .catch((error) => {
+              console.log("Could not request config refresh:", error);
+            });
+          return;
+        }
+
+        if (message.kind === "cordial:defi:proposal-cleared") {
+          browser.runtime
+            .sendMessage({ kind: "cordial:sidepanel:clear-proposal" })
+            .catch((error) => {
+              console.log("Could not clear proposal context:", error);
+            });
+        }
       });
     </script>
   </body>
