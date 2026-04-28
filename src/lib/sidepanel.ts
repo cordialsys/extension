@@ -37,7 +37,7 @@ export const SidePanel = {
 
   async setPath(tabId: number, path: string) {
     await browser.sidePanel
-      .setOptions({ tabId, path, enabled: true })
+      .setOptions({ tabId, path: SidePanel.defaultPath(), enabled: true })
       .catch((error) => {
         console.log("Could not set side panel path:", error);
       });
