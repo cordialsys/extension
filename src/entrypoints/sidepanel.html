@@ -54,11 +54,37 @@
       height="100%"
       scrolling="auto"
       title="embedded UI"
-      allow="publickey-credentials-get *"
+      allow="publickey-credentials-get *; clipboard-write *"
     ></iframe>
 
     <script type="module">
       const ui = "%VITE_UI%";
+      const uiOrigin = new URL(ui).origin;
+
+      function contextFromSearch(search) {
+        const proposal = search.get("proposal");
+        const addExtensionOrigin = search.get("add-extension-origin");
+        const context = {
+          kind: "cordial:defi:navigate-context",
+        };
+
+        if (proposal) {
+          context.proposalName = proposal;
+        }
+
+        if (addExtensionOrigin) {
+          try {
+            const parsed = new URL(addExtensionOrigin);
+            if (parsed.protocol === "http:" || parsed.protocol === "https:") {
+              context.addExtensionOrigin = parsed.origin;
+            }
+          } catch {
+            // Ignore invalid add-origin hints.
+          }
+        }
+
+        return context;
+      }
 
       function iframeSrcFromSearch(search) {
         const proposal = search.get("proposal");
@@ -87,6 +113,16 @@
         return iframeSrc;
       }
 
+      function postNavigateContext(search) {
+        const iframe = document.getElementById("treasury-ui");
+        if (!(iframe instanceof HTMLIFrameElement) || !iframe.contentWindow) {
+          return false;
+        }
+
+        iframe.contentWindow.postMessage(contextFromSearch(search), uiOrigin);
+        return true;
+      }
+
       function navigateFromSearch(search) {
         const iframe = document.getElementById("treasury-ui");
         if (iframe instanceof HTMLIFrameElement) {
@@ -106,7 +142,10 @@
         const cleanSearch = rawSearch.startsWith("?")
           ? rawSearch.slice(1)
           : rawSearch;
-        navigateFromSearch(new URLSearchParams(cleanSearch));
+        const search = new URLSearchParams(cleanSearch);
+        if (!postNavigateContext(search)) {
+          navigateFromSearch(search);
+        }
       });
     </script>
   </body>
