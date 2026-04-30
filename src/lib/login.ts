@@ -9,8 +9,69 @@ import { Temporal } from "temporal-polyfill";
 // and the login should be retained as long as the browser is open.
 import { get, set } from "idb-keyval";
 import { COLOR, GRAY, LOGIN_REFRESH } from "./constants";
-import { short_sleep } from "./util";
+import { sleep } from "./util";
 import { None, Option } from "./types";
+
+const LOGIN_POLL_SLEEP_MS = 1_000;
+const LOGIN_POLL_MAX_ATTEMPTS = 180;
+
+let loginFlowCounter = 0;
+
+function redactRequest(requestHex: string): string {
+  if (requestHex.length <= 16) return requestHex;
+  return `${requestHex.slice(0, 8)}...${requestHex.slice(-8)}`;
+}
+
+function loginDebug(event: string, details: Record<string, unknown> = {}) {
+  console.info("[cordial-extension:login]", event, {
+    ...details,
+  });
+}
+
+async function fetchWithCookies(url: string): Promise<Response> {
+  return await fetch(url, {
+    credentials: "include",
+  });
+}
+
+async function initiateLoginFlow(
+  identity: Identity,
+  request: Request,
+): Promise<Response> {
+  const key = `ed25519.${identity.publicHex}`;
+  return await fetchWithCookies(
+    `https://auth.cordial.systems/login/flow?key=${key}&request=${request.publicHex}`,
+  );
+}
+
+async function closeLoginTab(tabId: number, flowId: number) {
+  await browser.tabs
+    .remove(tabId)
+    .then(() => {
+      loginDebug("Login.new:closed-login-tab", { flowId, tabId });
+    })
+    .catch((error) => {
+      loginDebug("Login.new:close-login-tab-failed", {
+        flowId,
+        tabId,
+        error: error instanceof Error ? error.message : String(error),
+      });
+    });
+}
+
+async function refreshOpenSidePanels(flowId: number) {
+  await browser.runtime
+    .sendMessage({ kind: "cordial:sidepanel:login-complete" })
+    .then(() => {
+      loginDebug("Login.new:refreshed-sidepanels", { flowId });
+    })
+    .catch((error) => {
+      loginDebug("Login.new:refresh-sidepanels-failed", {
+        flowId,
+        error: error instanceof Error ? error.message : String(error),
+      });
+    });
+}
 
 export interface Identity {
   publicKey: CryptoKey;
@@ -140,6 +201,7 @@ export const Login = {
   // TODO: Would be pretty cool to set extension icon to "rotating"
   // while logging in. This can be done with timers: https://stackoverflow.com/a/44082232
   async login() {
+    loginDebug("Login.login:start");
     const login = await Login.new();
     await set("login", login);
 
@@ -163,8 +225,17 @@ export const Login = {
   },
 
   async new(): Promise<Login> {
+    const flowId = ++loginFlowCounter;
+    loginDebug("Login.new:start", { flowId });
     const prevLogin = await Login.load();
-    if (prevLogin) return prevLogin;
+    if (prevLogin) {
+      loginDebug("Login.new:existing-login", {
+        flowId,
+        userId: prevLogin.userId,
+        expires: prevLogin.expires,
+      });
+      return prevLogin;
+    }
     //1. prepare request and identity keys
     const identity = await Identity.new();
     const key = `ed25519.${identity.publicHex}`;
@@ -172,19 +243,59 @@ export const Login = {
 
     const request = Request.new();
     const requestHex = request.publicHex;
+    loginDebug("Login.new:request-created", {
+      flowId,
+      request: redactRequest(requestHex),
+    });
     // console.log("request", requestHex);
 
     // 2. have the user login
     const url = `https://auth.cordial.systems/login/flow?key=${key}&request=${requestHex}`;
+    let loginTabCreated: Promise<Option<number>> = Promise.resolve(None);
     if (!(await clerkLoggedIn())) {
+      loginDebug("Login.new:opening-login-tab", {
+        flowId,
+        request: redactRequest(requestHex),
+      });
       // console.log("opening tab");
-      browser.tabs.create({ url });
+      loginTabCreated = browser.tabs
+        .create({ url })
+        .then((tab) => {
+          loginDebug("Login.new:opened-login-tab", {
+            flowId,
+            tabId: tab.id,
+            request: redactRequest(requestHex),
+          });
+          return tab.id;
+        })
+        .catch((error) => {
+          loginDebug("Login.new:open-login-tab-failed", {
+            flowId,
+            request: redactRequest(requestHex),
+            error: error instanceof Error ? error.message : String(error),
+          });
+          return None;
+        });
     } else {
+      loginDebug("Login.new:silent-login-flow", {
+        flowId,
+        request: redactRequest(requestHex),
+      });
       // console.log("not opening tab");
-      await fetch(url);
+      await initiateLoginFlow(identity, request);
     }
 
-    return await completeLogin(identity, request);
+    const login = await completeLogin(identity, request, {
+      flowId,
+      source: "new",
+    });
+    const loginTabId = await loginTabCreated;
+    if (loginTabId !== undefined) {
+      await closeLoginTab(loginTabId, flowId);
+    }
+    await refreshOpenSidePanels(flowId);
+
+    return login;
   },
 
   async load(): Promise<Option<Login>> {
@@ -229,13 +340,17 @@ export const Login = {
 
   // TODO: Only refresh if we're somewhat close to expiry of cookie or certificate
   async track(): Promise<Option<Login>> {
+    const flowId = ++loginFlowCounter;
+    loginDebug("Login.track:start", { flowId });
     if (!(await Login.load())) {
+      loginDebug("Login.track:no-login", { flowId });
       setTimeout(Login.track, LOGIN_REFRESH);
       return;
     }
 
     if (!(await clerkLoggedIn())) {
       // can't refresh silently
+      loginDebug("Login.track:not-clerk-logged-in", { flowId });
       await showOff();
       setTimeout(Login.track, LOGIN_REFRESH);
       return;
@@ -243,13 +358,18 @@ export const Login = {
 
     // console.log("refreshing login");
     const identity = await Identity.new({ refresh: true });
-    const key = `ed25519.${identity.publicHex}`;
     const request = Request.new();
     const requestHex = request.publicHex;
+    loginDebug("Login.track:request-created", {
+      flowId,
+      request: redactRequest(requestHex),
+    });
 
-    const url = `https://auth.cordial.systems/login/flow?key=${key}&request=${requestHex}`;
-    await fetch(url);
-    const login = await completeLogin(identity, request);
+    await initiateLoginFlow(identity, request);
+    const login = await completeLogin(identity, request, {
+      flowId,
+      source: "track",
+    });
     await set("login", login);
     setTimeout(Login.track, LOGIN_REFRESH);
     return login;
@@ -259,14 +379,52 @@ export const Login = {
 async function completeLogin(
   identity: Identity,
   request: Request,
+  debugContext: { flowId: number; source: string },
 ): Promise<Login> {
   // 3.1 fetch boxed access token
   let url = `https://auth.cordial.systems/login/get-access?request=${request.publicHex}`;
   let boxed: Boxed;
+  let accessAttempts = 0;
+  let retriedAfterExternalLogin = false;
   while (true) {
-    const response = await fetch(url);
+    accessAttempts += 1;
+    loginDebug("completeLogin:get-access:attempt", {
+      flowId: debugContext.flowId,
+      source: debugContext.source,
+      attempt: accessAttempts,
+      request: redactRequest(request.publicHex),
+    });
+    const response = await fetchWithCookies(url);
+    loginDebug("completeLogin:get-access:response", {
+      flowId: debugContext.flowId,
+      source: debugContext.source,
+      attempt: accessAttempts,
+      request: redactRequest(request.publicHex),
+      status: response.status,
+      ok: response.ok,
+    });
     if (!response.ok) {
-      await short_sleep();
+      if (
+        response.status === 404 &&
+        !retriedAfterExternalLogin &&
+        (await clerkLoggedIn())
+      ) {
+        retriedAfterExternalLogin = true;
+        loginDebug("completeLogin:get-access:retry-after-external-login", {
+          flowId: debugContext.flowId,
+          source: debugContext.source,
+          attempt: accessAttempts,
+          request: redactRequest(request.publicHex),
+        });
+        await initiateLoginFlow(identity, request);
+      }
+
+      if (accessAttempts >= LOGIN_POLL_MAX_ATTEMPTS) {
+        throw new Error(
+          `Timed out waiting for auth access token after ${accessAttempts} attempts; last status ${response.status}`,
+        );
+      }
+      await sleep(LOGIN_POLL_SLEEP_MS);
       continue;
     }
     boxed = (await response.json()) as Boxed;
@@ -287,10 +445,31 @@ async function completeLogin(
 
   // 4.1 fetch boxed certificate
   url = `https://auth.cordial.systems/login/get-certificate?request=${request.publicHex}`;
+  let certificateAttempts = 0;
   while (true) {
-    const response = await fetch(url);
+    certificateAttempts += 1;
+    loginDebug("completeLogin:get-certificate:attempt", {
+      flowId: debugContext.flowId,
+      source: debugContext.source,
+      attempt: certificateAttempts,
+      request: redactRequest(request.publicHex),
+    });
+    const response = await fetchWithCookies(url);
+    loginDebug("completeLogin:get-certificate:response", {
+      flowId: debugContext.flowId,
+      source: debugContext.source,
+      attempt: certificateAttempts,
+      request: redactRequest(request.publicHex),
+      status: response.status,
+      ok: response.ok,
+    });
     if (!response.ok) {
-      await setTimeout(() => {}, 100);
+      if (certificateAttempts >= LOGIN_POLL_MAX_ATTEMPTS) {
+        throw new Error(
+          `Timed out waiting for auth certificate after ${certificateAttempts} attempts; last status ${response.status}`,
+        );
+      }
+      await sleep(LOGIN_POLL_SLEEP_MS);
       continue;
     }
     boxed = (await response.json()) as Boxed;
@@ -304,7 +483,15 @@ async function completeLogin(
 
   // 5. set cookie
   url = `https://auth.cordialapis.com/login/set-cookie?access_token=${access_token}`;
-  /*const response =*/ await fetch(url);
+  /*const response =*/ await fetchWithCookies(url);
+  loginDebug("completeLogin:success", {
+    flowId: debugContext.flowId,
+    source: debugContext.source,
+    userId,
+    expires: expires.epochMilliseconds,
+    accessAttempts,
+    certificateAttempts,
+  });
   // console.log(response);
 
   // all done, return

@@ -64,6 +64,13 @@ export const Error = {
       message,
     };
   },
+  rejected(message: string): Error {
+    return {
+      code: 4001,
+      status: "User Rejected Request",
+      message,
+    };
+  },
   unimplemented(message: string): Error {
     return {
       code: 12,

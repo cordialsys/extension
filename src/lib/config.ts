@@ -271,7 +271,7 @@ export const Config = {
       });
   },
 
-  async refreshAppearanceForTab(tab: number, tabUrl?: Option<string>) {
+  async refreshAppearanceForTab(tab: number, tabUrl?: string) {
     let url: Option<string> = tabUrl;
     if (!url) {
       const tabResult = await browser.tabs.get(tab).catch((error) => {

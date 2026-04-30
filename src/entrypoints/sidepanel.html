@@ -60,6 +60,20 @@
     <script type="module">
       const ui = "%VITE_UI%";
       const uiOrigin = new URL(ui).origin;
+      const navigateRetryDelays = [0, 150, 500, 1000, 2000, 4000];
+      let pendingNavigateSearch = null;
+      let navigateRetryTimers = [];
+
+      function proposalFromSearch(search) {
+        return search.get("proposal");
+      }
+
+      function clearNavigateRetryTimers() {
+        for (const timer of navigateRetryTimers) {
+          window.clearTimeout(timer);
+        }
+        navigateRetryTimers = [];
+      }
 
       function contextFromSearch(search) {
         const proposal = search.get("proposal");
@@ -119,8 +133,26 @@
           return false;
         }
 
+        console.info("[cordial-extension:sidepanel] post-navigate-context", {
+          proposalName: proposalFromSearch(search),
+        });
         iframe.contentWindow.postMessage(contextFromSearch(search), uiOrigin);
         return true;
+      }
+
+      function scheduleNavigateContext(search) {
+        pendingNavigateSearch = new URLSearchParams(search);
+        clearNavigateRetryTimers();
+
+        for (const delay of navigateRetryDelays) {
+          const timer = window.setTimeout(() => {
+            if (!pendingNavigateSearch) {
+              return;
+            }
+            postNavigateContext(pendingNavigateSearch);
+          }, delay);
+          navigateRetryTimers.push(timer);
+        }
       }
 
       function navigateFromSearch(search) {
@@ -130,10 +162,55 @@
         }
       }
 
+      const iframe = document.getElementById("treasury-ui");
+      if (iframe instanceof HTMLIFrameElement) {
+        iframe.addEventListener("load", () => {
+          if (!pendingNavigateSearch) {
+            return;
+          }
+          postNavigateContext(pendingNavigateSearch);
+        });
+      }
+
       navigateFromSearch(new URLSearchParams(window.location.search));
 
+      window.addEventListener("message", (event) => {
+        if (event.origin !== uiOrigin) {
+          return;
+        }
+
+        if (!event.data) {
+          return;
+        }
+
+        if (event.data.kind === "cordial:defi:config-updated") {
+          browser.runtime.sendMessage({
+            kind: "cordial:extension:config-updated",
+          });
+        }
+
+        if (event.data.kind === "cordial:defi:proposal-canceled") {
+          console.info("[cordial-extension:sidepanel] proposal-canceled", {
+            proposalName: event.data.proposalName,
+          });
+          browser.runtime.sendMessage({
+            kind: "cordial:extension:proposal-canceled",
+            proposalName: event.data.proposalName,
+          });
+        }
+      });
+
       browser.runtime.onMessage.addListener((message) => {
-        if (!message || message.kind !== "cordial:sidepanel:navigate") {
+        if (!message) {
+          return;
+        }
+
+        if (message.kind === "cordial:sidepanel:login-complete") {
+          navigateFromSearch(new URLSearchParams(window.location.search));
+          return;
+        }
+
+        if (message.kind !== "cordial:sidepanel:navigate") {
           return;
         }
 
@@ -143,8 +220,14 @@
           ? rawSearch.slice(1)
           : rawSearch;
         const search = new URLSearchParams(cleanSearch);
-        if (!postNavigateContext(search)) {
+        console.info("[cordial-extension:sidepanel] navigate", {
+          proposalName: proposalFromSearch(search),
+        });
+        if (postNavigateContext(search)) {
+          scheduleNavigateContext(search);
+        } else {
           navigateFromSearch(search);
+          scheduleNavigateContext(search);
         }
       });
     </script>

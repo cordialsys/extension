@@ -75,6 +75,12 @@ function newAccount(chain: IdentifierString, addr: string): Sol.Account {
   return Sol.Account.new(addr, pubKey, [chain], features);
 }
 
+function accountsFromConfig(config: Config): Sol.Account[] {
+  return config.addresses.map((a) =>
+    newAccount(config.chain as IdentifierString, a),
+  );
+}
+
 async function requestConfig(): Promise<Option<Config>> {
   return solRequest("cordial:config") as Promise<Option<Config>>;
 }
@@ -146,26 +152,25 @@ export class Solana implements Wallet {
   async _start(config: Config) {
     console.log("🚀 Starting Cordial Solana Provider with", config);
 
-    this.#accounts = config.addresses.map((a) =>
-      newAccount(config.chain as IdentifierString, a),
-    );
+    this.#accounts = accountsFromConfig(config);
 
     // TODO: only announce if origin is allowed
     // and we have an address (e.g. Orca totally ignores us if there are no addresses)
     this.announce();
+    this.emit("change", { accounts: this.#accounts });
   }
 
   async _stop() {
-    console.log("Stopping Cordial Solana Provider not implemented yet");
+    console.log("Stopping Cordial Solana Provider");
+    this.#accounts = [];
+    this.emit("change", { accounts: [] });
   }
 
   async _update(config: Config) {
     if (JSON.stringify(config) === JSON.stringify(CONFIG)) return;
-    console.log(
-      "Updating Cordial Solana Provider to",
-      config,
-      "not implemented yet",
-    );
+    console.log("Updating Cordial Solana Provider to", config);
+    this.#accounts = accountsFromConfig(config);
+    this.emit("change", { accounts: this.#accounts });
   }
 
   announce(this: Solana) {
