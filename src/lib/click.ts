@@ -16,9 +16,21 @@ function parseOrigin(tabUrl: Option<string>): Option<string> {
 }
 
 async function openSidePanel(tabId: number) {
-  await browser.sidePanel.open({ tabId }).catch((error) => {
+  const setOptions = browser.sidePanel
+    .setOptions({
+      tabId,
+      path: SidePanel.defaultPath(),
+      enabled: true,
+    })
+    .catch((error) => {
+      console.log("Could not set side panel options:", error);
+    });
+
+  const open = browser.sidePanel.open({ tabId }).catch((error) => {
     console.log("Could not open side panel:", error);
   });
+
+  await Promise.all([setOptions, open]);
 }
 
 // Click has the following meanings:

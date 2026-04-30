@@ -1,7 +1,7 @@
 import { Error, Result } from "@/lib/sdk/error";
 import { Sdk } from "@/lib/sdk";
 import { Err, Eth, Ok, Sol } from "@/lib/types";
-import { short_sleep } from "@/lib/util";
+import { short_sleep, sleep } from "@/lib/util";
 
 import { components } from "./treasury.d";
 import BigNumber from "bignumber.js";
@@ -60,6 +60,10 @@ function parseError(method: string, error: z.ZodError): Result<Call> {
   );
 }
 
+function bytesHex(value: string) {
+  return value.startsWith("0x") ? value.slice(2) : value;
+}
+
 export const Call = {
   newEvmTransaction(
     id: Eth.Id,
@@ -70,8 +74,7 @@ export const Call = {
     if (!inputR.success) return parseError(method, inputR.error);
     const input = inputR.data[0];
 
-    const address = AddressName.new(Eth.Chains[id], input.from.slice(2));
-    // keep the `.slice(2)` out, BigNumber detects hex numbers using the `0x` prefix
+    const address = AddressName.new(Eth.Chains[id], input.from);
     let amount: string;
     if (input.value)
       amount = new BigNumber(input.value).shiftedBy(-18).toFixed();
@@ -80,7 +83,7 @@ export const Call = {
     return Ok({
       address,
       method,
-      request: { amount, to: input.to.slice(2), data: input.data.slice(2) },
+      request: { amount, to: input.to, data: bytesHex(input.data) },
     });
   },
 
@@ -111,7 +114,7 @@ export const Call = {
     return Ok({
       address,
       method: "personal_sign",
-      request: { message: input[0].slice(2) },
+      request: { message: bytesHex(input[0]) },
     });
   },
 
@@ -172,9 +175,38 @@ export const Call = {
     });
   },
 
+  cancelWait(proposalName?: string) {
+    console.info("[cordial-extension:treasury] cancel proposal wait", {
+      proposalName,
+      activeProposalWaits: Array.from(ACTIVE_PROPOSAL_WAITS),
+    });
+    if (proposalName) {
+      CANCELLED_PROPOSALS.add(proposalName);
+      return;
+    }
+
+    cancelProposalWaitGeneration += 1;
+  },
+
   async byProposal(proposalName: string): Promise<Result<Call>> {
+    const waitGeneration = cancelProposalWaitGeneration;
     const start = Date.now();
+    ACTIVE_PROPOSAL_WAITS.add(proposalName);
+    console.info("[cordial-extension:treasury] wait for proposal call", {
+      proposalName,
+      waitGeneration,
+    });
     while (Date.now() < start + CALL_POLL_TIMEOUT) {
+      if (isProposalWaitCancelled(proposalName, waitGeneration)) {
+        CANCELLED_PROPOSALS.delete(proposalName);
+        ACTIVE_PROPOSAL_WAITS.delete(proposalName);
+        console.info("[cordial-extension:treasury] proposal wait canceled", {
+          proposalName,
+          waitGeneration,
+        });
+        return Err(Error.rejected(`Proposal ${proposalName} was canceled`));
+      }
+
       // Once our API filtering implements JSON expansion, we will
       // be able to do this, for now we have to use `proposal_id`.
       // const filter = `json(proposal).name = "${proposalName}"`;
@@ -187,16 +219,37 @@ export const Call = {
 
       if (calls?.length > 0) {
         // TODO: Check that there is only one call?
+        CANCELLED_PROPOSALS.delete(proposalName);
+        ACTIVE_PROPOSAL_WAITS.delete(proposalName);
+        console.info("[cordial-extension:treasury] proposal call found", {
+          proposalName,
+          callName: calls[0].name,
+        });
         return Ok(calls[0]);
       }
-      await short_sleep();
+      await sleep(CALL_POLL_INTERVAL);
     }
+    ACTIVE_PROPOSAL_WAITS.delete(proposalName);
+    console.info("[cordial-extension:treasury] proposal wait timed out", {
+      proposalName,
+    });
     return Err(timedOut("Call", CALL_POLL_TIMEOUT));
   },
 };
 
 const CALL_POLL_TIMEOUT = 60_000;
+const CALL_POLL_INTERVAL = 1_000;
 const TIMEOUT = 180_000;
+const CANCELLED_PROPOSALS = new Set<string>();
+const ACTIVE_PROPOSAL_WAITS = new Set<string>();
+let cancelProposalWaitGeneration = 0;
+
+function isProposalWaitCancelled(proposalName: string, waitGeneration: number) {
+  return (
+    waitGeneration !== cancelProposalWaitGeneration ||
+    CANCELLED_PROPOSALS.has(proposalName)
+  );
+}
 
 const timedOut = (resource: string, timeout: number) =>
   Error.unknown(`${resource} failed to complete with ${timeout} milliseconds`);

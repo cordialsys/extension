@@ -18,6 +18,9 @@ export default defineConfig({
     host_permissions: [
       // "https://accounts.cordial.systems/*",
       "https://admin.cordialapis.com/*",
+      "https://auth.cordial.systems/*",
+      "https://auth.cordialapis.com/*",
+      "https://clerk.cordial.systems/*",
       "https://treasury.cordialapis.com/*",
     ],
     key: "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAloJLJ8XRkwR+gieAIt1Uc3DfHOZ7nB4LAr74ZkAkM2VBeoTMD8pXJiruJ/FOHNVDmDStBdW00szVFFp2ikySkPFIT/8RXEtVRAuLSLK9q0tVuoTFtFNvaDTMXf5YNV0dOxCv2HHjf/j5xpXNRyAbI2rnkiENJI0cu3zLCPYEufHoT5BhSAeXgtsEtKePHycCfvwLB8hmXZzYXlYX3Yobgssa2KFwL0yx/skVhnxOu3wKLUvzSrCGia6g83TfWjKlJCixMGAPaVdHhQRNTfdh19D2db2mRr/f60XfDCcw+FwVZarM906fd0x+ft1q8JKN32TnIWv0GFUW0Q87iHIeIQIDAQAB",

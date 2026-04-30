@@ -10,6 +10,7 @@ are thrown when rejecting the promise
 */
 
 import superjson from "superjson";
+import { Debug } from "./debug";
 import {
   Broadcast,
   Configurator,
@@ -43,7 +44,7 @@ export type Promises = Map<Nonce, PendingRequest>;
 const PROMISES: Promises = new Map();
 const HEARTBEAT_INTERVAL = 5_000;
 const HEARTBEAT_RETRY = 1_000;
-const REQUEST_TIMEOUT = 15_000;
+const REQUEST_TIMEOUT = 5 * 60_000;
 let HEARTBEAT_STARTED = false;
 
 let CONFIGURATOR: Option<Configurator> = None;
@@ -63,6 +64,12 @@ function rejectPending(id: Nonce, reason: unknown) {
   PROMISES.delete(id);
   clearTimeout(pending.timeoutId);
 
+  Debug.record("provider", "request-rejected-local", {
+    id,
+    method: pending.method,
+    provider: pending.provider,
+    reason: reason instanceof Error ? reason.message : String(reason),
+  });
   // console.error(
   //   `Rejecting pending request ${pendingLabel(pending)} ::`,
   //   reason,
@@ -72,10 +79,21 @@ function rejectPending(id: Nonce, reason: unknown) {
 
 async function sendToExtension(request: Request) {
   const requestJson: string = superjson.stringify(request ?? null);
+  Debug.record("content", "runtime-message-send", {
+    id: request.header.id,
+    method: request.method,
+    provider: request.header.provider,
+  });
   return browser.runtime
     .sendMessage(requestJson)
     .then((responseJson) => relayResponse(responseJson))
     .catch((error) => {
+      Debug.record("content", "runtime-message-failed", {
+        error: error instanceof Error ? error.message : String(error),
+        id: request.header.id,
+        method: request.method,
+        provider: request.header.provider,
+      });
       console.error(
         `Extension message failed for ${requestLabel(request)}:`,
         error,
@@ -140,9 +158,21 @@ export function request(
   const request = Request.new(provider, method, params);
   const id = request.header.id;
   const timeoutId = window.setTimeout(() => {
+    Debug.record("provider", "request-timeout", {
+      id,
+      method,
+      provider,
+      timeoutMs: REQUEST_TIMEOUT,
+    });
     rejectPending(id, new Error(`Request timed out: ${provider} ${method}`));
   }, REQUEST_TIMEOUT);
   PROMISES.set(id, { id, provider, method, resolve, reject, timeoutId });
+  Debug.record("provider", "request-created", {
+    id,
+    method,
+    provider,
+    timeoutMs: REQUEST_TIMEOUT,
+  });
   const log = `▶️ ${provider} :: ${id} :: ${method}`;
   // console.log(`❓ ${provider} :: ${id} :: ${method} ::`, params);
   if (params) {
@@ -179,6 +209,7 @@ export function relayRequest(event: MessageEvent<Request>) {
 
 function relayResponse(responseJson: Option<string>) {
   if (!responseJson) {
+    Debug.record("content", "runtime-message-empty-response");
     // console.error("Empty extension response");
     return;
   }
@@ -189,13 +220,23 @@ function relayResponse(responseJson: Option<string>) {
 
     // checks
     if (!response || response.kind !== "cordial:extension:response") {
+      Debug.record("content", "runtime-message-invalid-response");
       // console.error("Invalid extension response", response);
       return;
     }
 
     // relay
+    Debug.record("content", "provider-response-posted", {
+      id: response.header.id,
+      method: response.method,
+      ok: response.result.ok,
+      provider: response.header.provider,
+    });
     window.postMessage(response);
   } catch (error) {
+    Debug.record("content", "runtime-message-parse-failed", {
+      error: error instanceof Error ? error.message : String(error),
+    });
     console.error("Failed to parse extension response:", error);
   }
 }
@@ -232,6 +273,11 @@ export function response(response: Response) {
   // console.log("  provider 👈 relay ::", response);
   const request = PROMISES.get(id);
   if (!request) {
+    Debug.record("provider", "response-without-pending-request", {
+      id,
+      method: response.method,
+      provider,
+    });
     console.error("No such request for", id);
     return;
   }
@@ -241,10 +287,34 @@ export function response(response: Response) {
   // const log = `✍ ${provider} :: ${id} :: ${response.method} ::`;
   const log = `⬅️ ${provider} :: ${id} :: ${response.method} ::`;
   if (result.ok) {
+    Debug.record("provider", "request-resolved", {
+      id,
+      method: response.method,
+      provider,
+    });
     console.log(log, result.value);
     request.resolve(result.value);
   } else {
+    Debug.record("provider", "request-rejected", {
+      error: result.error,
+      id,
+      method: response.method,
+      provider,
+    });
     console.error(log, result.error);
+    if (
+      typeof result.error === "object" &&
+      result.error !== null &&
+      "code" in result.error &&
+      result.error.code === 4001
+    ) {
+      console.info("[cordial-extension:relay] rejecting provider request", {
+        id,
+        provider,
+        method: response.method,
+        error: result.error,
+      });
+    }
     request.reject(result.error);
   }
 }

@@ -1,4 +1,5 @@
 import { Config } from "./config";
+import { Debug } from "./debug";
 import { Login } from "./login";
 import { Error, Result } from "./sdk";
 import { Broadcast, Err, None, Ok, Option, Request, Response } from "./types";
@@ -82,12 +83,25 @@ export function onMessage(
   const request: Request = superjson.parse(requestJson ?? null);
   // console.log("request:", request);
   if (!request || request.kind !== "cordial:provider:request") return;
+  Debug.record("background", "provider-request-received", {
+    id: request.header.id,
+    method: request.method,
+    origin: sender.origin,
+    provider: request.header.provider,
+    tabId: sender.tab?.id,
+  });
 
   // Bit weird.. if handleRequest is async, then the responder doesn't work
   // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/onMessage#sending_an_asynchronous_response_using_sendresponse
   //
   // Seems with Chrome 144 (out January 7, 2026), should be able to use async/await normally.
   handle(request, sender).then((response) => {
+    Debug.record("background", "provider-response-ready", {
+      id: request.header.id,
+      method: request.method,
+      ok: response.result.ok,
+      provider: request.header.provider,
+    });
     const responseJson = superjson.stringify(response ?? null);
     respond(responseJson);
   });
