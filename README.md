@@ -18,3 +18,10 @@ Environment variables are loaded via Vite/WXT (`.env`, with `.env.local` overrid
 - `VITE_MAINNET_ONLY`
   Restricts extension behavior to mainnet-only mode when truthy.
   Default: `false`
+
+## Releasing
+
+- bump version in `package.json`
+- run `just zip` and `just tag`
+- publish `.output/cordial-treasury-browser-wallet-extension-{{ version }}-chrome.zip` on Chrome Web Store
+- turn the tag into a release on <https://github.com/cordialsys/extension/releases/new>, uploading the ZIP file (use the release notes generator)

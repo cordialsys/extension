@@ -1,9 +1,14 @@
+version := `pnpm ls --long|rg cordial|sed -E 's/^.*@([0-9]+\.[0-9]+\.[0-9]+).*$/\1/'`
+
 # company-owned devices have locked down extensions
 dev:
 	pnpm run dev
 
 build:
 	pnpm run build
+
+version:
+	echo {{ version }}
 
 zip:
 	pnpm run zip
@@ -46,3 +51,11 @@ setup-arch: pnpm-install
 pnpm-install:
 	pnpm -v
 	pnpm install
+
+tag version=version:
+	git tag -a v{{ version }} -m'v{{ version }}'
+	git push origin v{{ version }}
+
+untag version=version:
+	git tag -d v{{ version }}
+	git push origin --delete v{{ version }}
