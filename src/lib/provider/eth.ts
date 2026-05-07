@@ -5,6 +5,13 @@ import { Eth, None, Option } from "@/lib/types";
 type Config = Eth.Config;
 let CONFIG: Option<Config> = None;
 
+interface ConfigureOptions {
+  // Re-announce the provider and re-emit chain/account events even when the
+  // wallet config is unchanged. This helps SPAs recover if they missed the
+  // initial EIP-6963 announcement or mounted listeners after route changes.
+  force?: boolean;
+}
+
 const INFO: Eth.Info = {
   uuid: "db69fd17-3a07-453d-92c9-e51a6027de1d",
   name: "Cordial Wallet (ETH)",
@@ -22,9 +29,9 @@ export class Ethereum extends EventEmitter implements Eth.Provider {
   }
 
   // manually trigger a reconfiguration, returning the config that was used
-  async reconfigure(): Promise<Option<Config>> {
+  async reconfigure(options: ConfigureOptions = {}): Promise<Option<Config>> {
     const config = await requestConfig();
-    await this.configure(config);
+    await this.configure(config, options);
     return config;
   }
 
@@ -35,12 +42,12 @@ export class Ethereum extends EventEmitter implements Eth.Provider {
   // https://eips.ethereum.org/EIPS/eip-2786
   // https://eips.ethereum.org/EIPS/eip-6963
   // https://docs.metamask.io/wallet/reference/provider-api
-  async configure(config: Option<Config>) {
+  async configure(config: Option<Config>, options: ConfigureOptions = {}) {
     // console.log("ETH provider received config", config);
 
     try {
       if (!!config && !CONFIG) await this._start(config);
-      if (!!config && !!CONFIG) await this._update(config);
+      if (!!config && !!CONFIG) await this._update(config, options);
       if (!config && !!CONFIG) await this._stop();
     } catch (error) {
       console.error(`Ethereum provider configuration error: ${error}`);
@@ -74,9 +81,18 @@ export class Ethereum extends EventEmitter implements Eth.Provider {
   }
 
   // allowed to throw
-  async _update(config: Config) {
-    if (JSON.stringify(config) === JSON.stringify(CONFIG)) return;
-    console.log("Updating Cordial Ethereum Provider to", config);
+  async _update(config: Config, options: ConfigureOptions = {}) {
+    // Normal extension broadcasts are ignored when config is unchanged. Forced
+    // updates are explicit resyncs for dapps that have dropped local state.
+    if (!options.force && JSON.stringify(config) === JSON.stringify(CONFIG))
+      return;
+    console.log(
+      options.force
+        ? "Resyncing Cordial Ethereum Provider to"
+        : "Updating Cordial Ethereum Provider to",
+      config,
+    );
+    this.announce();
     this.emit("chainChanged", config.id);
     this.emit("accountsChanged", Array.from(config.addresses));
   }

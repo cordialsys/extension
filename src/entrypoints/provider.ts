@@ -33,28 +33,51 @@ export default defineUnlistedScript(() => {
   // and only look at `window.ethereum` for the EVM provider.
   (window as unknown as { ethereum: unknown }).ethereum = eth;
 
+  // Some dapps like to disconnect after page changes, so giving it some "kicks"
+  // preemptively can help to keep it connected.
+  //
   // Focus events alone can be missed depending on tab/window transitions.
-  // Ping on multiple resume signals and throttle duplicate bursts.
-  const PING_THROTTLE_MS = 500;
-  let lastPingAt = 0;
+  // Resync on multiple resume signals and retry after short delays for dapps
+  // that mount wallet listeners after the provider script starts.
+  const RESYNC_BURST_THROTTLE_MS = 500;
+  const RESYNC_RETRY_DELAYS_MS = [250, 1000, 2000, 4000] as const;
+  let lastResyncBurstAt = 0;
+  let resyncRetryTimers: number[] = [];
 
-  const ping = () => {
+  const resync = () => {
     void Relay.ping().catch((error) => {
       console.error("Provider ping failed:", error);
     });
+    void eth.reconfigure({ force: true }).catch((error) => {
+      console.error("Ethereum provider resync failed:", error);
+    });
   };
 
-  const pingIfReady = () => {
+  const scheduleResyncBurst = () => {
     const now = Date.now();
-    if (now - lastPingAt < PING_THROTTLE_MS) return;
-    lastPingAt = now;
-    ping();
+    if (now - lastResyncBurstAt < RESYNC_BURST_THROTTLE_MS) return;
+    lastResyncBurstAt = now;
+
+    for (const timer of resyncRetryTimers) window.clearTimeout(timer);
+    resyncRetryTimers = RESYNC_RETRY_DELAYS_MS.map((delay) =>
+      window.setTimeout(resync, delay),
+    );
+
+    resync();
   };
 
-  pingIfReady();
-  window.addEventListener("focus", pingIfReady);
-  window.addEventListener("pageshow", pingIfReady);
+  scheduleResyncBurst();
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", scheduleResyncBurst, {
+      once: true,
+    });
+    window.addEventListener("load", scheduleResyncBurst, { once: true });
+  }
+
+  window.addEventListener("focus", scheduleResyncBurst);
+  window.addEventListener("pageshow", scheduleResyncBurst);
   document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "visible") pingIfReady();
+    if (document.visibilityState === "visible") scheduleResyncBurst();
   });
 });
