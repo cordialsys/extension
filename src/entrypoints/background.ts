@@ -78,9 +78,26 @@ function onTabCreated(tab: globalThis.Browser.tabs.Tab) {
 function onRuntimeMessage(
   message: unknown,
   sender: globalThis.Browser.runtime.MessageSender,
-  respond: (response: string) => void,
+  respond: (response: unknown) => void,
 ) {
   const kind = getRuntimeMessageKind(message);
+
+  if (kind === "cordial:sidepanel:get-navigation") {
+    const parsed = parseRuntimeMessage(message);
+    const tabId =
+      typeof parsed === "object" &&
+      parsed !== null &&
+      "tabId" in parsed &&
+      typeof parsed.tabId === "number"
+        ? parsed.tabId
+        : undefined;
+    Debug.record("background", "sidepanel-get-navigation", {
+      senderUrl: sender.url,
+      tabId,
+    });
+    respond(tabId === undefined ? null : SidePanel.getPendingNavigation(tabId));
+    return true;
+  }
 
   if (kind === "cordial:extension:config-updated") {
     Debug.record("background", "config-updated", {
