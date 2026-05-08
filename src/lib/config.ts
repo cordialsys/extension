@@ -3,7 +3,7 @@ import { Login } from "./login";
 import { Sdk } from "./sdk";
 import * as A from "./sdk/admin";
 import { None, Option } from "./types";
-import { evm, svm } from "./handler";
+import { evm, Port, svm } from "./handler";
 
 let REVISION: Option<string> = None;
 let CONFIG: Option<Config> = None;
@@ -136,6 +136,11 @@ export const Config = {
   },
 
   async propagate(config: Option<Config>) {
+    const previous = CONFIG;
+    const removedOrigins =
+      previous?.origins.filter((origin) => !config?.origins.includes(origin)) ??
+      [];
+
     if (config) {
       const api = Config.matchPattern(config.treasury.url);
       const has = await browser.permissions.contains({ origins: [api] });
@@ -148,6 +153,10 @@ export const Config = {
     await evm.propagate(None, config);
     await svm.propagate(config);
     await Config.refreshAppearanceForVisibleTabs();
+
+    if (removedOrigins.length) {
+      await Port.promptAddOriginForConnectedTabs(removedOrigins);
+    }
   },
 
   onNotificationButtonClicked(notificationId: string, buttonIndex: number) {

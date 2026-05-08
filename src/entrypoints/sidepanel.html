@@ -60,12 +60,19 @@
     <script type="module">
       const ui = "%VITE_UI%";
       const uiOrigin = new URL(ui).origin;
+      const iframeSrc = `${ui}defi?defi=fullscreen`;
+      const ownTabIdValue = Number(
+        new URLSearchParams(window.location.search).get("tabId"),
+      );
+      const ownTabId = Number.isSafeInteger(ownTabIdValue)
+        ? ownTabIdValue
+        : null;
       const navigateRetryDelays = [0, 150, 500, 1000, 2000, 4000];
-      let pendingNavigateSearch = null;
+      let pendingNavigateContext = null;
       let navigateRetryTimers = [];
 
-      function proposalFromSearch(search) {
-        return search.get("proposal");
+      function proposalFromContext(context) {
+        return context?.proposalName;
       }
 
       function clearNavigateRetryTimers() {
@@ -75,20 +82,38 @@
         navigateRetryTimers = [];
       }
 
-      function contextFromSearch(search) {
-        const proposal = search.get("proposal");
-        const addExtensionOrigin = search.get("add-extension-origin");
+      function hasNavigationPayload(context) {
+        return !!(
+          context?.addExtensionOrigin ||
+          context?.proposalName ||
+          context?.treasuryId
+        );
+      }
+
+      function normalizeNavigationContext(value) {
+        if (
+          typeof value !== "object" ||
+          value === null ||
+          value.kind !== "cordial:defi:navigate-context"
+        ) {
+          return null;
+        }
+
         const context = {
           kind: "cordial:defi:navigate-context",
         };
 
-        if (proposal) {
-          context.proposalName = proposal;
+        if (typeof value.proposalName === "string") {
+          context.proposalName = value.proposalName;
         }
 
-        if (addExtensionOrigin) {
+        if (typeof value.treasuryId === "string") {
+          context.treasuryId = value.treasuryId;
+        }
+
+        if (typeof value.addExtensionOrigin === "string") {
           try {
-            const parsed = new URL(addExtensionOrigin);
+            const parsed = new URL(value.addExtensionOrigin);
             if (parsed.protocol === "http:" || parsed.protocol === "https:") {
               context.addExtensionOrigin = parsed.origin;
             }
@@ -100,79 +125,119 @@
         return context;
       }
 
-      function iframeSrcFromSearch(search) {
-        const proposal = search.get("proposal");
-        const treasury = search.get("t");
-        const addExtensionOrigin = search.get("add-extension-origin");
-
-        let iframeSrc = `${ui}defi`;
-        if (proposal) {
-          const defiSearch = new URLSearchParams();
-          defiSearch.set("proposal", proposal);
-          if (treasury) {
-            defiSearch.set("t", treasury);
-          }
-          iframeSrc = `${ui}defi?${defiSearch.toString()}`;
-        } else if (addExtensionOrigin) {
-          try {
-            const parsed = new URL(addExtensionOrigin);
-            if (parsed.protocol === "http:" || parsed.protocol === "https:") {
-              iframeSrc = `${ui}defi?add-extension-origin=${encodeURIComponent(parsed.origin)}`;
-            }
-          } catch {
-            // Ignore invalid add-origin hints and keep default panel route.
-          }
-        }
-
-        return iframeSrc;
-      }
-
-      function postNavigateContext(search) {
+      function postNavigateContext(context) {
         const iframe = document.getElementById("treasury-ui");
         if (!(iframe instanceof HTMLIFrameElement) || !iframe.contentWindow) {
           return false;
         }
 
-        console.info("[cordial-extension:sidepanel] post-navigate-context", {
-          proposalName: proposalFromSearch(search),
-        });
-        iframe.contentWindow.postMessage(contextFromSearch(search), uiOrigin);
+        console.info(
+          "[cordial-extension:sidepanel] post-navigate-context",
+          context,
+        );
+        iframe.contentWindow.postMessage(context, uiOrigin);
         return true;
       }
 
-      function scheduleNavigateContext(search) {
-        pendingNavigateSearch = new URLSearchParams(search);
+      function scheduleNavigateContext(context) {
+        pendingNavigateContext = hasNavigationPayload(context) ? context : null;
         clearNavigateRetryTimers();
+
+        if (!pendingNavigateContext) {
+          return;
+        }
 
         for (const delay of navigateRetryDelays) {
           const timer = window.setTimeout(() => {
-            if (!pendingNavigateSearch) {
+            if (!pendingNavigateContext) {
               return;
             }
-            postNavigateContext(pendingNavigateSearch);
+            postNavigateContext(pendingNavigateContext);
           }, delay);
           navigateRetryTimers.push(timer);
         }
       }
 
-      function navigateFromSearch(search) {
+      function navigateToDefi() {
         const iframe = document.getElementById("treasury-ui");
         if (iframe instanceof HTMLIFrameElement) {
-          iframe.src = iframeSrcFromSearch(search);
+          iframe.src = iframeSrc;
+        }
+      }
+
+      function isNavigationForCurrentTab(message) {
+        if (typeof message.tabId !== "number") {
+          return true;
+        }
+
+        return ownTabId === message.tabId;
+      }
+
+      async function handleNavigateMessage(message) {
+        if (!isNavigationForCurrentTab(message)) {
+          console.info("[cordial-extension:sidepanel] ignored-navigate", {
+            ownTabId,
+            tabId: message.tabId,
+          });
+          return;
+        }
+
+        const context = normalizeNavigationContext(message.context);
+        if (!context) {
+          return;
+        }
+
+        console.info("[cordial-extension:sidepanel] navigate", {
+          proposalName: proposalFromContext(context),
+          tabId: message.tabId,
+        });
+        if (postNavigateContext(context)) {
+          scheduleNavigateContext(context);
+        } else {
+          navigateToDefi();
+          scheduleNavigateContext(context);
+        }
+      }
+
+      async function loadPendingNavigation() {
+        if (ownTabId === null) {
+          return;
+        }
+
+        const context = await browser.runtime
+          .sendMessage({
+            kind: "cordial:sidepanel:get-navigation",
+            tabId: ownTabId,
+          })
+          .then(normalizeNavigationContext)
+          .catch((error) => {
+            console.info(
+              "[cordial-extension:sidepanel] get-navigation-failed",
+              {
+                error: error instanceof Error ? error.message : String(error),
+                tabId: ownTabId,
+              },
+            );
+            return null;
+          });
+
+        if (context) {
+          scheduleNavigateContext(context);
         }
       }
 
       const iframe = document.getElementById("treasury-ui");
       if (iframe instanceof HTMLIFrameElement) {
         iframe.addEventListener("load", () => {
-          if (!pendingNavigateSearch) {
+          if (!pendingNavigateContext) {
             return;
           }
-          postNavigateContext(pendingNavigateSearch);
+          postNavigateContext(pendingNavigateContext);
         });
       }
 
-      navigateFromSearch(new URLSearchParams(window.location.search));
+      navigateToDefi();
+      void loadPendingNavigation();
 
       window.addEventListener("message", (event) => {
         if (event.origin !== uiOrigin) {
@@ -180,6 +245,17 @@
         }
 
         if (!event.data) {
+          return;
+        }
+
+        if (event.data.kind === "cordial:defi:get-navigate-context") {
+          console.info("[cordial-extension:sidepanel] get-navigate-context", {
+            hasPendingContext: !!pendingNavigateContext,
+            ownTabId,
+          });
+          if (pendingNavigateContext) {
+            postNavigateContext(pendingNavigateContext);
+          }
           return;
         }
 
@@ -206,7 +282,8 @@
         }
 
         if (message.kind === "cordial:sidepanel:login-complete") {
-          navigateFromSearch(new URLSearchParams(window.location.search));
+          navigateToDefi();
+          void loadPendingNavigation();
           return;
         }
 
@@ -214,21 +291,7 @@
           return;
         }
 
-        const rawSearch =
-          typeof message.search === "string" ? message.search : "";
-        const cleanSearch = rawSearch.startsWith("?")
-          ? rawSearch.slice(1)
-          : rawSearch;
-        const search = new URLSearchParams(cleanSearch);
-        console.info("[cordial-extension:sidepanel] navigate", {
-          proposalName: proposalFromSearch(search),
-        });
-        if (postNavigateContext(search)) {
-          scheduleNavigateContext(search);
-        } else {
-          navigateFromSearch(search);
-          scheduleNavigateContext(search);
-        }
+        void handleNavigateMessage(message);
       });
     </script>
   </body>
