@@ -2,6 +2,7 @@ import { Config } from "./config";
 import { Debug } from "./debug";
 import { Login } from "./login";
 import { Error, Result } from "./sdk";
+import { SidePanel } from "./sidepanel";
 import { Broadcast, Err, None, Ok, Option, Request, Response } from "./types";
 
 import * as evm from "./handler/evm";
@@ -67,6 +68,23 @@ export const Port = {
         console.log("Tab", id, "disconnected");
         delete PORTS[id];
       }
+    }
+  },
+
+  async promptAddOriginForConnectedTabs(origins: string[]) {
+    const originSet = new Set(origins);
+
+    for (const id in PORTS) {
+      const port = PORTS[id];
+      const origin = port.sender?.origin;
+      const tabId = port.sender?.tab?.id ?? Number(id);
+      if (!origin || !originSet.has(origin) || Number.isNaN(tabId)) continue;
+      if (Config.allowed(origin)) continue;
+
+      await SidePanel.setNavigation(
+        tabId,
+        SidePanel.addExtensionOriginNavigation(origin),
+      );
     }
   },
 

@@ -19,7 +19,7 @@ async function openSidePanel(tabId: number) {
   const setOptions = browser.sidePanel
     .setOptions({
       tabId,
-      path: SidePanel.defaultPath(),
+      path: SidePanel.defaultPath(tabId),
       enabled: true,
     })
     .catch((error) => {
@@ -65,14 +65,17 @@ export async function onClicked(tab: globalThis.Browser.tabs.Tab) {
 
   const origin = parseOrigin(tab.url);
   if (!origin) {
-    await SidePanel.setPath(tab.id, SidePanel.defaultPath());
+    await SidePanel.setNavigation(tab.id, SidePanel.defaultNavigation());
     return;
   }
 
   if (!Config.allowed(origin)) {
-    await SidePanel.setPath(tab.id, SidePanel.addExtensionOriginPath(origin));
+    await SidePanel.setNavigation(
+      tab.id,
+      SidePanel.addExtensionOriginNavigation(origin),
+    );
     return;
   }
 
-  await SidePanel.setPath(tab.id, SidePanel.defaultPath());
+  await SidePanel.setNavigation(tab.id, SidePanel.defaultNavigation());
 }
